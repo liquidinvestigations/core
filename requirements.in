@@ -1,2 +1,4 @@
 pip-tools
 Django
+django-oauth-toolkit
+django-cors-middleware
