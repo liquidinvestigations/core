@@ -1,5 +1,13 @@
-<!doctype html>
-<meta charset="utf-8">
-<body>
+{% extends "base.html" %}
 
+{% block content %}
 <h1>Liquid Investigations</h1>
+
+{% if request.user.is_authenticated %}
+  {{ request.user }}
+  <a href="/accounts/logout/?next=/">[logout]</a>
+{% else %}
+  <a href="/accounts/login/">[login]</a>
+{% endif %}
+
+{% endblock %}

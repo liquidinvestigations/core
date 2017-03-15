@@ -1,0 +1,13 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>hoover</title>
+{% load static %}
+<link rel="stylesheet" href="{% static "search/bootstrap.css" %}">
+{% block headstyles %}{% endblock %}
+<body>
+
+<div class="container">
+{% block content %}{% endblock %}
+</div>
+
+{% block scripts %}{% endblock %}
