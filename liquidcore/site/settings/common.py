@@ -13,7 +13,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'oauth2_provider',
     'corsheaders',
-    'liquidcore.home',
+    'liquidcore.home.apps.HomeConfig',
 ]
 
 MIDDLEWARE = [
