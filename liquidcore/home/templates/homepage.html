@@ -3,11 +3,16 @@
 {% block content %}
 <h1>Liquid Investigations</h1>
 
-{% if request.user.is_authenticated %}
-  {{ request.user }}
-  <a href="/accounts/logout/?next=/">[logout]</a>
-{% else %}
-  <a href="/accounts/login/">[login]</a>
-{% endif %}
+<p>
+  {% if request.user.is_authenticated %}
+    {{ request.user }}
+    <a href="/accounts/logout/?next=/">[logout]</a>
+    {% if request.user.is_staff %}
+      <a href="/admin/">[admin]</a>
+    {% endif %}
+  {% else %}
+    <a href="/accounts/login/">[login]</a>
+  {% endif %}
+</p>
 
 {% endblock %}
