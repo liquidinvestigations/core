@@ -13,3 +13,4 @@ first==2.0.1              # via pip-tools
 oauthlib==2.0.1           # via django-oauth-toolkit
 pip-tools==1.8.0
 six==1.10.0               # via django-oauth-toolkit, pip-tools
+waitress==1.0.2
