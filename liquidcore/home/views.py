@@ -5,6 +5,7 @@ from django.conf import settings
 def homepage(request):
     return render(request, 'homepage.html', {
         'hypothesis_app_url': settings.HYPOTHESIS_APP_URL,
+        'hoover_app_url': settings.HOOVER_APP_URL,
     })
 
 def profile(request):
