@@ -27,4 +27,13 @@
 </p>
 {% endif %}
 
+
+{% if request.user.is_authenticated %}
+<ul>
+  {% for hostname in node_hostnames %}
+    <li><a href='http://{{ hostname }}'>{{ hostname }}</a></li>
+  {% endfor %}
+</ul>
+{% endif %}
+
 {% endblock %}
