@@ -6,3 +6,5 @@ class HomeConfig(AppConfig):
 
     def ready(self):
         from . import signals
+        from . import discovery
+
