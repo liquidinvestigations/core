@@ -6,7 +6,11 @@ from django.conf import settings
 nodes = {}
 
 def get_data_from_info(info):
-    hostname = str(info.properties[b'liquid_hostname'])
+    properties = {
+            str(key): str(info.properties[key])
+            for key in info.properties
+    }
+    hostname = properties['liquid_hostname']
     return {
         "type": info.type,
         "server": info.server,
@@ -16,7 +20,7 @@ def get_data_from_info(info):
         "address": ".".join(str(x) for x in info.address),
         "name": info.name,
         "port": info.port,
-        "properties": info.properties,
+        "properties": properties,
         "discovered_at": datetime.now().isoformat()
     }
 
