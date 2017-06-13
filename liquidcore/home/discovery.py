@@ -5,13 +5,16 @@ from django.conf import settings
 
 nodes = {}
 
-def get_data_from_info(info):
-    properties = {
-            str(key): str(info.properties[key])
-            for key in info.properties
-    }
-    hostname = properties['liquid_hostname']
+def dict_string(data):
     return {
+            str(key): str(data[key])
+            for key in data
+    }
+
+def get_data_from_info(info):
+    properties = dict_string(info.properties)
+    hostname = properties['liquid_hostname']
+    data = {
         "type": info.type,
         "server": info.server,
         "hostname": hostname,
@@ -23,11 +26,12 @@ def get_data_from_info(info):
         "properties": properties,
         "discovered_at": datetime.now().isoformat()
     }
+    return dict_string(data)
 
 class WorkstationListener(object):
     def add_service(self, zeroconf, type_, name):
         info = zeroconf.get_service_info(type_, name, 10000)
-        if info and b'liquid_hostname' in info.properties:
+        if info and 'liquid_hostname' in dict_string(info.properties):
             nodes[name] = get_data_from_info(info)
 
     def remove_service(self, zeroconf, type_, name):
