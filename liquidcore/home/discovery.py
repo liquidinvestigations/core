@@ -6,10 +6,12 @@ from django.conf import settings
 nodes = {}
 
 def get_data_from_info(info):
+    hostname = str(info.properties[b'liquid_hostname'])
     return {
         "type": info.type,
         "server": info.server,
-        "hostname": info.properties['liquid_hostname'],
+        "hostname": hostname,
+        "local": hostname == settings.LIQUID_DOMAIN,
         "name": info.name,
         "address": ".".join(str(x) for x in info.address),
         "name": info.name,
@@ -21,12 +23,8 @@ def get_data_from_info(info):
 class WorkstationListener(object):
     def add_service(self, zeroconf, type_, name):
         info = zeroconf.get_service_info(type_, name, 10000)
-        print("added: ", name, type_, info)
-        if info and 'liquid_hostname' in info.properties:
+        if info and b'liquid_hostname' in info.properties:
             nodes[name] = get_data_from_info(info)
-
-    def update_record(self, zeroconf, type_, record):
-        print("updated: ", record)
 
     def remove_service(self, zeroconf, type_, name):
         info = zeroconf.get_service_info(type_, name)
@@ -53,7 +51,6 @@ def start():
     service_desc = { "liquid_hostname" : service_hostname }
     service_ip = socket.inet_aton("127.0.0.1")
     service_port = 80
-    print("registering:", service_hostname, service_name, service_local_hostname, sep="\n")
     liquid_service = ServiceInfo(
             type_=SERVICE_TYPE,
             name=service_name,
@@ -62,5 +59,4 @@ def start():
             properties=service_desc,
             server=service_local_hostname
     )
-    print("registering ", liquid_service)
     zeroconf.register_service(liquid_service)
