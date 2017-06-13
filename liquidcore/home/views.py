@@ -21,7 +21,4 @@ def profile(request):
     })
 
 def nodes(request):
-    user = request.user
-    if not user.is_authenticated():
-        return HttpResponse('Unauthorized', status=401)
     return JsonResponse(discovery.nodes)
