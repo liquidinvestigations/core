@@ -48,25 +48,7 @@ class WorkstationListener(object):
 
 zeroconf = None
 
-SERVICE_TYPE = "_http._tcp.local."
-
-def register_service():
-    # broadcast our service type
-    service_hostname = settings.LIQUID_DOMAIN
-    service_name = "LI_" + service_hostname.replace(".", "-") + '.' + SERVICE_TYPE
-    service_local_hostname = service_hostname.replace(".", "-") + ".local."
-    service_desc = { "liquid_hostname" : service_hostname }
-    service_ip = socket.inet_aton("127.0.0.1")
-    service_port = 80
-    liquid_service = ServiceInfo(
-            type_=SERVICE_TYPE,
-            name=service_name,
-            address=service_ip,
-            port=service_port,
-            properties=service_desc,
-            server=service_local_hostname
-    )
-    zeroconf.register_service(liquid_service)
+SERVICE_TYPE = "_liquid._tcp.local."
 
 def start():
     global zeroconf
@@ -80,10 +62,3 @@ def start():
 
     # start a browser that listens for our service type
     browser = ServiceBrowser(zeroconf, SERVICE_TYPE, listener)
-
-    # try to register the service
-    try:
-        register_service()
-    except NonUniqueNameException:
-        # The service has already been published
-        pass
