@@ -7,8 +7,9 @@ nodes = {}
 
 def update_dns():
     with open(settings.DNSMASQ_OVERWRITE_CONF, 'w') as conf:
-        for node in nodes:
-            conf.write('server=/{}/{}\n'.format(node['hostname'], node['address']))
+        for node in nodes.values():
+            if not node['local']:
+                conf.write('server=/{}/{}\n'.format(node['hostname'], node['address']))
 
 def dict_decode(data):
     def decode(data):
