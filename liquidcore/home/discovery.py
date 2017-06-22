@@ -5,6 +5,11 @@ from django.conf import settings
 
 nodes = {}
 
+def update_dns():
+    with open(settings.DNSMASQ_OVERWRITE_CONF, 'w') as conf:
+        for node in nodes:
+            conf.write('server=/{}/{}\n'.format(node['hostname'], node['address']))
+
 def dict_decode(data):
     def decode(data):
         if isinstance(data, bytes):
@@ -41,10 +46,12 @@ class WorkstationListener(object):
         properties = dict_decode(info.properties)
         if 'liquid_hostname' in properties:
             nodes[name] = get_data_from_info(info, properties)
+            update_dns()
 
     def remove_service(self, zeroconf, type_, name):
         if name in nodes:
             del nodes[name]
+            update_dns()
 
 zeroconf = None
 
