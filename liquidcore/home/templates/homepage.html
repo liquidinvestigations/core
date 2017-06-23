@@ -27,4 +27,11 @@
 </p>
 {% endif %}
 
+
+<ul>
+  {% for hostname in node_hostnames %}
+    <li><a href='http://{{ hostname }}'>{{ hostname }}</a></li>
+  {% endfor %}
+</ul>
+
 {% endblock %}

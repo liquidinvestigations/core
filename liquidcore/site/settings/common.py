@@ -89,3 +89,5 @@ STATIC_ROOT = str(BASE_DIR / 'static')
 
 HYPOTHESIS_USER_SCRIPTS = None
 HYPOTHESIS_APP_URL = None
+
+DNSMASQ_OVERWRITE_CONF = '/var/liquid/dns/dns.conf'

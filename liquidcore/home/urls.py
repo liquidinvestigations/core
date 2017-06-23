@@ -3,4 +3,5 @@ from . import views
 
 urlpatterns = [
     url(r'^$', views.homepage),
+    url(r'^nodes$', views.nodes),
 ]
