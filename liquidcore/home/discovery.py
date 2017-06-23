@@ -64,6 +64,9 @@ def start():
         # this has been run before
         return
 
+    # initially, wipe the dns config
+    update_dns()
+
     zeroconf = Zeroconf()
     listener = WorkstationListener()
 
