@@ -4,3 +4,4 @@ django-oauth-toolkit
 django-cors-middleware
 waitress
 whitenoise
+requests
