@@ -3,21 +3,26 @@ from django.db.models.signals import post_save, pre_delete
 from django.contrib.auth.models import User
 from django.conf import settings
 
-if settings.HYPOTHESIS_USER_SCRIPTS:
+if settings.INVOKE_HOOK:
+
+    def invoke_hook(name, *args, env={}):
+        subprocess.run([settings.INVOKE_HOOK] + args, check=True)
 
     def create_hypothesis_user(sender, instance, created, **kwargs):
         if created:
-            script = settings.HYPOTHESIS_USER_SCRIPTS['create']
             username = instance.get_username()
             password = instance._password
-            subprocess.check_call([script, username, password])
+            invoke_hook('user-created', username, env={
+                'PASSWORD': password,
+            })
 
         else:
             password = instance._password
             if password is not None:
-                script = settings.HYPOTHESIS_USER_SCRIPTS['passwd']
                 username = instance.get_username()
-                subprocess.check_call([script, username, password])
+                invoke_hook('user-created', username, env={
+                    'PASSWORD': password,
+                })
 
     post_save.connect(
         create_hypothesis_user,
@@ -26,9 +31,8 @@ if settings.HYPOTHESIS_USER_SCRIPTS:
     )
 
     def delete_hypothesis_user(sender, instance, **kwargs):
-        script = settings.HYPOTHESIS_USER_SCRIPTS['delete']
         username = instance.get_username()
-        subprocess.check_call([script, username])
+        invoke_hook('user-deleted', username)
 
     pre_delete.connect(
         delete_hypothesis_user,

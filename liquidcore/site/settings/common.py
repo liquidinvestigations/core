@@ -87,7 +87,7 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATIC_ROOT = str(BASE_DIR / 'static')
 
-HYPOTHESIS_USER_SCRIPTS = None
+INVOKE_HOOK = None
 HYPOTHESIS_APP_URL = None
 
 DISCOVERY_URL = None
