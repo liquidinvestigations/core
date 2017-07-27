@@ -1,3 +1,4 @@
+import os
 import subprocess
 from django.db.models.signals import post_save, pre_delete
 from django.contrib.auth.models import User
@@ -6,9 +7,13 @@ from django.conf import settings
 if settings.INVOKE_HOOK:
 
     def invoke_hook(name, *args, env={}):
-        subprocess.run([settings.INVOKE_HOOK] + args, check=True)
+        subprocess.run(
+            [settings.INVOKE_HOOK, name] + list(args),
+            env=dict(os.environ, **env),
+            check=True,
+        )
 
-    def create_hypothesis_user(sender, instance, created, **kwargs):
+    def on_user_save(sender, instance, created, **kwargs):
         if created:
             username = instance.get_username()
             password = instance._password
@@ -25,17 +30,17 @@ if settings.INVOKE_HOOK:
                 })
 
     post_save.connect(
-        create_hypothesis_user,
+        on_user_save,
         sender=User,
-        dispatch_uid='create_hypothesis_user',
+        dispatch_uid='on_user_save',
     )
 
-    def delete_hypothesis_user(sender, instance, **kwargs):
+    def on_user_delete(sender, instance, **kwargs):
         username = instance.get_username()
         invoke_hook('user-deleted', username)
 
     pre_delete.connect(
-        delete_hypothesis_user,
+        on_user_delete,
         sender=User,
-        dispatch_uid='delete_hypothesis_user',
+        dispatch_uid='on_user_delete',
     )
