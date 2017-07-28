@@ -8,7 +8,7 @@ from django.conf import settings
 
 def invoke_hook(name, *args, env={}):
     subprocess.run(
-        [settings.INVOKE_HOOK, name] + list(args),
+        ['sudo', settings.INVOKE_HOOK, name] + list(args),
         env=dict(os.environ, **env),
         check=True,
     )
