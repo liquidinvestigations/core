@@ -1,4 +1,5 @@
 import os
+import json
 import subprocess
 from django.db.models.signals import post_save, pre_delete
 from django.contrib.auth.models import User
@@ -18,7 +19,9 @@ if settings.INVOKE_HOOK:
             username = instance.get_username()
             password = instance._password
             invoke_hook('user-created', username, env={
-                'PASSWORD': password,
+                'LIQUID_HOOK_DATA': json.dumps({
+                    'password': password,
+                }),
             })
 
         else:
@@ -26,7 +29,9 @@ if settings.INVOKE_HOOK:
             if password is not None:
                 username = instance.get_username()
                 invoke_hook('user-created', username, env={
-                    'PASSWORD': password,
+                    'LIQUID_HOOK_DATA': json.dumps({
+                        'password': password,
+                    }),
                 })
 
     post_save.connect(
