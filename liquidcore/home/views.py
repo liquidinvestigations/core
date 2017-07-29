@@ -19,6 +19,8 @@ def homepage(request):
         'hypothesis_app_url': settings.HYPOTHESIS_APP_URL,
         'hoover_app_url': settings.HOOVER_APP_URL,
         'dokuwiki_app_url': settings.DOKUWIKI_APP_URL,
+        'matrix_app_url': settings.MATRIX_APP_URL,
+        'davros_app_url': settings.DAVROS_APP_URL,
     })
 
 def profile(request):
