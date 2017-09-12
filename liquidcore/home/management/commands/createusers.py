@@ -26,6 +26,7 @@ class Command(BaseCommand):
 
             else:
                 print("Updating user", data['username'])
+                user.set_password(data['password'])
 
             is_admin = bool(data.get('is_admin'))
             user.is_superuser = is_admin
