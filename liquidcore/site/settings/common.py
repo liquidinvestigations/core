@@ -13,7 +13,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'oauth2_provider',
     'corsheaders',
+    'rest_framework',
     'liquidcore.home.apps.HomeConfig',
+    'liquidcore.api',
 ]
 
 MIDDLEWARE = [
@@ -78,6 +80,11 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAdminUser',
+    )
+}
 
 LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'UTC'
