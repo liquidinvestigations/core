@@ -7,3 +7,4 @@ django-cors-middleware
 waitress
 whitenoise
 requests
+pytest-django
