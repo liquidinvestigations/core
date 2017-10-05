@@ -5,7 +5,7 @@ from __future__ import unicode_literals
 from django.db import migrations
 
 def create_service_instances(apps, schema_editor):
-    Service = apps.get_model("api", "Service")
+    Service = apps.get_model("config", "Service")
     service_name_list = [
         'hoover',
         'hypothesis',
@@ -21,7 +21,7 @@ def create_service_instances(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('api', '0001_initial'),
+        ('config', '0001_initial'),
     ]
 
     operations = [

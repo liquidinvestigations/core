@@ -7,10 +7,12 @@ from django.conf import settings
 
 
 def invoke_hook(name, *args, env={}):
+    invoke_line = settings.INVOKE_HOOK + " " + name + " ".join(args)
     subprocess.run(
-        ['sudo', settings.INVOKE_HOOK, name] + list(args),
+        [invoke_line],
         env=dict(os.environ, **env),
         check=True,
+        shell=True,
     )
 
 
