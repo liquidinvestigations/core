@@ -8,7 +8,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('api', '0002_create_service_instances'),
+        ('config', '0002_create_service_instances'),
     ]
 
     operations = [

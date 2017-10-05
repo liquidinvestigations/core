@@ -1,10 +1,12 @@
 from django.conf import settings
 from django.contrib.auth.models import User
+from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny, IsAdminUser
 from rest_framework import viewsets
 from rest_framework.decorators import detail_route, list_route, api_view
 from rest_framework.views import APIView
+from rest_framework import status
 
 from .models import *
 from .permissions import IsAdminOrSelf
@@ -12,8 +14,13 @@ from .serializers import *
 
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
-    serializer_class = UserSerializer
     lookup_field = 'username'
+
+    # don't let the user update the `username` field
+    def get_serializer_class(self):
+        if self.request.method == 'POST':
+            return CreateUserSerializer
+        return UpdateUserSerializer
 
     # @list_route creates an endpoint that doesn't contain the pk.
     # We don't return a list, but that's not a problem.
@@ -90,7 +97,7 @@ class ServiceViewSet(viewsets.ReadOnlyModelViewSet):
         service = self.get_object()
         service.is_enabled = data['is_enabled']
         service.save()
-        # TODO start/stop service only if needed
+        # TODO send start/stop command to system
         return Response(status=status.HTTP_200_OK)
 
 class NodeViewSet(viewsets.ReadOnlyModelViewSet):
@@ -115,9 +122,6 @@ class NodeViewSet(viewsets.ReadOnlyModelViewSet):
         return Response(status=status.HTTP_200_OK)
 
 
-def _get_setting(name):
-    return Setting.objects.get(name=name)
-
 @api_view()
 def network_status(request):
     return Response({})
@@ -127,30 +131,37 @@ class NetworkDomain(APIView):
         return Response({"domain": settings.LIQUID_DOMAIN})
 
     def put(self, request, format=None):
-        # TODO NOT IMPLEMENTED
-        return Response({"detail": "not implemented"},
-                        status=status.HTTP_501_NOT_IMPLEMENTED)
+        serializer = NetworkDomainSerializer(data=request.data)
+        if serializer.is_valid():
+            # TODO send change domain command to system
+            return Response({"detail": "not implemented"},
+                            status=status.HTTP_501_NOT_IMPLEMENTED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-class NetworkLan(APIView):
+class NetworkSettingAPIView(APIView):
     def get(self, request, format=None):
-        lan = _get_setting('network.lan')
-        return Response(lan.data)
+        setting = get_object_or_404(Setting, name=self.setting_name)
+        serializer = self.serializer_class(setting.data)
+        return Response(serializer.data)
 
     def put(self, request, format=None):
-        return Response()
+        serializer = self.serializer_class(data=request.data)
+        if serializer.is_valid():
+            setting, _ = Setting.objects.get_or_create(name=self.setting_name)
+            setting.data = serializer.validated_data
+            setting.save()
+            # TODO send update to system
+            return Response(serializer.validated_data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-class NetworkWan(APIView):
-    def get(self, request, format=None):
-        wan = _get_setting('network.wan')
-        return Response(wan.data)
+class NetworkLan(NetworkSettingAPIView):
+    setting_name = "network.lan"
+    serializer_class = LanSerializer
 
-    def put(self, request, format=None):
-        return Response()
+class NetworkWan(NetworkSettingAPIView):
+    setting_name = "network.wan"
+    serializer_class = WanSerializer
 
-class NetworkSsh(APIView):
-    def get(self, request, format=None):
-        ssh = _get_setting('network.ssh')
-        return Response(ssh.data)
-
-    def put(self, request, format=None):
-        return Response()
+class NetworkSsh(NetworkSettingAPIView):
+    setting_name = "network.ssh"
+    serializer_class = SshSerializer

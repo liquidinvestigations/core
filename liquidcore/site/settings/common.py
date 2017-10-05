@@ -15,7 +15,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'rest_framework',
     'liquidcore.home.apps.HomeConfig',
-    'liquidcore.api',
+    'liquidcore.config',
 ]
 
 MIDDLEWARE = [
