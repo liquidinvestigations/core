@@ -196,3 +196,42 @@ class NetworkSsh(NetworkSettingAPIView):
           "port": 22
         }
     }
+
+class Registration(APIView):
+    def get(self, request, format=None):
+        if Setting.objects.count() > 0:
+            return Response({"detail": "Registration already done!"},
+                            status=status.HTTP_400_BAD_REQUEST)
+        defaults = {
+            "username": "admin",
+            "password": "",
+            "domain": settings.LIQUID_DOMAIN,
+            "lan": NetworkLan.default_data['lan'],
+            "wan": NetworkWan.default_data['wan'],
+            "ssh": NetworkSsh.default_data['ssh'],
+        }
+        return Response(defaults)
+
+    def post(self, request, format=None):
+        if Setting.objects.count() > 0:
+            return Response({"detail": "Registration already done!"},
+                            status=status.HTTP_400_BAD_REQUEST)
+
+        # validate and extract the data
+        serializer = RegistrationSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        data = serializer.validated_data
+        for key in ['wan', 'lan', 'ssh']:
+            setting_name = "network." + key
+            setting = Setting(name=setting_name, data={key: data[key]})
+            setting.save()
+
+        # create initial user
+        User.objects.create_user(
+            username=data['username'],
+            password=data['password'],
+            is_staff=True,
+            is_superuser=True
+        )
+        # TODO send update to system with all data
+        return Response()
