@@ -1,6 +1,5 @@
 from django.conf import settings
 from django.contrib.auth.models import User
-from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny, IsAdminUser
 from rest_framework import viewsets
@@ -140,9 +139,14 @@ class NetworkDomain(APIView):
 
 class NetworkSettingAPIView(APIView):
     def get(self, request, format=None):
-        setting = get_object_or_404(Setting, name=self.setting_name)
-        serializer = self.serializer_class(setting.data)
-        return Response(serializer.data)
+        setting, created = Setting.objects.get_or_create(
+            name=self.setting_name
+        )
+        if created:
+            setting.data = self.default_data
+            setting.save()
+
+        return Response(setting.data)
 
     def put(self, request, format=None):
         serializer = self.serializer_class(data=request.data)
@@ -157,11 +161,38 @@ class NetworkSettingAPIView(APIView):
 class NetworkLan(NetworkSettingAPIView):
     setting_name = "network.lan"
     serializer_class = LanSerializer
+    default_data = {
+        "lan": {
+          "ip": "10.0.0.1",
+          "netmask": "255.255.255.0",
+          "dhcp_range": "10.0.0.100-255",
+          "hotspot": {
+            "ssid": "",
+            "password": ""
+          },
+          "eth": False
+        }
+    }
 
 class NetworkWan(NetworkSettingAPIView):
     setting_name = "network.wan"
     serializer_class = WanSerializer
+    default_data = {
+        "wan": {
+          "wifi": {
+            "ssid": "",
+            "password": ""
+          }
+        }
+    }
 
 class NetworkSsh(NetworkSettingAPIView):
     setting_name = "network.ssh"
     serializer_class = SshSerializer
+    default_data = {
+        "ssh": {
+          "enabled": False,
+          "authorized_keys": [],
+          "port": 22
+        }
+    }
