@@ -36,7 +36,7 @@ class UserViewSet(viewsets.ModelViewSet):
         if not username:
             return Response({"is_authenticated": False})
         queryset = User.objects.get(username=username)
-        data = UserSerializer(queryset, context={'request':request}).data
+        data = UpdateUserSerializer(queryset, context={'request':request}).data
         data["is_authenticated"] = True
         return Response(data)
 
