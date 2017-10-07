@@ -2,6 +2,15 @@ import json
 from django.conf import settings
 from django.db import models
 
+SERVICE_URLS = {
+    'hoover': settings.HOOVER_APP_URL,
+    'hypothesis': settings.HYPOTHESIS_APP_URL,
+    'dokuwiki': settings.DOKUWIKI_APP_URL,
+    'matrix': settings.MATRIX_APP_URL,
+    'davros': settings.DAVROS_APP_URL,
+}
+
+
 class Service(models.Model):
     name = models.CharField(max_length=30, primary_key=True)
     is_enabled = models.BooleanField()
@@ -11,7 +20,7 @@ class Service(models.Model):
 
     @property
     def url(self):
-        return self.name + "." + settings.LIQUID_DOMAIN
+        return SERVICE_URLS.get(self.name)
 
 
 class Setting(models.Model):
