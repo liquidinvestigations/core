@@ -7,7 +7,7 @@ from .models import *
 def valid_username(username):
     if not username:
         raise serializers.ValidationError("empty username")
-    if not bool(re.match(r"^(\w|\.)+$", hostname)):
+    if not bool(re.match(r"^(\w|\.)+$", username)):
         raise serializers.ValidationError("username can only contain letters, digits, underscore and dot")
     if len(username) > 64:
         raise serializers.ValidationError("username too long")
@@ -19,7 +19,7 @@ def valid_password(password):
     return password
 
 def valid_domain(domain):
-    if not bool(re.match(r"^((\w|-)+\.)+(\w+)$", hostname)):
+    if not bool(re.match(r"^((\w|-)+\.)+(\w+)$", domain)):
         raise serializers.ValidationError("invalid hostname")
     return domain
 
@@ -74,11 +74,6 @@ class NodeSerializer(serializers.ModelSerializer):
 class NodeTrustedSerializer(serializers.Serializer):
     is_trusted = serializers.BooleanField()
 
-class InitialRegistrationSerializer(serializers.Serializer):
-    username = serializers.CharField(validators=[valid_username])
-    password = serializers.CharField(validators=[valid_password])
-    domain = serializers.CharField(validators=[valid_domain])
-
 class NetworkDomainSerializer(serializers.Serializer):
     domain = serializers.CharField(validators=[valid_domain])
 
@@ -119,3 +114,11 @@ class SshSerializer(serializers.Serializer):
         authorized_keys = Key(many=True)
 
     ssh = Ssh()
+
+class RegistrationSerializer(serializers.Serializer):
+    username = serializers.CharField(validators=[valid_username])
+    password = serializers.CharField(validators=[valid_password])
+    domain = serializers.CharField(validators=[valid_domain])
+    lan = LanSerializer.Lan()
+    wan = WanSerializer.Wan()
+    ssh = SshSerializer.Ssh()
