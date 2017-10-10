@@ -43,9 +43,8 @@ class UserViewSet(viewsets.ModelViewSet):
     @detail_route(
         methods=['put'],
         permission_classes=[IsAdminUser],
-        url_name='active'
     )
-    def set_active(self, request, pk=None):
+    def active(self, request, username=None):
         """Sets the user as active or inactive"""
         user = self.get_object()
 
@@ -60,9 +59,8 @@ class UserViewSet(viewsets.ModelViewSet):
     @detail_route(
         methods=['post'],
         permission_classes=[IsAdminOrSelf],
-        url_name='password'
     )
-    def change_password(self, request, pk=None):
+    def password(self, request, pk=None):
         user = self.get_object()
         serializer = PasswordChangeSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -85,9 +83,8 @@ class ServiceViewSet(viewsets.ReadOnlyModelViewSet):
     @detail_route(
         methods=['put'],
         permission_classes=[IsAdminUser],
-        url_name='enabled'
     )
-    def set_enabled(self, request, pk=None):
+    def enabled(self, request, pk=None):
         """Sets the service as enabled or disabled."""
         serializer = ServiceEnabledSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -106,9 +103,8 @@ class NodeViewSet(viewsets.ReadOnlyModelViewSet):
     @detail_route(
         methods=['put'],
         permission_classes=[IsAdminUser],
-        url_name='trusted'
     )
-    def set_trusted(self, request, pk=None):
+    def trusted(self, request, pk=None):
         """Sets the service as enabled or disabled."""
         serializer = NodeTrustedSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
