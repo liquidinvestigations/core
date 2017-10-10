@@ -82,43 +82,34 @@ class WifiLoginSerializer(serializers.Serializer):
     password = serializers.CharField(max_length=63, min_length=8)
 
 class LanSerializer(serializers.Serializer):
-    class Lan(serializers.Serializer):
-        ip = serializers.IPAddressField(protocol="IPv4")
-        netmask = serializers.IPAddressField(protocol="IPv4")
-        dhcp_range = serializers.CharField()
-        hotspot = WifiLoginSerializer()
-        eth = serializers.BooleanField()
-
-    lan = Lan()
+    ip = serializers.IPAddressField(protocol="IPv4")
+    netmask = serializers.IPAddressField(protocol="IPv4")
+    dhcp_range = serializers.CharField()
+    hotspot = WifiLoginSerializer()
+    eth = serializers.BooleanField()
 
 class WanSerializer(serializers.Serializer):
-    class Wan(serializers.Serializer):
-        class WanStatic(serializers.Serializer):
-            ip = serializers.IPAddressField(protocol="IPv4")
-            netmask = serializers.IPAddressField(protocol="IPv4")
-            gateway = serializers.IPAddressField(protocol="IPv4")
-            dns_server = serializers.IPAddressField(protocol="IPv4")
+    class WanStatic(serializers.Serializer):
+        ip = serializers.IPAddressField(protocol="IPv4")
+        netmask = serializers.IPAddressField(protocol="IPv4")
+        gateway = serializers.IPAddressField(protocol="IPv4")
+        dns_server = serializers.IPAddressField(protocol="IPv4")
 
-        wifi = WifiLoginSerializer()
-        static = WanStatic(required=False)
-
-    wan = Wan()
+    wifi = WifiLoginSerializer()
+    static = WanStatic(required=False)
 
 class SshSerializer(serializers.Serializer):
-    class Ssh(serializers.Serializer):
-        class Key(serializers.Serializer):
-            key = serializers.CharField()
+    class Key(serializers.Serializer):
+        key = serializers.CharField()
 
-        enabled = serializers.BooleanField()
-        port = serializers.IntegerField(max_value=65535, min_value=1)
-        authorized_keys = Key(many=True)
-
-    ssh = Ssh()
+    enabled = serializers.BooleanField()
+    port = serializers.IntegerField(max_value=65535, min_value=1)
+    authorized_keys = Key(many=True)
 
 class RegistrationSerializer(serializers.Serializer):
     username = serializers.CharField(validators=[valid_username])
     password = serializers.CharField(validators=[valid_password])
     domain = serializers.CharField(validators=[valid_domain])
-    lan = LanSerializer.Lan()
-    wan = WanSerializer.Wan()
-    ssh = SshSerializer.Ssh()
+    lan = LanSerializer()
+    wan = WanSerializer()
+    ssh = SshSerializer()

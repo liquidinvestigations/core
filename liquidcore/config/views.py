@@ -162,27 +162,23 @@ class NetworkLan(NetworkSettingAPIView):
     setting_name = "network.lan"
     serializer_class = LanSerializer
     default_data = {
-        "lan": {
-          "ip": "10.0.0.1",
-          "netmask": "255.255.255.0",
-          "dhcp_range": "10.0.0.100-255",
-          "hotspot": {
-            "ssid": "",
-            "password": ""
-          },
-          "eth": False
-        }
+        "ip": "10.0.0.1",
+        "netmask": "255.255.255.0",
+        "dhcp_range": "10.0.0.100-255",
+        "hotspot": {
+          "ssid": "",
+          "password": ""
+        },
+        "eth": False,
     }
 
 class NetworkWan(NetworkSettingAPIView):
     setting_name = "network.wan"
     serializer_class = WanSerializer
     default_data = {
-        "wan": {
-          "wifi": {
-            "ssid": "",
-            "password": ""
-          }
+        "wifi": {
+          "ssid": "",
+          "password": "",
         }
     }
 
@@ -190,11 +186,9 @@ class NetworkSsh(NetworkSettingAPIView):
     setting_name = "network.ssh"
     serializer_class = SshSerializer
     default_data = {
-        "ssh": {
-          "enabled": False,
-          "authorized_keys": [],
-          "port": 22
-        }
+        "enabled": False,
+        "authorized_keys": [],
+        "port": 22,
     }
 
 class Registration(APIView):
@@ -206,9 +200,9 @@ class Registration(APIView):
             "username": "admin",
             "password": "",
             "domain": settings.LIQUID_DOMAIN,
-            "lan": NetworkLan.default_data['lan'],
-            "wan": NetworkWan.default_data['wan'],
-            "ssh": NetworkSsh.default_data['ssh'],
+            "lan": NetworkLan.default_data,
+            "wan": NetworkWan.default_data,
+            "ssh": NetworkSsh.default_data,
         }
         return Response(defaults)
 
@@ -223,7 +217,7 @@ class Registration(APIView):
         data = serializer.validated_data
         for key in ['wan', 'lan', 'ssh']:
             setting_name = "network." + key
-            setting = Setting(name=setting_name, data={key: data[key]})
+            setting = Setting(name=setting_name, data=data[key])
             setting.save()
 
         # create initial user
