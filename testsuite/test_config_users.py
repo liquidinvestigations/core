@@ -170,3 +170,40 @@ def test_whoami(client, admin_user):
     whoami = client.get('/api/users/whoami/')
     assert 200 == whoami.status_code
     assert {'is_authenticated': False} == whoami.json()
+
+def test_username_validation(client, admin_user):
+    GOOD_USERNAMES = [
+        'alpha0123',
+        'phillip.glass',
+        'erik_satie',
+        'yet_another.badly.named_user',
+        'johnDoe',
+    ]
+    BAD_USERNAMES = [
+        'beta!',
+        'this-username-is-no-good',
+        'sh',  # length 2 < 3
+        'x',
+        'long username' * 5,  # length 65 > 64
+        'money&power',
+    ]
+    USER_STUB = {
+        "is_admin": False,
+        "first_name": "first name",
+        "last_name": "last name",
+        "is_active": True,
+    }
+
+    assert client.login(username='admin', password='q')
+
+    for username in GOOD_USERNAMES:
+        data = USER_STUB.copy()
+        data['username'] = username
+        post = client.post('/api/users/', data=data)
+        assert 201 == post.status_code
+
+    for username in BAD_USERNAMES:
+        data = USER_STUB.copy()
+        data['username'] = username
+        post = client.post('/api/users/', data=data, format='json')
+        assert 400 == post.status_code
