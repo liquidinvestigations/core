@@ -22,6 +22,19 @@ class Service(models.Model):
     def url(self):
         return SERVICE_URLS.get(self.name)
 
+    @property
+    def data(self):
+        return {
+            'name': self.name,
+            'is_enabled': self.is_enabled,
+            'state': self.state,
+            'state_description': self.state_description,
+            'error_message': self.error_message,
+        }
+
+    def __str__(self):
+        return "{!r} = {}".format(self.name, self.data)
+
 
 class Setting(models.Model):
     name = models.CharField(max_length=255, primary_key=True)
@@ -34,6 +47,9 @@ class Setting(models.Model):
     @data.setter
     def data(self, data):
         self.data_text = json.dumps(data)
+
+    def __str__(self):
+        return "{!r} = {}".format(self.name, self.data)
 
 
 class Node(models.Model):
@@ -49,3 +65,6 @@ class Node(models.Model):
     @data.setter
     def data(self, data):
         self.data_text = json.dumps(data)
+
+    def __str__(self):
+        return "{!r} = {}".format(self.name, self.data)
