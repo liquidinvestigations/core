@@ -177,10 +177,28 @@ def test_initial_registration_setup(client, data):
     assert 400 == post.status_code
     assert {'detail': "Registration already done"} == post.json()
 
+GOOD_DOMAINS = [
+    'liquidnode.local',
+    'however-bored-ill-write-tests.com',
+    'more.segments.please.org',
+    'some-dashes.auto',
+    'weird-tld.liquid',
+    'num8berx.zero',
+]
+
+BAD_DOMAINS = [
+    'under_score.com',
+    'other~things.xxx',
+    'dash-where-it.shouldnt-be',
+    'put+both-patches.cn',
+]
+
 @pytest.mark.parametrize("key,vals,broken_vals", [
     ("lan", [LAN1, LAN2], [LAN_BROKEN]),
     ("wan", [WAN1, WAN2], [WAN_BROKEN]),
     ("ssh", [SSH1, SSH2], [SSH_BROKEN]),
+    ("domain", [{'domain': d} for d in GOOD_DOMAINS],
+               [{'domain': d} for d in BAD_DOMAINS]),
 ])
 def test_network_configuration(client, key, vals, broken_vals):
     endpoint = '/api/network/{}/'.format(key)
@@ -199,6 +217,7 @@ def test_network_configuration(client, key, vals, broken_vals):
 
     for val in broken_vals:
         put = client.put(endpoint, data=val, format='json')
+        if 200 == put.status_code: print(put.json())
         assert 400 == put.status_code
         # check that the last successful update is still there
         check_get_response(client, endpoint, vals[-1])
