@@ -1,3 +1,4 @@
+from contextlib import contextmanager
 from django.conf import settings
 from django.contrib.auth.models import User
 from rest_framework.response import Response
@@ -130,19 +131,13 @@ def network_status(request):
 
 class NetworkSettingAPIView(APIView):
     def get(self, request, format=None):
-        setting, created = Setting.objects.get_or_create(
-            name=self.setting_name
-        )
-        if created:
-            setting.data = self.default_data
-            setting.save()
-
+        setting = Setting.objects.get(name=self.setting_name)
         return Response(setting.data)
 
     def put(self, request, format=None):
         serializer = self.serializer_class(data=request.data)
         if serializer.is_valid():
-            setting, _ = Setting.objects.get_or_create(name=self.setting_name)
+            setting = Setting.objects.get(name=self.setting_name)
             setting.data = serializer.validated_data
             setting.save()
             update_system()
@@ -152,59 +147,42 @@ class NetworkSettingAPIView(APIView):
 class NetworkDomain(NetworkSettingAPIView):
     setting_name = "domain"
     serializer_class = NetworkDomainSerializer
-    default_data = 'liquidnode.liquid'
 
 class NetworkLan(NetworkSettingAPIView):
     setting_name = "lan"
     serializer_class = LanSerializer
-    default_data = {
-        "ip": "10.0.0.1",
-        "netmask": "255.255.255.0",
-        "dhcp_range": "10.0.0.100-255",
-        "hotspot": {
-          "ssid": "",
-          "password": ""
-        },
-        "eth": False,
-    }
 
 class NetworkWan(NetworkSettingAPIView):
     setting_name = "wan"
     serializer_class = WanSerializer
-    default_data = {
-        "wifi": {
-          "ssid": "",
-          "password": "",
-        }
-    }
 
 class NetworkSsh(NetworkSettingAPIView):
     setting_name = "ssh"
     serializer_class = SshSerializer
-    default_data = {
-        "enabled": False,
-        "authorized_keys": [],
-        "port": 22,
-    }
+
+def _get_settings():
+    return {s.name: s for s in Setting.objects.all()}
 
 class Registration(APIView):
     permission_classes=[AllowAny]
     def get(self, request, format=None):
-        if Setting.objects.count() > 0:
+        settings = _get_settings()
+        if settings['initialized'].data:
             return Response({"detail": "Registration already done"},
                             status=status.HTTP_400_BAD_REQUEST)
         defaults = {
             "username": "admin",
             "password": "",
-            "domain": NetworkDomain.default_data,
-            "lan": NetworkLan.default_data,
-            "wan": NetworkWan.default_data,
-            "ssh": NetworkSsh.default_data,
+            "domain": settings['domain'].data,
+            "lan": settings['lan'].data,
+            "wan": settings['wan'].data,
+            "ssh": settings['ssh'].data,
         }
         return Response(defaults)
 
     def post(self, request, format=None):
-        if Setting.objects.count() > 0:
+        settings = _get_settings()
+        if settings['initialized'].data:
             return Response({"detail": "Registration already done"},
                             status=status.HTTP_400_BAD_REQUEST)
 
@@ -225,4 +203,9 @@ class Registration(APIView):
             is_superuser=True
         )
         update_system()
+
+        initialized = settings['initialized']
+        initialized.data = True
+        initialized.save()
+
         return Response()
