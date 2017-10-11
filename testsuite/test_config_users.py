@@ -153,3 +153,20 @@ def test_set_users_active(client, admin_user):
         'is_active': False
     })
     assert set_inactive_mike.status_code == 403
+
+def test_whoami(client, admin_user):
+    whoami = client.get('/api/users/whoami/')
+    assert 200 == whoami.status_code
+    assert {'is_authenticated': False} == whoami.json()
+
+    assert client.login(username='admin', password='q')
+    whoami = client.get('/api/users/whoami/')
+    assert 200 == whoami.status_code
+    assert True == whoami.json()['is_authenticated']
+    assert 'admin' == whoami.json()['username']
+    assert True == whoami.json()['is_admin']
+
+    client.logout()
+    whoami = client.get('/api/users/whoami/')
+    assert 200 == whoami.status_code
+    assert {'is_authenticated': False} == whoami.json()
