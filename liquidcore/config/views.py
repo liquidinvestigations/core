@@ -8,7 +8,6 @@ from rest_framework.views import APIView
 from rest_framework import status
 
 from .models import *
-from .permissions import IsAdminOrSelf
 from .serializers import *
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -58,18 +57,24 @@ class UserViewSet(viewsets.ModelViewSet):
 
     @detail_route(
         methods=['post'],
-        permission_classes=[IsAdminOrSelf],
+        permission_classes=[IsAuthenticated],
     )
-    def password(self, request, pk=None):
+    def password(self, request, username=None):
         user = self.get_object()
         serializer = PasswordChangeSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         data = serializer.validated_data
 
         if not request.user.is_staff:
+            if user != request.user:
+                return Response({"detail": "Only admins can change other user's passwords"},
+                                status=status.HTTP_403_FORBIDDEN)
             # admin users don't need to specify the old password
+            if 'old_password' not in data:
+                return Response({"detail": "old_password not specified"},
+                                status=status.HTTP_400_BAD_REQUEST)
             if not user.check_password(data['old_password']):
-                return Response({"old_password": "Invalid Password"},
+                return Response({"old_password": ["Wrong Password"]},
                                 status=status.HTTP_400_BAD_REQUEST)
         user.set_password(data['new_password'])
         user.save()

@@ -56,7 +56,8 @@ class UserActiveSerializer(serializers.Serializer):
     is_active = serializers.BooleanField()
 
 class PasswordChangeSerializer(serializers.Serializer):
-    old_password = serializers.CharField(required=False, validators=[valid_password])
+    # old_password is not validated, as it's just being passed to check_login
+    old_password = serializers.CharField(required=False)
     new_password = serializers.CharField(validators=[valid_password])
 
 class ServiceSerializer(serializers.ModelSerializer):
