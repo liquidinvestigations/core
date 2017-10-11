@@ -13,6 +13,7 @@ from .serializers import *
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     lookup_field = 'username'
+    lookup_value_regex = USERNAME_URL_REGEX
 
     # don't let the user update the `username` field
     def get_serializer_class(self):

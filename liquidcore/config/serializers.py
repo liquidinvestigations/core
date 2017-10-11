@@ -4,10 +4,14 @@ from rest_framework import serializers
 
 from .models import *
 
+USERNAME_REGEX = r"^([a-zA-Z0-9_]|\.)+$"
+USERNAME_URL_REGEX = USERNAME_REGEX[1:-1]
+DOMAIN_REGEX = r"^(([a-zA-Z0-9_]|-)+\.)+([a-zA-Z0-9_]+)$"
+
 def valid_username(username):
     if not username:
         raise serializers.ValidationError("empty username")
-    if not bool(re.match(r"^([a-zA-Z0-9_]|\.)+$", username)):
+    if not bool(re.match(USERNAME_REGEX, username)):
         raise serializers.ValidationError("username can only contain letters, digits, underscore and dot")
     if len(username) < 3:
         raise serializers.ValidationError("username too short")
@@ -21,7 +25,7 @@ def valid_password(password):
     return password
 
 def valid_domain(domain):
-    if not bool(re.match(r"^(([a-zA-Z0-9_]|-)+\.)+([a-zA-Z0-9_]+)$", domain)):
+    if not bool(re.match(DOMAIN_REGEX, domain)):
         raise serializers.ValidationError("invalid hostname")
     return domain
 
