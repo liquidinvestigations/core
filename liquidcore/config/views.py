@@ -150,12 +150,12 @@ class NetworkSettingAPIView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class NetworkDomain(NetworkSettingAPIView):
-    setting_name = "network.domain"
+    setting_name = "domain"
     serializer_class = NetworkDomainSerializer
     default_data = 'liquidnode.liquid'
 
 class NetworkLan(NetworkSettingAPIView):
-    setting_name = "network.lan"
+    setting_name = "lan"
     serializer_class = LanSerializer
     default_data = {
         "ip": "10.0.0.1",
@@ -169,7 +169,7 @@ class NetworkLan(NetworkSettingAPIView):
     }
 
 class NetworkWan(NetworkSettingAPIView):
-    setting_name = "network.wan"
+    setting_name = "wan"
     serializer_class = WanSerializer
     default_data = {
         "wifi": {
@@ -179,7 +179,7 @@ class NetworkWan(NetworkSettingAPIView):
     }
 
 class NetworkSsh(NetworkSettingAPIView):
-    setting_name = "network.ssh"
+    setting_name = "ssh"
     serializer_class = SshSerializer
     default_data = {
         "enabled": False,
@@ -213,7 +213,7 @@ class Registration(APIView):
         serializer.is_valid(raise_exception=True)
         data = serializer.validated_data
         for key in ['domain', 'lan', 'wan', 'ssh']:
-            setting_name = "network." + key
+            setting_name = key
             setting = Setting(name=setting_name, data=data[key])
             setting.save()
 
