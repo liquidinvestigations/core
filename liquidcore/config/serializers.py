@@ -9,6 +9,8 @@ def valid_username(username):
         raise serializers.ValidationError("empty username")
     if not bool(re.match(r"^(\w|\.)+$", username)):
         raise serializers.ValidationError("username can only contain letters, digits, underscore and dot")
+    if len(username) < 3:
+        raise serializers.ValidationError("username too short")
     if len(username) > 64:
         raise serializers.ValidationError("username too long")
     return username
