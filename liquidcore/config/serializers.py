@@ -7,7 +7,7 @@ from .models import *
 def valid_username(username):
     if not username:
         raise serializers.ValidationError("empty username")
-    if not bool(re.match(r"^(\w|\.)+$", username)):
+    if not bool(re.match(r"^([a-zA-Z0-9_]|\.)+$", username)):
         raise serializers.ValidationError("username can only contain letters, digits, underscore and dot")
     if len(username) < 3:
         raise serializers.ValidationError("username too short")
@@ -21,7 +21,7 @@ def valid_password(password):
     return password
 
 def valid_domain(domain):
-    if not bool(re.match(r"^((\w|-)+\.)+(\w+)$", domain)):
+    if not bool(re.match(r"^(([a-zA-Z0-9_]|-)+\.)+([a-zA-Z0-9_]+)$", domain)):
         raise serializers.ValidationError("invalid hostname")
     return domain
 
