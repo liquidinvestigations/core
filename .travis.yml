@@ -1,0 +1,9 @@
+language: python
+python:
+  - "3.5"
+  - "3.6"
+install:
+  - pip install -r requirements.txt
+  - echo 'SECRET_KEY = "xxx"' > liquidcore/site/settings/local.py
+script:
+  - py.test
