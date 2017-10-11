@@ -127,18 +127,6 @@ class NodeViewSet(viewsets.ReadOnlyModelViewSet):
 def network_status(request):
     return Response({})
 
-class NetworkDomain(APIView):
-    def get(self, request, format=None):
-        return Response({"domain": settings.LIQUID_DOMAIN})
-
-    def put(self, request, format=None):
-        serializer = NetworkDomainSerializer(data=request.data)
-        if serializer.is_valid():
-            # TODO send change domain command to system
-            return Response({"detail": "not implemented"},
-                            status=status.HTTP_501_NOT_IMPLEMENTED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
 class NetworkSettingAPIView(APIView):
     def get(self, request, format=None):
         setting, created = Setting.objects.get_or_create(
@@ -159,6 +147,13 @@ class NetworkSettingAPIView(APIView):
             # TODO send update to system
             return Response(serializer.validated_data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class NetworkDomain(NetworkSettingAPIView):
+    setting_name = "network.domain"
+    serializer_class = NetworkDomainSerializer
+    default_data = {
+        "domain": 'liquidnode.liquid',
+    }
 
 class NetworkLan(NetworkSettingAPIView):
     setting_name = "network.lan"
@@ -202,7 +197,7 @@ class Registration(APIView):
         defaults = {
             "username": "admin",
             "password": "",
-            "domain": settings.LIQUID_DOMAIN or 'liquidnode.liquid',
+            "domain": NetworkDomain.default_data,
             "lan": NetworkLan.default_data,
             "wan": NetworkWan.default_data,
             "ssh": NetworkSsh.default_data,
