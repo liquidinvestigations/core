@@ -7,3 +7,5 @@ install:
   - echo 'SECRET_KEY = "xxx"' > liquidcore/site/settings/local.py
 script:
   - py.test
+notifications:
+  email: false
