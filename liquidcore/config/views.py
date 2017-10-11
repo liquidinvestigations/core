@@ -193,14 +193,15 @@ class NetworkSsh(NetworkSettingAPIView):
     }
 
 class Registration(APIView):
+    permission_classes=[AllowAny]
     def get(self, request, format=None):
         if Setting.objects.count() > 0:
-            return Response({"detail": "Registration already done!"},
+            return Response({"detail": "Registration already done"},
                             status=status.HTTP_400_BAD_REQUEST)
         defaults = {
             "username": "admin",
             "password": "",
-            "domain": settings.LIQUID_DOMAIN,
+            "domain": settings.LIQUID_DOMAIN or 'liquidnode.liquid',
             "lan": NetworkLan.default_data,
             "wan": NetworkWan.default_data,
             "ssh": NetworkSsh.default_data,
@@ -209,7 +210,7 @@ class Registration(APIView):
 
     def post(self, request, format=None):
         if Setting.objects.count() > 0:
-            return Response({"detail": "Registration already done!"},
+            return Response({"detail": "Registration already done"},
                             status=status.HTTP_400_BAD_REQUEST)
 
         # validate and extract the data
