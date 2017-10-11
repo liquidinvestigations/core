@@ -152,9 +152,7 @@ class NetworkSettingAPIView(APIView):
 class NetworkDomain(NetworkSettingAPIView):
     setting_name = "network.domain"
     serializer_class = NetworkDomainSerializer
-    default_data = {
-        "domain": 'liquidnode.liquid',
-    }
+    default_data = 'liquidnode.liquid'
 
 class NetworkLan(NetworkSettingAPIView):
     setting_name = "network.lan"
