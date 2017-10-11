@@ -6,7 +6,7 @@ from .models import *
 
 USERNAME_REGEX = r"^([a-zA-Z0-9_]|\.)+$"
 USERNAME_URL_REGEX = USERNAME_REGEX[1:-1]
-DOMAIN_REGEX = r"^(([a-zA-Z0-9_]|-)+\.)+([a-zA-Z0-9_]+)$"
+DOMAIN_REGEX = r"^(([a-zA-Z0-9]|-)+\.)+([a-zA-Z0-9]+)$"
 
 def valid_username(username):
     if not username:
