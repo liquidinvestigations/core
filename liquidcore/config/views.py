@@ -1,3 +1,4 @@
+import fcntl
 from contextlib import contextmanager
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -163,6 +164,15 @@ class NetworkSsh(NetworkSettingAPIView):
 def _get_settings():
     return {s.name: s for s in Setting.objects.all()}
 
+@contextmanager
+def _lock():
+    with open(settings.INITIALIZE_LOCK_FILE_PATH, 'w') as lock_file:
+        fcntl.flock(lock_file, fcntl.LOCK_EX)
+        try:
+            yield
+        finally:
+            fcntl.flock(lock_file, fcntl.LOCK_UN)
+
 class Registration(APIView):
     permission_classes=[AllowAny]
     def get(self, request, format=None):
@@ -181,31 +191,32 @@ class Registration(APIView):
         return Response(defaults)
 
     def post(self, request, format=None):
-        settings = _get_settings()
-        if settings['initialized'].data:
-            return Response({"detail": "Registration already done"},
-                            status=status.HTTP_400_BAD_REQUEST)
+        with _lock():
+            settings = _get_settings()
+            if settings['initialized'].data:
+                return Response({"detail": "Registration already done"},
+                                status=status.HTTP_400_BAD_REQUEST)
 
-        # validate and extract the data
-        serializer = RegistrationSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        data = serializer.validated_data
-        for key in ['domain', 'lan', 'wan', 'ssh']:
-            setting_name = key
-            setting = Setting(name=setting_name, data=data[key])
-            setting.save()
+            # validate and extract the data
+            serializer = RegistrationSerializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
+            data = serializer.validated_data
+            for key in ['domain', 'lan', 'wan', 'ssh']:
+                setting_name = key
+                setting = Setting(name=setting_name, data=data[key])
+                setting.save()
 
-        # create initial user
-        User.objects.create_user(
-            username=data['username'],
-            password=data['password'],
-            is_staff=True,
-            is_superuser=True
-        )
-        update_system()
+            # create initial user
+            User.objects.create_user(
+                username=data['username'],
+                password=data['password'],
+                is_staff=True,
+                is_superuser=True
+            )
+            update_system()
 
-        initialized = settings['initialized']
-        initialized.data = True
-        initialized.save()
+            initialized = settings['initialized']
+            initialized.data = True
+            initialized.save()
 
         return Response()
