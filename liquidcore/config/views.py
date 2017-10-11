@@ -131,15 +131,24 @@ def network_status(request):
     return Response({})
 
 class NetworkSettingAPIView(APIView):
+
+    @staticmethod
+    def to_db(value):
+        return value
+
+    @staticmethod
+    def from_db(value):
+        return value
+
     def get(self, request, format=None):
         setting = Setting.objects.get(name=self.setting_name)
-        return Response(setting.data)
+        return Response(self.from_db(setting.data))
 
     def put(self, request, format=None):
         serializer = self.serializer_class(data=request.data)
         if serializer.is_valid():
             setting = Setting.objects.get(name=self.setting_name)
-            setting.data = serializer.validated_data
+            setting.data = self.to_db(serializer.validated_data)
             setting.save()
             update_system()
             return Response(serializer.validated_data)
@@ -148,6 +157,14 @@ class NetworkSettingAPIView(APIView):
 class NetworkDomain(NetworkSettingAPIView):
     setting_name = "domain"
     serializer_class = NetworkDomainSerializer
+
+    @staticmethod
+    def to_db(value):
+        return value["domain"]
+
+    @staticmethod
+    def from_db(value):
+        return {"domain": value}
 
 class NetworkLan(NetworkSettingAPIView):
     setting_name = "lan"
