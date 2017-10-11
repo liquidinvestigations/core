@@ -14,7 +14,7 @@ def get_configuration():
     settings = map_table(models.Setting)
 
     return {
-        'domain': settings['domain']['domain'],
+        'domain': settings['domain'],
         'lan': settings['lan'],
         'wan': settings['wan'],
         'ssh': settings['ssh'],
