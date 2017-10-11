@@ -24,6 +24,19 @@ WAN2 = {
   }
 }
 
+WAN_BROKEN = {
+  "static": {
+    "ip": "192.168.66.66",
+    "netmask": "255.255.255.0",
+    "gateway": "not an ip address",
+    "dns_server": "192.168.66.1"
+  },
+  "wifi": {
+    "ssid": "network",
+    "password": "short"
+  }
+}
+
 LAN1 = {
   "ip": "10.0.0.1",
   "netmask": "255.255.255.0",
@@ -37,6 +50,17 @@ LAN1 = {
 
 LAN2 = {
   "ip": "192.168.0.1",
+  "netmask": "255.255.0.0",
+  "dhcp_range": "192.0.0.2-255",
+  "hotspot": {
+    "ssid": "yet another hotspot",
+    "password": "more passwords!"
+  },
+  "eth": False
+}
+
+LAN_BROKEN = {
+  "ip": "not an ip address",
   "netmask": "255.255.0.0",
   "dhcp_range": "192.0.0.2-255",
   "hotspot": {
@@ -61,6 +85,13 @@ SSH2 = {
   "authorized_keys": [],
   "port": 222
 }
+
+SSH_BROKEN = {
+  "enabled": "whatever",
+  "authorized_keys": [],
+  "port": 222
+}
+
 
 REGISTRATION_DEFAULT = {
     "username": "admin",
@@ -146,3 +177,28 @@ def test_initial_registration_setup(client, data):
     assert 400 == post.status_code
     assert {'detail': "Registration already done"} == post.json()
 
+@pytest.mark.parametrize("key,vals,broken_vals", [
+    ("lan", [LAN1, LAN2], [LAN_BROKEN]),
+    ("wan", [WAN1, WAN2], [WAN_BROKEN]),
+    ("ssh", [SSH1, SSH2], [SSH_BROKEN]),
+])
+def test_network_configuration(client, key, vals, broken_vals):
+    endpoint = '/api/network/{}/'.format(key)
+
+    registration_post = client.post('/api/registration/',
+                                    data=REGISTRATION1,
+                                    format='json')
+    assert 200 == registration_post.status_code
+    assert client.login(username=REGISTRATION1['username'],
+                        password=REGISTRATION1['password'])
+
+    for val in vals:
+        put = client.put(endpoint, data=val, format='json')
+        assert 200 == put.status_code
+        check_get_response(client, endpoint, val)
+
+    for val in broken_vals:
+        put = client.put(endpoint, data=val, format='json')
+        assert 400 == put.status_code
+        # check that the last successful update is still there
+        check_get_response(client, endpoint, vals[-1])
