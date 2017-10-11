@@ -23,10 +23,15 @@ def valid_domain(domain):
         raise serializers.ValidationError("invalid hostname")
     return domain
 
-class CreateUserSerializer(serializers.Serializer):
+class CreateUserSerializer(serializers.HyperlinkedModelSerializer):
     is_admin = serializers.BooleanField(source='is_staff')
     username = serializers.CharField(validators=[valid_username])
 
+    # hyperlink urls using username as identity
+    url = serializers.HyperlinkedIdentityField(
+        view_name='user-detail',
+        lookup_field='username'
+    )
     class Meta:
         model = User
         fields = ('url', 'username', 'first_name',
