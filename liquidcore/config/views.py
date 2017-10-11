@@ -214,7 +214,7 @@ class Registration(APIView):
         serializer = RegistrationSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         data = serializer.validated_data
-        for key in ['wan', 'lan', 'ssh']:
+        for key in ['domain', 'lan', 'wan', 'ssh']:
             setting_name = "network." + key
             setting = Setting(name=setting_name, data=data[key])
             setting.save()
