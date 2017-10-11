@@ -3,15 +3,10 @@ from . import models
 
 
 def get_configuration():
-    def map_table(model):
-        return {item.name: item.data for item in model.objects.all()}
-
-    db = {
-        'services': map_table(models.Service),
-        'nodes': map_table(models.Node),
+    settings = {
+        item.name: item.data
+        for item in models.Setting.objects.all()
     }
-
-    settings = map_table(models.Setting)
 
     return {
         'domain': settings['domain'],
