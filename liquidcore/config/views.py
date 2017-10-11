@@ -9,6 +9,7 @@ from rest_framework import status
 
 from .models import *
 from .serializers import *
+from .system import update_system
 
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
@@ -99,7 +100,7 @@ class ServiceViewSet(viewsets.ReadOnlyModelViewSet):
         service = self.get_object()
         service.is_enabled = data['is_enabled']
         service.save()
-        # TODO send start/stop command to system
+        update_system()
         return Response(status=status.HTTP_200_OK)
 
 class NodeViewSet(viewsets.ReadOnlyModelViewSet):
@@ -119,7 +120,7 @@ class NodeViewSet(viewsets.ReadOnlyModelViewSet):
         node = self.get_object()
         node.is_trusted = data['is_trusted']
         node.save()
-        # TODO send updated node list to the discovery service
+        update_system()
         return Response(status=status.HTTP_200_OK)
 
 
@@ -144,7 +145,7 @@ class NetworkSettingAPIView(APIView):
             setting, _ = Setting.objects.get_or_create(name=self.setting_name)
             setting.data = serializer.validated_data
             setting.save()
-            # TODO send update to system
+            update_system()
             return Response(serializer.validated_data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -225,5 +226,5 @@ class Registration(APIView):
             is_staff=True,
             is_superuser=True
         )
-        # TODO send update to system with all data
+        update_system()
         return Response()
