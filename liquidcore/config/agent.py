@@ -32,6 +32,7 @@ from contextlib import contextmanager
 import fcntl
 import subprocess
 import json
+import yaml
 import daemon
 
 
@@ -115,12 +116,25 @@ def _do_the_job(job_id, var, setup):
     with _lock(var / 'agent.lock'):
         _log("Acquired lock")
 
+        config_yml = setup / 'ansible' / 'vars' / 'config.yml'
+        with config_yml.open(encoding='utf8') as g:
+            old_config = yaml.load(g)
+
+        _log("Old configuration:", old_config)
+
         with job._task_file.open(encoding='utf8') as f:
             target_configuration = json.load(f)
 
         _log("target_configuration:", target_configuration)
+        new_config = dict(old_config, liquid=target_configuration)
 
-        # TODO apply the configuration using ansible
+        _log("New configuration:", new_config)
+
+        with config_yml.open('w', encoding='utf8') as g:
+            yaml.dump(new_config, g)
+
+        # TODO run('bin/install --tags configure', cwd=str(setup))
+        # TODO supervisorctl restart all
 
         job._task_file.unlink()
         _log("Finished")
