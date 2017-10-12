@@ -8,3 +8,4 @@ waitress
 whitenoise
 requests
 pytest-django
+python-daemon
