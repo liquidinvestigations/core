@@ -47,20 +47,20 @@ def launch(target_configuration):
         'target_configuration': target_configuration,
     }
 
-    job = _Job(_timestamp(), var)
-    with job._task_file.open('w', encoding='utf8') as f:
+    job = Job(timestamp(), var)
+    with job.task_file.open('w', encoding='utf8') as f:
         print(json.dumps(task_data, indent=2), file=f)
 
-    _call_self_in_subprocess('daemonize', job.id, var, setup)
+    call_self_in_subprocess('daemonize', job.id, var, setup)
 
     return job
 
 
-def _timestamp():
+def timestamp():
     return str(datetime.utcnow().isoformat())
 
 
-class _Job:
+class Job:
 
     """
     A configuration job. This class does not encapsulate any configuration
@@ -72,11 +72,11 @@ class _Job:
         self.var = Path(var)
 
     @property
-    def _task_file(self):
+    def task_file(self):
         return self.var / 'task-{}.json'.format(self.id)
 
     def is_finished(self):
-        return not self._task_file.exists()
+        return not self.task_file.exists()
 
     def open_logfile(self, mode='r'):
         logs = self.var / 'logs'
@@ -88,7 +88,7 @@ class _Job:
 
 
 @contextmanager
-def _lock(path):
+def lock(path):
     with open(str(path), 'w') as lock_file:
         fcntl.flock(lock_file, fcntl.LOCK_EX)
         try:
@@ -97,16 +97,16 @@ def _lock(path):
             fcntl.flock(lock_file, fcntl.LOCK_UN)
 
 
-def _call_self_in_subprocess(*args, **kwargs):
+def call_self_in_subprocess(*args, **kwargs):
     argv = [sys.executable, __file__] + [str(a) for a in args]
     subprocess.run(argv, check=True, **kwargs)
 
 
-def _log(*args):
-    print(*args, _timestamp())
+def log(*args):
+    print(*args, timestamp())
 
 
-class _State:
+class State:
 
     """
     Read and write global state from disk. Only write to disk while holding the
@@ -134,16 +134,16 @@ class _State:
         self.save(dict(self.load(), **delta))
 
 
-def _do_the_job(job_id, var, setup):
+def do_the_job(job_id, var, setup):
     """
     Perform useful work, since by now we're in our own little world, with
     stdout+stderr redirected to the log file.
     """
-    job = _Job(job_id, var)
-    state_db = _State(var)
-    _log("Acquiring agent lock")
-    with _lock(var / 'agent.lock'):
-        _log("Acquired lock")
+    job = Job(job_id, var)
+    state_db = State(var)
+    log("Acquiring agent lock")
+    with lock(var / 'agent.lock'):
+        log("Acquired lock")
         if state_db.load().get('job'):
             raise RuntimeError("Another job was running and did not finish")
         state_db.patch(job=job_id)
@@ -152,15 +152,15 @@ def _do_the_job(job_id, var, setup):
         with config_yml.open(encoding='utf8') as g:
             old_config = yaml.load(g)
 
-        _log("Old configuration:", old_config)
+        log("Old configuration:", old_config)
 
-        with job._task_file.open(encoding='utf8') as f:
+        with job.task_file.open(encoding='utf8') as f:
             target_configuration = json.load(f)
 
-        _log("target_configuration:", target_configuration)
+        log("target_configuration:", target_configuration)
         new_config = dict(old_config, liquid=target_configuration)
 
-        _log("New configuration:", new_config)
+        log("New configuration:", new_config)
 
         with config_yml.open('w', encoding='utf8') as g:
             yaml.dump(new_config, g)
@@ -169,18 +169,18 @@ def _do_the_job(job_id, var, setup):
         # TODO supervisorctl restart all
 
         state_db.patch(job=None)
-        job._task_file.unlink()
-        _log("Finished")
+        job.task_file.unlink()
+        log("Finished")
 
-    _log("Released lock")
+    log("Released lock")
 
 
-def _daemonize(job_id, var, setup):
+def daemonize(job_id, var, setup):
     """ daemonize, so we don't get killed by the caller of `launch` """
     with daemon.DaemonContext():
-        job = _Job(job_id, var)
+        job = Job(job_id, var)
         with job.open_logfile('a') as f:
-            _call_self_in_subprocess(
+            call_self_in_subprocess(
                 'run', job_id, var, setup,
                 stdout=f, stderr=f,
             )
@@ -189,7 +189,7 @@ def _daemonize(job_id, var, setup):
 if __name__ == '__main__':
     [stage, job_id, var, setup] = sys.argv[1:]
     if stage == 'daemonize':
-        _daemonize(job_id, var, setup)
+        daemonize(job_id, var, setup)
 
     else:
-        _do_the_job(job_id, Path(var), Path(setup))
+        do_the_job(job_id, Path(var), Path(setup))
