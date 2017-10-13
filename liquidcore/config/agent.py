@@ -106,15 +106,47 @@ def _log(*args):
     print(*args, _timestamp())
 
 
+class _State:
+
+    """
+    Read and write global state from disk. Only write to disk while holding the
+    `agent.lock` lockfile.
+    """
+
+    def __init__(self, var):
+        self.var = var
+        self.state_file = var / 'state.json'
+        self.new_state_file = var / 'new-state.json'
+
+    def load(self):
+        try:
+            with self.state_file.open(encoding='utf8') as f:
+                return json.load(f)
+        except FileNotFoundError:
+            return {}
+
+    def save(self, state):
+        with self.new_state_file.open('w', encoding='utf8') as f:
+            print(json.dumps(state, indent=2, sort_keys=True), file=f)
+        self.new_state_file.rename(self.state_file)
+
+    def patch(self, **delta):
+        self.save(dict(self.load(), **delta))
+
+
 def _do_the_job(job_id, var, setup):
     """
     Perform useful work, since by now we're in our own little world, with
     stdout+stderr redirected to the log file.
     """
     job = _Job(job_id, var)
+    state_db = _State(var)
     _log("Acquiring agent lock")
     with _lock(var / 'agent.lock'):
         _log("Acquired lock")
+        if state_db.load().get('job'):
+            raise RuntimeError("Another job was running and did not finish")
+        state_db.patch(job=job_id)
 
         config_yml = setup / 'ansible' / 'vars' / 'config.yml'
         with config_yml.open(encoding='utf8') as g:
@@ -136,6 +168,7 @@ def _do_the_job(job_id, var, setup):
         # TODO run('bin/install --tags configure', cwd=str(setup))
         # TODO supervisorctl restart all
 
+        state_db.patch(job=None)
         job._task_file.unlink()
         _log("Finished")
 
