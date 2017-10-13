@@ -26,6 +26,7 @@ Internally, the agent follows this script:
 """
 
 import sys
+import os
 from datetime import datetime
 from pathlib import Path
 from contextlib import contextmanager
@@ -106,6 +107,11 @@ def log(*args):
     print(*args, timestamp())
 
 
+def run_shell(cmd, **kwargs):
+    log('+', cmd)
+    return subprocess.run(cmd, shell=True, **kwargs)
+
+
 class State:
 
     """
@@ -165,8 +171,11 @@ def do_the_job(job_id, var, setup):
         with config_yml.open('w', encoding='utf8') as g:
             yaml.dump(new_config, g)
 
-        # TODO run('bin/install --tags configure', cwd=str(setup))
-        # TODO supervisorctl restart all
+        run_shell(
+            'sudo PYTHONUNBUFFERED=1 bin/install --tags configure',
+            cwd=str(setup),
+        )
+        run_shell('sudo supervisorctl restart all')
 
         state_db.patch(job=None)
         job.task_file.unlink()
@@ -183,6 +192,7 @@ def daemonize(job_id, var, setup):
             call_self_in_subprocess(
                 'run', job_id, var, setup,
                 stdout=f, stderr=f,
+                env=dict(os.environ, PYTHONUNBUFFERED='1'),
             )
 
 
