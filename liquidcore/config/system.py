@@ -22,17 +22,7 @@ def get_configuration():
 
 def configure_system(target_configuration):
     job = agent.launch(target_configuration)
-
-    print('Job {} launched, waiting for it to finish ...'.format(job.id))
-    while not job.is_finished():
-        import time
-        time.sleep(.2)
-    print('Job {} done!'.format(job.id))
-
-    with job.open_logfile() as f:
-        print('================')
-        print(f.read())
-        print('================')
+    print('Job {} launched'.format(job.id))
 
 
 def update_system():
