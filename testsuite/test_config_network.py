@@ -177,32 +177,29 @@ def test_initial_registration_setup(client, data):
     assert 400 == post.status_code
     assert {'detail': "Registration already done"} == post.json()
 
-GOOD_DOMAINS = [
+GOOD_DOMAINS = [{'domain': d} for d in [
     'liquidnode.local',
     'however-bored-ill-write-tests.com',
     'more.segments.please.org',
     'some-dashes.auto',
     'weird-tld.liquid',
     'num8berx.zero',
-]
+]]
 
-BAD_DOMAINS = [
+BAD_DOMAINS = [{'domain': d} for d in [
     'under_score.com',
     'other~things.xxx',
     'dash-where-it.shouldnt-be',
     'put+both-patches.cn',
-]
+]]
 
-@pytest.mark.parametrize("key,vals,broken_vals", [
-    ("lan", [LAN1, LAN2], [LAN_BROKEN]),
-    ("wan", [WAN1, WAN2], [WAN_BROKEN]),
-    ("ssh", [SSH1, SSH2], [SSH_BROKEN]),
-    ("domain", [{'domain': d} for d in GOOD_DOMAINS],
-               [{'domain': d} for d in BAD_DOMAINS]),
+@pytest.mark.parametrize("endpoint,vals,broken_vals", [
+    ("/api/network/lan/", [LAN1, LAN2], [LAN_BROKEN]),
+    ("/api/network/wan/", [WAN1, WAN2], [WAN_BROKEN]),
+    ("/api/network/ssh/", [SSH1, SSH2], [SSH_BROKEN]),
+    ("/api/network/domain/", GOOD_DOMAINS, BAD_DOMAINS),
 ])
-def test_network_configuration(client, key, vals, broken_vals):
-    endpoint = '/api/network/{}/'.format(key)
-
+def test_network_configuration(client, endpoint, vals, broken_vals):
     registration_post = client.post('/api/registration/',
                                     data=REGISTRATION1,
                                     format='json')
