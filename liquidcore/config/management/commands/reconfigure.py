@@ -1,5 +1,5 @@
 from django.core.management.base import BaseCommand
-from ... import system
+from ... import reconfigure
 
 
 class Command(BaseCommand):
@@ -7,4 +7,4 @@ class Command(BaseCommand):
     help = "Reconfigure the system"
 
     def handle(self, **options):
-        system.update_system()
+        reconfigure.reconfigure_system()

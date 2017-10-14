@@ -20,11 +20,7 @@ def get_configuration():
     }
 
 
-def configure_system(target_configuration):
+def reconfigure_system():
+    target_configuration = get_configuration()
     job = agent.launch(target_configuration)
     print('Job {} launched'.format(job.id))
-
-
-def update_system():
-    target_configuration = get_configuration()
-    configure_system(target_configuration)
