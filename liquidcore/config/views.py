@@ -119,8 +119,8 @@ class NodeViewSet(viewsets.ReadOnlyModelViewSet):
         serializer.is_valid(raise_exception=True)
         data = serializer.validated_data
 
-        node = self.get_object()
-        node.is_trusted = data['is_trusted']
+        node = Node.objects.get(id=pk)
+        node.trusted = data['is_trusted']
         node.save()
         update_system()
         return Response(status=status.HTTP_200_OK)

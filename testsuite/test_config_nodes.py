@@ -48,6 +48,25 @@ SERIALIZED_NODE = {
 def test_get_nodes(client, admin_user, example_node):
     assert client.login(username='admin', password='q')
 
-    users_resp = client.get('/api/nodes/')
-    assert 200 == users_resp.status_code
-    assert [SERIALIZED_NODE] == users_resp.json()
+    node_list = client.get('/api/nodes/')
+    assert 200 == node_list.status_code
+    assert [SERIALIZED_NODE] == node_list.json()
+
+def test_set_enabled(client, admin_user, example_node):
+    assert client.login(username='admin', password='q')
+
+    # set as trusted
+    node_set_trusted = client.put('/api/nodes/1/trusted/', data={'is_trusted': True})
+    assert node_set_trusted.status_code == 200
+
+    get_node = client.get("/api/nodes/1/")
+    assert 200 == get_node.status_code
+    assert True == get_node.json()['is_trusted']
+
+    # set as not trusted
+    node_set_trusted = client.put('/api/nodes/1/trusted/', data={'is_trusted': False})
+    assert node_set_trusted.status_code == 200
+
+    get_node = client.get("/api/nodes/1/")
+    assert 200 == get_node.status_code
+    assert False == get_node.json()['is_trusted']
