@@ -78,10 +78,12 @@ class ServiceEnabledSerializer(serializers.Serializer):
 
 class NodeSerializer(serializers.ModelSerializer):
     data = serializers.ReadOnlyField()
+    is_trusted = serializers.BooleanField(default=False, source='trusted')
+    hostname = serializers.CharField(source='name')
 
     class Meta:
         model = Node
-        exclude = ('data_text',)
+        fields = ['id', 'is_trusted', 'hostname', 'data']
 
 class NodeTrustedSerializer(serializers.Serializer):
     is_trusted = serializers.BooleanField()
