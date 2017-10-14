@@ -68,12 +68,18 @@ def test_password_change_admin_self(client, admin_user):
 
     # make sure new login works
     client.logout()
-    client.login(username='admin', password='12345678')
+    assert client.login(username='admin', password='12345678')
 
 def test_password_change_nonadmin(client):
     User.objects.create_user(
         username='mike',
         password='mike',
+        is_staff=False
+    )
+
+    User.objects.create_user(
+        username='joe',
+        password='joe',
         is_staff=False
     )
 
@@ -104,6 +110,16 @@ def test_password_change_nonadmin(client):
     # check new login
     client.logout()
     assert client.login(username='mike', password='12345678')
+
+    # check that mike can't change joe's password
+    password = client.post("/api/users/joe/password/", data={
+        "old_password": "joe",
+        "new_password": "12345678",
+    })
+    assert password.status_code == 403
+    assert password.json() == {
+        'detail': "Only admins can change other user's passwords"
+    }
 
 def test_set_users_active(client, admin_user):
     assert client.login(username='admin', password='q')
