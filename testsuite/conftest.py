@@ -4,4 +4,4 @@ import pytest
 def mock_agent(monkeypatch):
     class Job: id = 'mock'
     from liquidcore.config import agent
-    monkeypatch.setattr(agent, 'launch', lambda target_configuration: Job)
+    monkeypatch.setattr(agent, 'launch', lambda *args: Job)

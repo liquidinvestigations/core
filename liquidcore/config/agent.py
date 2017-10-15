@@ -38,7 +38,7 @@ import daemon
 import psutil
 
 
-def launch(target_configuration):
+def launch(target_configuration, repair):
     """ Launch a job to apply `target_configuration`. """
     from django.conf import settings
 
@@ -47,6 +47,7 @@ def launch(target_configuration):
 
     task_data = {
         'target_configuration': target_configuration,
+        'repair': repair,
     }
 
     job = Job(timestamp(), var)
@@ -208,21 +209,27 @@ def do_the_job(job_id, var, setup):
     """
     job = Job(job_id, var)
     with pidfile(job.pid_file):
+        with job.options_file.open(encoding='utf8') as f:
+            task_data = json.load(f)
+
         state_db = State(var)
         log("Acquiring agent lock")
         with lock(var / 'agent.lock'):
             log("Acquired lock")
+
             if state_db.load().get('job'):
-                raise RuntimeError("Another job was running and did not finish")
+                if not task_data.get('repair'):
+                    raise RuntimeError(
+                        "Another job was running and did not finish")
+
             state_db.patch(job=job_id)
 
-            with job.options_file.open(encoding='utf8') as f:
-                target_configuration = json.load(f)
-
-            run_setup(setup, target_configuration)
+            run_setup(setup, task_data['target_configuration'])
 
             state_db.patch(job=None)
+
             job.options_file.unlink()
+
             log("Finished")
 
         log("Released lock")

@@ -68,3 +68,29 @@ def test_detect_failed_job(setup):
 
     with pytest.raises(agent.JobFailed):
         job.wait()
+
+
+def test_failed_job_marks_system_as_broken(setup):
+    setup.mock(succeeds=False)
+
+    def reconfigure(**kwargs):
+        return system.reconfigure_system(**kwargs).wait()
+
+    with pytest.raises(agent.JobFailed):
+        reconfigure()
+
+    # system is in "broken" state; jobs will fail until we run "repair"
+
+    setup.mock(succeeds=True)
+
+    with pytest.raises(agent.JobFailed):
+        reconfigure()
+
+    with pytest.raises(agent.JobFailed):
+        reconfigure()
+
+    reconfigure(repair=True)
+    # system is repaired; next jobs will run happily.
+
+    reconfigure()
+    reconfigure()
