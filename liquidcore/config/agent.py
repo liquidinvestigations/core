@@ -161,30 +161,47 @@ def run_setup(setup, target_configuration):
     )
 
 
+@contextmanager
+def pidfile(pid_file):
+    tmp_pid_file = pid_file.parent / (pid_file.name + '.tmp')
+
+    with tmp_pid_file.open('w', encoding='utf8') as f:
+        print(os.getpid(), file=f)
+
+    tmp_pid_file.rename(pid_file)
+
+    yield
+
+    # Removing the pidfile means "job completed successfully", so we
+    # only remove it if no exception was raised.
+    pid_file.unlink()
+
+
 def do_the_job(job_id, var, setup):
     """
     Perform useful work, since by now we're in our own little world, with
     stdout+stderr redirected to the log file.
     """
     job = Job(job_id, var)
-    state_db = State(var)
-    log("Acquiring agent lock")
-    with lock(var / 'agent.lock'):
-        log("Acquired lock")
-        if state_db.load().get('job'):
-            raise RuntimeError("Another job was running and did not finish")
-        state_db.patch(job=job_id)
+    with pidfile(job.pid_file):
+        state_db = State(var)
+        log("Acquiring agent lock")
+        with lock(var / 'agent.lock'):
+            log("Acquired lock")
+            if state_db.load().get('job'):
+                raise RuntimeError("Another job was running and did not finish")
+            state_db.patch(job=job_id)
 
-        with job.options_file.open(encoding='utf8') as f:
-            target_configuration = json.load(f)
+            with job.options_file.open(encoding='utf8') as f:
+                target_configuration = json.load(f)
 
-        run_setup(setup, target_configuration)
+            run_setup(setup, target_configuration)
 
-        state_db.patch(job=None)
-        job.options_file.unlink()
-        log("Finished")
+            state_db.patch(job=None)
+            job.options_file.unlink()
+            log("Finished")
 
-    log("Released lock")
+        log("Released lock")
 
 
 def daemonize(job_id, var, setup):
