@@ -1,11 +1,17 @@
 """
 Configuration agent for liquid-core
 
-This module does daemonization voodoo. Its only public function, `launch`,
-expects a `target_configuration` (the configuration that will be applied), and
-returns a job object.
+This module does daemonization voodoo. It has two public methods: `launch` and
+`status`.
 
-The job object has the following members:
+## `agent.launch(target_configuration, repair)`
+`target_configuration` is the configuration that will be applied.
+
+`repair` - if the last job failed, should we attempt to recover? This flag
+should only be set when the user explicitly requests a repair, otherwise we'll
+be masking errors.
+
+Returns a job object with the following members:
 
 * `id` - job identifier (an ISO UTC timestamp)
 * `is_finished()` - checks if the job is done
