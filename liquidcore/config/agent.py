@@ -34,7 +34,6 @@ from contextlib import contextmanager
 import fcntl
 import subprocess
 import json
-import yaml
 import daemon
 
 
@@ -119,11 +118,6 @@ def log(*args):
     print(*args, timestamp())
 
 
-def run_shell(cmd, **kwargs):
-    log('+', cmd)
-    return subprocess.run(cmd, shell=True, **kwargs)
-
-
 class State:
 
     """
@@ -152,6 +146,21 @@ class State:
         self.save(dict(self.load(), **delta))
 
 
+def run_setup(setup, target_configuration):
+    log(
+        "Calling setup with target configuration",
+        json.dumps(target_configuration, indent=2, sort_keys=True)
+    )
+
+    subprocess.run(
+        './libexec/liquid-core-configure',
+        shell=True,
+        cwd=str(setup),
+        input=json.dumps(target_configuration, indent=2).encode('utf8'),
+        check=True,
+    )
+
+
 def do_the_job(job_id, var, setup):
     """
     Perform useful work, since by now we're in our own little world, with
@@ -166,28 +175,10 @@ def do_the_job(job_id, var, setup):
             raise RuntimeError("Another job was running and did not finish")
         state_db.patch(job=job_id)
 
-        config_yml = setup / 'ansible' / 'vars' / 'config.yml'
-        with config_yml.open(encoding='utf8') as g:
-            old_config = yaml.load(g)
-
-        log("Old configuration:", old_config)
-
         with job.options_file.open(encoding='utf8') as f:
             target_configuration = json.load(f)
 
-        log("target_configuration:", target_configuration)
-        new_config = dict(old_config, liquid=target_configuration)
-
-        log("New configuration:", new_config)
-
-        with config_yml.open('w', encoding='utf8') as g:
-            yaml.dump(new_config, g)
-
-        run_shell(
-            'sudo PYTHONUNBUFFERED=1 bin/install --tags configure',
-            cwd=str(setup),
-        )
-        run_shell('sudo supervisorctl restart all')
+        run_setup(setup, target_configuration)
 
         state_db.patch(job=None)
         job.options_file.unlink()
