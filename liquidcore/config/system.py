@@ -64,3 +64,17 @@ def put_config(key_str, value):
 
     else:
         raise ValueError('Unknown key[0] = {!r}'.format(key[0]))
+
+
+def admin(request):
+    from django.shortcuts import render
+    return render(request, 'liquidcore/config.html', {
+        'jobs': agent.status(),
+    })
+
+
+def admin_log(request, job_id):
+    from django.http import HttpResponse
+    job = agent.status()[job_id]['job']
+    with job.open_logfile() as f:
+        return HttpResponse(f.read(), content_type='text/plain')

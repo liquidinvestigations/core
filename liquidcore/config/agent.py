@@ -29,11 +29,16 @@ Internally, the agent follows this script:
 * It then proceeds to apply the update - it modifies setup's configuration file
   and runs ansible.
 
+## `agent.status()`
+Returns a status report of known jobs.
+
 """
 
 import time
 import sys
 import os
+import re
+from collections import defaultdict
 from datetime import datetime
 from pathlib import Path
 from contextlib import contextmanager
@@ -63,6 +68,41 @@ def launch(target_configuration, repair):
     call_self_in_subprocess('daemonize', job.id, var, setup)
 
     return job
+
+
+def status():
+    from django.conf import settings
+
+    jobs = defaultdict(dict)
+
+    var = Path(settings.LIQUID_CORE_VAR)
+    for item in var.iterdir():
+        options_match = re.match(r'^job-(?P<id>.*)\.json$', item.name)
+        if options_match:
+            job_id = options_match.group('id')
+            jobs[job_id]['options'] = True
+
+        pidfile_match = re.match(r'^job-(?P<id>.*)\.pid$', item.name)
+        if pidfile_match:
+            job_id = pidfile_match.group('id')
+            try:
+                with item.open(encoding='utf8') as f:
+                    jobs[job_id]['pid'] = int(f.read())
+            except FileNotFoundError:
+                continue
+
+    logs = var / 'logs'
+    for item in logs.iterdir():
+        logfile_match = re.match(r'^job-(?P<id>.*)\.log$', item.name)
+        if logfile_match:
+            job_id = logfile_match.group('id')
+            with item.open(encoding='utf8') as f:
+                jobs[job_id]['log'] = f.read()
+
+    for job_id in jobs:
+        jobs[job_id]['job'] = Job(job_id, var)
+
+    return dict(jobs)
 
 
 def timestamp():
