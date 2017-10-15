@@ -35,6 +35,7 @@ import fcntl
 import subprocess
 import json
 import daemon
+import psutil
 
 
 def launch(target_configuration):
@@ -61,6 +62,10 @@ def timestamp():
     return str(datetime.utcnow().isoformat())
 
 
+class JobFailed(Exception):
+    pass
+
+
 class Job:
 
     """
@@ -76,19 +81,38 @@ class Job:
     def options_file(self):
         return self.var / 'job-{}.json'.format(self.id)
 
-    def wait(self):
-        print('Waiting for job {} to finish ...'.format(self.id))
-        while self.task_file.exists():
-            time.sleep(.2)
+    @property
+    def pid_file(self):
+        return self.var / 'job-{}.pid'.format(self.id)
 
-        print('Job {} done!'.format(self.id))
+    def wait(self, launch_timeout=5):
+        t0 = time.time()
+        while True:
+            if not self.options_file.exists():
+                # the job finished and deleted its options file
+                return
 
-        with self.open_logfile() as f:
-            print('================')
-            print(f.read())
-            print('================')
+            try:
+                with self.pid_file.open(encoding='utf8') as f:
+                    pid = int(f.read())
+            except FileNotFoundError:
+                if time.time() > t0 + launch_timeout:
+                    raise JobFailed('Job {} failed to launch' .format(self.id))
 
-        return True
+                continue
+
+            if psutil.pid_exists(pid):
+                # the job is running, let's wait a bit
+                time.sleep(.2)
+                continue
+
+            # look again to make sure the pidfile was not deleted
+            if self.pid_file.exists():
+                # yep, process is dead but pidfile is in place, it died :(
+                raise JobFailed(
+                    'Job {} died, i found its stale pidfile'
+                    .format(self.id)
+                )
 
     def open_logfile(self, mode='r'):
         logs = self.var / 'logs'
