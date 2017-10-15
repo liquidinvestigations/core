@@ -124,7 +124,7 @@ class Job:
     def open_logfile(self, mode='r'):
         logs = self.var / 'logs'
         logs.mkdir(mode=0o755, exist_ok=True)
-        logfile = logs / 'agent-{}.log'.format(self.id)
+        logfile = logs / 'job-{}.log'.format(self.id)
         if mode == 'r' and not logfile.exists():
             logfile.touch()
         return logfile.open(mode, encoding='utf8')
