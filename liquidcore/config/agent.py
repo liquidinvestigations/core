@@ -73,10 +73,12 @@ def launch(target_configuration, repair):
 
 def status():
     from django.conf import settings
+    return enumerate_jobs(Path(settings.LIQUID_CORE_VAR))
 
+
+def enumerate_jobs(var):
     jobs = defaultdict(dict)
 
-    var = Path(settings.LIQUID_CORE_VAR)
     for item in var.iterdir():
         options_match = re.match(r'^job-(?P<id>.*)\.json$', item.name)
         if options_match:
@@ -104,6 +106,16 @@ def status():
         jobs[job_id]['job'] = Job(job_id, var)
 
     return dict(jobs)
+
+
+def delete_old_jobs(var, keep):
+    for job_item in enumerate_jobs(var).values():
+        job = job_item['job']
+        if job.id == keep:
+            continue
+        for path in [job.options_file, job.pid_file]:
+            if path.is_file():
+                path.unlink()
 
 
 def timestamp():
@@ -284,6 +296,9 @@ def do_the_job(job_id, var, setup):
             run_setup(setup, **task_data)
 
             state_db.patch(job=None)
+
+            if repair:
+                delete_old_jobs(var, keep=job_id)
 
             job.options_file.unlink()
 
