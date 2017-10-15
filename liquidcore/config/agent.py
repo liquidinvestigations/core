@@ -59,6 +59,7 @@ def launch(target_configuration, repair):
     task_data = {
         'target_configuration': target_configuration,
         'repair': repair,
+        'sudo': settings.LIQUID_SETUP_SUDO,
     }
 
     job = Job(timestamp(), var)
@@ -217,18 +218,22 @@ class State:
         self.save(dict(self.load(), **delta))
 
 
-def run_setup(setup, target_configuration):
+def run_setup(setup, target_configuration, sudo=False):
     log(
         "Calling setup with target configuration",
         json.dumps(target_configuration, indent=2, sort_keys=True)
     )
+
+    cmd = './libexec/liquid-core-configure'
+    if sudo:
+        cmd = 'sudo ' + cmd
 
     options = {
         'vars': target_configuration,
     }
 
     subprocess.run(
-        './libexec/liquid-core-configure',
+        cmd,
         shell=True,
         cwd=str(setup),
         input=json.dumps(options, indent=2).encode('utf8'),
@@ -262,19 +267,21 @@ def do_the_job(job_id, var, setup):
         with job.options_file.open(encoding='utf8') as f:
             task_data = json.load(f)
 
+        repair = task_data.pop('repair')
+
         state_db = State(var)
         log("Acquiring agent lock")
         with lock(var / 'agent.lock'):
             log("Acquired lock")
 
             if state_db.load().get('job'):
-                if not task_data.get('repair'):
+                if not repair:
                     raise RuntimeError(
                         "Another job was running and did not finish")
 
             state_db.patch(job=job_id)
 
-            run_setup(setup, task_data['target_configuration'])
+            run_setup(setup, **task_data)
 
             state_db.patch(job=None)
 
