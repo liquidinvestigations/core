@@ -39,12 +39,16 @@ def setup(tmpdir, monkeypatch):
     setup_configure = libexec / 'liquid-core-configure'
 
     class setup:
-        def write_configure_script(configure_src):
+        def mock(succeeds=True):
+            by_outcome = {
+                True: MOCK_LIQUID_CORE_CONFIG,
+                False: MOCK_FAIL_LIQUID_CORE_CONFIG,
+            }
             with setup_configure.open('w', encoding='utf8') as f:
-                f.write(configure_src)
+                f.write(by_outcome[succeeds])
             setup_configure.chmod(0o755)
 
-    setup.write_configure_script(MOCK_LIQUID_CORE_CONFIG)
+    setup.mock()
 
     with override_settings():
         settings.LIQUID_CORE_VAR = str(core_var_dir)
@@ -59,7 +63,7 @@ def test_run_one_job():
 
 
 def test_detect_failed_job(setup):
-    setup.write_configure_script(MOCK_FAIL_LIQUID_CORE_CONFIG)
+    setup.mock(succeeds=False)
     job = system.reconfigure_system()
 
     with pytest.raises(agent.JobFailed):
