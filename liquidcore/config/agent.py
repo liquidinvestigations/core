@@ -223,11 +223,15 @@ def run_setup(setup, target_configuration):
         json.dumps(target_configuration, indent=2, sort_keys=True)
     )
 
+    options = {
+        'vars': target_configuration,
+    }
+
     subprocess.run(
         './libexec/liquid-core-configure',
         shell=True,
         cwd=str(setup),
-        input=json.dumps(target_configuration, indent=2).encode('utf8'),
+        input=json.dumps(options, indent=2).encode('utf8'),
         check=True,
     )
 
