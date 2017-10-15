@@ -11,7 +11,7 @@ from rest_framework import status
 
 from .models import *
 from .serializers import *
-from .reconfigure import reconfigure_system
+from .system import reconfigure_system
 
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()

@@ -2,7 +2,7 @@ from pathlib import Path
 import pytest
 from django.test.utils import override_settings
 from django.conf import settings
-from liquidcore.config import reconfigure, agent
+from liquidcore.config import system, agent
 
 
 @pytest.fixture(autouse=True)
@@ -12,7 +12,7 @@ def mock_target_configuration(monkeypatch):
     def set_value(new_value):
         value = new_value
 
-    monkeypatch.setattr(reconfigure, 'get_configuration', lambda: value)
+    monkeypatch.setattr(system, 'get_configuration', lambda: value)
 
     return set_value
 
@@ -54,13 +54,13 @@ def setup(tmpdir, monkeypatch):
 
 
 def test_run_one_job():
-    job = reconfigure.reconfigure_system()
+    job = system.reconfigure_system()
     job.wait()
 
 
 def test_detect_failed_job(setup):
     setup.write_configure_script(MOCK_FAIL_LIQUID_CORE_CONFIG)
-    job = reconfigure.reconfigure_system()
+    job = system.reconfigure_system()
 
     with pytest.raises(agent.JobFailed):
         job.wait()

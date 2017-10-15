@@ -1,6 +1,6 @@
 import json
 from django.core.management.base import BaseCommand
-from ... import reconfigure
+from ... import system
 
 
 class Command(BaseCommand):
@@ -12,5 +12,5 @@ class Command(BaseCommand):
         parser.add_argument('value')
 
     def handle(self, key, value, **options):
-        job = reconfigure.put_config(key, json.loads(value))
+        job = system.put_config(key, json.loads(value))
         job.wait()

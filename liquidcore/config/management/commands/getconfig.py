@@ -1,6 +1,6 @@
 import json
 from django.core.management.base import BaseCommand
-from ... import reconfigure
+from ... import system
 
 
 class Command(BaseCommand):
@@ -11,5 +11,5 @@ class Command(BaseCommand):
         parser.add_argument('key', default=None)
 
     def handle(self, key, **options):
-        value = reconfigure.get_config(key)
+        value = system.get_config(key)
         print(json.dumps(value, indent=2, sort_keys=True))
