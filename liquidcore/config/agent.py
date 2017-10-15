@@ -50,7 +50,7 @@ def launch(target_configuration):
     }
 
     job = Job(timestamp(), var)
-    with job.task_file.open('w', encoding='utf8') as f:
+    with job.options_file.open('w', encoding='utf8') as f:
         print(json.dumps(task_data, indent=2), file=f)
 
     call_self_in_subprocess('daemonize', job.id, var, setup)
@@ -74,8 +74,8 @@ class Job:
         self.var = Path(var)
 
     @property
-    def task_file(self):
-        return self.var / 'task-{}.json'.format(self.id)
+    def options_file(self):
+        return self.var / 'job-{}.json'.format(self.id)
 
     def wait(self):
         print('Waiting for job {} to finish ...'.format(self.id))
@@ -172,7 +172,7 @@ def do_the_job(job_id, var, setup):
 
         log("Old configuration:", old_config)
 
-        with job.task_file.open(encoding='utf8') as f:
+        with job.options_file.open(encoding='utf8') as f:
             target_configuration = json.load(f)
 
         log("target_configuration:", target_configuration)
@@ -190,7 +190,7 @@ def do_the_job(job_id, var, setup):
         run_shell('sudo supervisorctl restart all')
 
         state_db.patch(job=None)
-        job.task_file.unlink()
+        job.options_file.unlink()
         log("Finished")
 
     log("Released lock")
