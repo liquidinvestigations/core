@@ -1,6 +1,6 @@
 import pytest
 
-@pytest.fixture(autouse=True)
+@pytest.fixture
 def mock_agent(monkeypatch):
     class Job: id = 'mock'
     from liquidcore.config import agent
