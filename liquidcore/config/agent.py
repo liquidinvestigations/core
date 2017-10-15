@@ -25,6 +25,7 @@ Internally, the agent follows this script:
 
 """
 
+import time
 import sys
 import os
 from datetime import datetime
@@ -76,8 +77,19 @@ class Job:
     def task_file(self):
         return self.var / 'task-{}.json'.format(self.id)
 
-    def is_finished(self):
-        return not self.task_file.exists()
+    def wait(self):
+        print('Waiting for job {} to finish ...'.format(self.id))
+        while self.task_file.exists():
+            time.sleep(.2)
+
+        print('Job {} done!'.format(self.id))
+
+        with self.open_logfile() as f:
+            print('================')
+            print(f.read())
+            print('================')
+
+        return True
 
     def open_logfile(self, mode='r'):
         logs = self.var / 'logs'
