@@ -13,4 +13,9 @@ class Command(BaseCommand):
 
     def handle(self, key, value, **options):
         job = system.put_config(key, json.loads(value))
-        job.wait()
+        try:
+            job.wait()
+        except:
+            with job.open_logfile() as f:
+                print(f.read())
+            raise
