@@ -58,7 +58,7 @@ def launch(options, repair):
 
     task_data = {
         'options': options,
-        'command': settings.LIQUID_SETUP_COMMAND,
+        'command': settings.LIQUID_SETUP_RECONFIGURE,
         'repair': repair,
     }
 

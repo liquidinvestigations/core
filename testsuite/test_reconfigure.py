@@ -50,7 +50,7 @@ def setup(tmpdir, monkeypatch):
 
     with override_settings():
         settings.LIQUID_CORE_VAR = str(setup.core_var_dir)
-        settings.LIQUID_SETUP_COMMAND = str(mock_setup)
+        settings.LIQUID_SETUP_RECONFIGURE = str(mock_setup)
 
         yield setup
 
