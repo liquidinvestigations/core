@@ -4,8 +4,8 @@ Configuration agent for liquid-core
 This module does daemonization voodoo. It has two public methods: `launch` and
 `status`.
 
-## `agent.launch(target_configuration, repair)`
-`target_configuration` is the configuration that will be applied.
+## `agent.launch(options, repair)`
+`options` is the configuration that will be applied.
 
 `repair` - if the last job failed, should we attempt to recover? This means
 clearing the "failed" flag and re-applying the target configuration. This flag
@@ -50,14 +50,14 @@ import daemon
 import psutil
 
 
-def launch(target_configuration, repair):
-    """ Launch a job to apply `target_configuration`. """
+def launch(options, repair):
+    """ Launch a job to apply `options`. """
     from django.conf import settings
 
     var = Path(settings.LIQUID_CORE_VAR)
 
     task_data = {
-        'target_configuration': target_configuration,
+        'options': options,
         'command': settings.LIQUID_SETUP_COMMAND,
         'repair': repair,
     }
@@ -243,15 +243,11 @@ class State:
         self.save(dict(self.load(), **delta))
 
 
-def run_task(command, target_configuration):
+def run_task(command, options):
     log(
         "Calling setup with target configuration",
-        json.dumps(target_configuration, indent=2, sort_keys=True)
+        json.dumps(options, indent=2, sort_keys=True)
     )
-
-    options = {
-        'vars': target_configuration,
-    }
 
     subprocess.run(
         command,

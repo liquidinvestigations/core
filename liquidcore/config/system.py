@@ -21,8 +21,8 @@ def get_configuration():
 
 
 def reconfigure_system(repair=False):
-    target_configuration = get_configuration()
-    job = agent.launch(target_configuration, repair)
+    options = get_configuration()
+    job = agent.launch(options, repair)
     print('Job {} launched'.format(job.id))
     return job
 

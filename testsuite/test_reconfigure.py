@@ -7,7 +7,7 @@ from liquidcore.config import system, agent
 
 
 @pytest.fixture(autouse=True)
-def mock_target_configuration(monkeypatch):
+def mock_job_options(monkeypatch):
     value = {}
 
     def set_value(new_value):
@@ -101,8 +101,8 @@ import sys
 import json
 
 options = json.load(sys.stdin)
-prefix = options['vars']['prefix']
-delay = options['vars']['delay']
+prefix = options['prefix']
+delay = options['delay']
 
 def stamp_time(n):
     filename = '{}{}.txt'.format(prefix, n)
@@ -121,15 +121,15 @@ if os.environ.get('AGENT_LOCKING_STRESSTEST'):
     DELAY_VALUES = [0, 3, 5, 1, 3, 5]
 
 @pytest.mark.parametrize('delay', DELAY_VALUES)
-def test_concurrency(setup, mock_target_configuration, delay):
+def test_concurrency(setup, mock_job_options, delay):
     setup.mock(TEST_CONCURRENCY_WHOAMI)
 
-    mock_target_configuration({
+    mock_job_options({
         'prefix': '{}/a'.format(setup.core_var_dir),
         'delay': delay,
     })
     job1 = system.reconfigure_system()
-    mock_target_configuration({
+    mock_job_options({
         'prefix': '{}/b'.format(setup.core_var_dir),
         'delay': delay,
     })
