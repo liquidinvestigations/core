@@ -33,12 +33,7 @@ raise RuntimeError("please just die.")
 
 @pytest.fixture(autouse=True)
 def setup(tmpdir, monkeypatch):
-    mock_setup_dir = Path(str(tmpdir.mkdir('setup')))
-    core_var_dir = Path(str(tmpdir.mkdir('var')))
-
-    libexec = mock_setup_dir / 'libexec'
-    libexec.mkdir(mode=0o755)
-    setup_configure = libexec / 'liquid-core-configure'
+    mock_setup = Path(str(tmpdir.mkdir('setup'))) / 'mock-setup'
 
     class setup:
         def mock(content=None, succeeds=True):
@@ -46,17 +41,16 @@ def setup(tmpdir, monkeypatch):
                 True: MOCK_LIQUID_CORE_CONFIG,
                 False: MOCK_FAIL_LIQUID_CORE_CONFIG,
             }
-            with setup_configure.open('w', encoding='utf8') as f:
+            with mock_setup.open('w', encoding='utf8') as f:
                 f.write(content or by_outcome[succeeds])
-            setup_configure.chmod(0o755)
+            mock_setup.chmod(0o755)
 
     setup.mock()
-
-    setup.core_var_dir = core_var_dir
+    setup.core_var_dir = Path(str(tmpdir.mkdir('var')))
 
     with override_settings():
-        settings.LIQUID_CORE_VAR = str(core_var_dir)
-        settings.LIQUID_SETUP_DIR = str(mock_setup_dir)
+        settings.LIQUID_CORE_VAR = str(setup.core_var_dir)
+        settings.LIQUID_SETUP_COMMAND = str(mock_setup)
 
         yield setup
 

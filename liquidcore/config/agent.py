@@ -55,19 +55,18 @@ def launch(target_configuration, repair):
     from django.conf import settings
 
     var = Path(settings.LIQUID_CORE_VAR)
-    setup = Path(settings.LIQUID_SETUP_DIR)
 
     task_data = {
         'target_configuration': target_configuration,
+        'command': settings.LIQUID_SETUP_COMMAND,
         'repair': repair,
-        'sudo': settings.LIQUID_SETUP_SUDO,
     }
 
     job = Job(timestamp(), var)
     with job.options_file.open('w', encoding='utf8') as f:
         print(json.dumps(task_data, indent=2), file=f)
 
-    call_self_in_subprocess('daemonize', job.id, var, setup)
+    call_self_in_subprocess('daemonize', job.id, var)
 
     return job
 
@@ -244,24 +243,19 @@ class State:
         self.save(dict(self.load(), **delta))
 
 
-def run_setup(setup, target_configuration, sudo=False):
+def run_task(command, target_configuration):
     log(
         "Calling setup with target configuration",
         json.dumps(target_configuration, indent=2, sort_keys=True)
     )
-
-    cmd = './libexec/liquid-core-configure'
-    if sudo:
-        cmd = 'sudo ' + cmd
 
     options = {
         'vars': target_configuration,
     }
 
     subprocess.run(
-        cmd,
+        command,
         shell=True,
-        cwd=str(setup),
         input=json.dumps(options, indent=2).encode('utf8'),
         check=True,
     )
@@ -283,7 +277,7 @@ def pidfile(pid_file):
     pid_file.unlink()
 
 
-def do_the_job(job_id, var, setup):
+def do_the_job(job_id, var):
     """
     Perform useful work, since by now we're in our own little world, with
     stdout+stderr redirected to the log file.
@@ -305,7 +299,7 @@ def do_the_job(job_id, var, setup):
 
             state_db.patch(job=job_id)
 
-            run_setup(setup, **task_data)
+            run_task(**task_data)
 
             state_db.patch(job=None)
 
@@ -317,22 +311,22 @@ def do_the_job(job_id, var, setup):
             log("Finished")
 
 
-def daemonize(job_id, var, setup):
+def daemonize(job_id, var):
     """ daemonize, so we don't get killed by the caller of `launch` """
     with daemon.DaemonContext():
         job = Job(job_id, var)
         with job.open_logfile('a') as f:
             call_self_in_subprocess(
-                'run', job_id, var, setup,
+                'run', job_id, var,
                 stdout=f, stderr=f,
                 env=dict(os.environ, PYTHONUNBUFFERED='1'),
             )
 
 
 if __name__ == '__main__':
-    [stage, job_id, var, setup] = sys.argv[1:]
+    [stage, job_id, var] = sys.argv[1:]
     if stage == 'daemonize':
-        daemonize(job_id, var, setup)
+        daemonize(job_id, var)
 
     else:
-        do_the_job(job_id, Path(var), Path(setup))
+        do_the_job(job_id, Path(var))
