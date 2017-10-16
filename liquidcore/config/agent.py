@@ -146,7 +146,14 @@ class Job:
     def pid_file(self):
         return self.var / 'job-{}.pid'.format(self.id)
 
-    def wait(self, launch_timeout=5):
+    def wait(self, launch_timeout=5, dump_logs=True):
+        def dump_the_logs():
+            if dump_logs:
+                with self.open_logfile() as f:
+                    print("========", file=sys.stderr)
+                    print(f.read(), file=sys.stderr)
+                    print("========", file=sys.stderr)
+
         t0 = time.time()
         while True:
             if not self.options_file.exists():
@@ -158,6 +165,7 @@ class Job:
                     pid = int(f.read())
             except FileNotFoundError:
                 if time.time() > t0 + launch_timeout:
+                    dump_the_logs()
                     raise JobFailed('Job {} failed to launch' .format(self.id))
 
                 continue
@@ -170,6 +178,7 @@ class Job:
             # look again to make sure the pidfile was not deleted
             if self.pid_file.exists():
                 # yep, process is dead but pidfile is in place, it died :(
+                dump_the_logs()
                 raise JobFailed(
                     'Job {} died, I found its stale pidfile'
                     .format(self.id)
