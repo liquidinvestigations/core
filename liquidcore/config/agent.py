@@ -196,11 +196,16 @@ class Job:
 @contextmanager
 def lock(path):
     with open(str(path), 'w') as lock_file:
+        log("Acquiring lock", path)
         fcntl.flock(lock_file, fcntl.LOCK_EX)
+        log("Acquired lock", path)
+
         try:
             yield
+
         finally:
             fcntl.flock(lock_file, fcntl.LOCK_UN)
+            log("Released lock", path)
 
 
 def call_self_in_subprocess(*args, **kwargs):
@@ -209,7 +214,7 @@ def call_self_in_subprocess(*args, **kwargs):
 
 
 def log(*args):
-    print(*args, timestamp())
+    print(timestamp(), *args)
 
 
 class State:
@@ -291,9 +296,7 @@ def do_the_job(job_id, var, setup):
         repair = task_data.pop('repair')
 
         state_db = State(var)
-        log("Acquiring agent lock")
         with lock(var / 'agent.lock'):
-            log("Acquired lock")
 
             if state_db.load().get('job'):
                 if not repair:
@@ -312,8 +315,6 @@ def do_the_job(job_id, var, setup):
             job.options_file.unlink()
 
             log("Finished")
-
-        log("Released lock")
 
 
 def daemonize(job_id, var, setup):
