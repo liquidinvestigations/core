@@ -137,4 +137,5 @@ def test_concurrency(setup, mock_target_configuration):
         with path.open(encoding='utf8') as f:
             return float(f.read())
 
-    assert t('a0') < t('a1') < t('b0') < t('b1')
+    (a0, a1, b0, b1) = t('a0'), t('a1'), t('b0'), t('b1')
+    assert (a0 < a1 < b0 < b1) or (b0 < b1 < a0 < a1)
