@@ -1,6 +1,6 @@
 from django.conf.urls import url
 from django.contrib.admin import AdminSite, site as default_site
-from ..config import system
+from ..config import admin as config_admin
 
 
 class LiquidAdminSite(AdminSite):
@@ -13,8 +13,9 @@ class LiquidAdminSite(AdminSite):
 
     def get_urls(self):
         return super().get_urls() + [
-            url(r'config/$', system.admin),
-            url(r'config/(?P<job_id>[^/]+)\.log$', system.admin_log),
+            url(r'reconfigure/$', config_admin.reconfigure),
+            url(r'reconfigure/(?P<job_id>[^/]+)\.log$',
+                config_admin.reconfigure_job_log),
         ]
 
 
