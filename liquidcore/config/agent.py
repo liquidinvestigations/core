@@ -7,7 +7,8 @@ This module does daemonization voodoo. It has two public methods: `launch` and
 ## `agent.launch(target_configuration, repair)`
 `target_configuration` is the configuration that will be applied.
 
-`repair` - if the last job failed, should we attempt to recover? This flag
+`repair` - if the last job failed, should we attempt to recover? This means
+clearing the "failed" flag and re-applying the target configuration. This flag
 should only be set when the user explicitly requests a repair, otherwise we'll
 be masking errors.
 
@@ -170,7 +171,7 @@ class Job:
             if self.pid_file.exists():
                 # yep, process is dead but pidfile is in place, it died :(
                 raise JobFailed(
-                    'Job {} died, i found its stale pidfile'
+                    'Job {} died, I found its stale pidfile'
                     .format(self.id)
                 )
 
@@ -203,7 +204,6 @@ def log(*args):
 
 
 class State:
-
     """
     Read and write global state from disk. Only write to disk while holding the
     `agent.lock` lockfile.
