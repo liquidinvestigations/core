@@ -32,8 +32,8 @@ raise RuntimeError("please just die.")
 
 @pytest.fixture(autouse=True)
 def setup(tmpdir, monkeypatch):
-    mock_setup_dir = Path(tmpdir.mkdir('setup'))
-    core_var_dir = Path(tmpdir.mkdir('var'))
+    mock_setup_dir = Path(str(tmpdir.mkdir('setup')))
+    core_var_dir = Path(str(tmpdir.mkdir('var')))
 
     libexec = mock_setup_dir / 'libexec'
     libexec.mkdir(mode=0o755)
@@ -108,7 +108,7 @@ import json
 options = json.load(sys.stdin)
 
 def stamp_time(n):
-    filename = '{}{}.txt'.format(options['prefix'], n)
+    filename = '{}{}.txt'.format(options['vars']['prefix'], n)
     with open(filename, 'w', encoding='utf8') as f:
         print(time.time(), file=f)
 
