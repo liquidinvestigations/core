@@ -1,3 +1,4 @@
+import os
 from pathlib import Path
 import pytest
 from django.test.utils import override_settings
@@ -106,24 +107,38 @@ import sys
 import json
 
 options = json.load(sys.stdin)
+prefix = options['vars']['prefix']
+delay = options['vars']['delay']
 
 def stamp_time(n):
-    filename = '{}{}.txt'.format(options['vars']['prefix'], n)
+    filename = '{}{}.txt'.format(prefix, n)
     with open(filename, 'w', encoding='utf8') as f:
         print(time.time(), file=f)
 
 stamp_time(0)
-time.sleep(3)
+print('sleeping', delay)
+time.sleep(delay)
 stamp_time(1)
 """
 
 
-def test_concurrency(setup, mock_target_configuration):
+DELAY_VALUES = [3]
+if os.environ.get('AGENT_LOCKING_STRESSTEST'):
+    DELAY_VALUES = [0, 3, 5, 1, 3, 5]
+
+@pytest.mark.parametrize('delay', DELAY_VALUES)
+def test_concurrency(setup, mock_target_configuration, delay):
     setup.mock(TEST_CONCURRENCY_WHOAMI)
 
-    mock_target_configuration({'prefix': '{}/a'.format(setup.core_var_dir)})
+    mock_target_configuration({
+        'prefix': '{}/a'.format(setup.core_var_dir),
+        'delay': delay,
+    })
     job1 = system.reconfigure_system()
-    mock_target_configuration({'prefix': '{}/b'.format(setup.core_var_dir)})
+    mock_target_configuration({
+        'prefix': '{}/b'.format(setup.core_var_dir),
+        'delay': delay,
+    })
     job2 = system.reconfigure_system()
 
     job1.wait()
