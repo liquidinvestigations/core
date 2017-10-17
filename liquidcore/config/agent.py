@@ -145,7 +145,7 @@ class Job:
     def pid_file(self):
         return self.var / 'job-{}.pid'.format(self.id)
 
-    def wait(self, launch_timeout=5, dump_logs=True):
+    def wait(self, launch_timeout=20, dump_logs=True):
         def dump_the_logs():
             if dump_logs:
                 with self.open_logfile() as f:
