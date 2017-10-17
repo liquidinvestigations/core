@@ -21,7 +21,9 @@ def get_configuration():
 
 
 def reconfigure_system(repair=False):
-    options = get_configuration()
+    options = {
+        'vars': get_configuration(),
+    }
     job = agent.launch(options, repair)
     print('Job {} launched'.format(job.id))
     return job
