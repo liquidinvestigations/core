@@ -11,7 +11,7 @@ from rest_framework import status
 
 from .models import *
 from .serializers import *
-from .system import update_system
+from .system import reconfigure_system
 
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
@@ -102,7 +102,7 @@ class ServiceViewSet(viewsets.ReadOnlyModelViewSet):
         service = self.get_object()
         service.is_enabled = data['is_enabled']
         service.save()
-        update_system()
+        reconfigure_system()
         return Response(status=status.HTTP_200_OK)
 
 class NodeViewSet(viewsets.ReadOnlyModelViewSet):
@@ -122,7 +122,7 @@ class NodeViewSet(viewsets.ReadOnlyModelViewSet):
         node = Node.objects.get(id=pk)
         node.trusted = data['is_trusted']
         node.save()
-        update_system()
+        reconfigure_system()
         return Response(status=status.HTTP_200_OK)
 
 
@@ -150,7 +150,7 @@ class NetworkSettingAPIView(APIView):
             setting = Setting.objects.get(name=self.setting_name)
             setting.data = self.to_db(serializer.validated_data)
             setting.save()
-            update_system()
+            reconfigure_system()
             return Response(serializer.validated_data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -230,7 +230,7 @@ class Registration(APIView):
                 is_staff=True,
                 is_superuser=True
             )
-            update_system()
+            reconfigure_system()
 
             initialized = settings['initialized']
             initialized.data = True

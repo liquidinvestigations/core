@@ -1,0 +1,29 @@
+<!doctype html>
+<meta charset="utf8">
+
+<body>
+
+<table>
+  <thead>
+    <tr>
+      <th>Job ID</th>
+      <th>pending</th>
+      <th>started</th>
+      <th>log</th>
+    </tr>
+  </thead>
+  <tbody>
+  {% for job_id, properties in jobs.items %}
+    <tr>
+      <td>{{ job_id }}</td>
+      <td>{% if properties.options %}yes{% endif %}</td>
+      <td>{{ properties.pid }}</td>
+      <td>
+        {% if properties.log %}
+          <a href="{{ job_id }}.log">view</a>
+        {% endif %}
+      </td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
