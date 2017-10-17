@@ -4,8 +4,9 @@ from . import agent
 
 
 def reconfigure(request):
+    jobs = sorted(agent.status().items())
     return render(request, 'liquidcore/config.html', {
-        'jobs': agent.status(),
+        'jobs': jobs,
     })
 
 

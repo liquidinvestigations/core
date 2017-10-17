@@ -13,7 +13,7 @@
     </tr>
   </thead>
   <tbody>
-  {% for job_id, properties in jobs.items %}
+  {% for job_id, properties in jobs %}
     <tr>
       <td>{{ job_id }}</td>
       <td>{% if properties.options %}yes{% endif %}</td>
