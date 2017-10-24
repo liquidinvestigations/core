@@ -100,9 +100,9 @@ import time
 import sys
 import json
 
-options = json.load(sys.stdin)
-prefix = options['prefix']
-delay = options['delay']
+vars = json.load(sys.stdin)['vars']
+prefix = vars['prefix']
+delay = vars['delay']
 
 def stamp_time(n):
     filename = '{}{}.txt'.format(prefix, n)
