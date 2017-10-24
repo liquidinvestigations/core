@@ -4,8 +4,8 @@ from rest_framework import serializers
 
 from .models import *
 
-USERNAME_REGEX = r"^([a-zA-Z0-9_]|\.)+$"
-USERNAME_URL_REGEX = USERNAME_REGEX[1:-1]
+USERNAME_URL_REGEX = r'([a-zA-Z0-9_]|\.)+'
+USERNAME_REGEX = r"^{}$".format(USERNAME_URL_REGEX)
 DOMAIN_REGEX = r"^(([a-zA-Z0-9]|-)+\.)+([a-zA-Z0-9]+)$"
 
 def valid_username(username):
