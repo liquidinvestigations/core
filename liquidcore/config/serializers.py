@@ -2,7 +2,7 @@ import re
 from django.contrib.auth.models import User
 from rest_framework import serializers
 
-from .models import *
+from . import models
 
 USERNAME_URL_REGEX = r'([a-zA-Z0-9_]|\.)+'
 USERNAME_REGEX = r"^{}$".format(USERNAME_URL_REGEX)
@@ -60,7 +60,7 @@ class ServiceSerializer(serializers.ModelSerializer):
     url = serializers.ReadOnlyField()
 
     class Meta:
-        model = Service
+        model = models.Service
         fields = '__all__'
 
 class ServiceEnabledSerializer(serializers.Serializer):
@@ -72,7 +72,7 @@ class NodeSerializer(serializers.ModelSerializer):
     hostname = serializers.CharField(source='name')
 
     class Meta:
-        model = Node
+        model = models.Node
         fields = ['id', 'is_trusted', 'hostname', 'data']
 
 class NodeTrustedSerializer(serializers.Serializer):

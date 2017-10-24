@@ -9,15 +9,15 @@ from rest_framework.decorators import detail_route, list_route, api_view
 from rest_framework.views import APIView
 from rest_framework import status
 
-from .models import *
-from .serializers import *
+from .models import Service, Setting, Node
+from . import serializers
 from .system import reconfigure_system
 
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
-    serializer_class = UserSerializer
+    serializer_class = serializers.UserSerializer
     lookup_field = 'username'
-    lookup_value_regex = USERNAME_URL_REGEX
+    lookup_value_regex = serializers.USERNAME_URL_REGEX
 
     # @list_route creates an endpoint that doesn't contain the pk.
     # We don't return a list, but that's not a problem.
@@ -33,8 +33,7 @@ class UserViewSet(viewsets.ModelViewSet):
         username = request.user.username
         if not username:
             return Response({"is_authenticated": False})
-        queryset = User.objects.get(username=username)
-        data = UserSerializer(queryset, context={'request':request}).data
+        data = serializers.UserSerializer(request.user, context={'request':request}).data
         data["is_authenticated"] = True
         return Response(data)
 
@@ -46,7 +45,7 @@ class UserViewSet(viewsets.ModelViewSet):
         """Sets the user as active or inactive"""
         user = self.get_object()
 
-        serializer = UserActiveSerializer(data=request.data)
+        serializer = serializers.UserActiveSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         data = serializer.validated_data
 
@@ -60,7 +59,7 @@ class UserViewSet(viewsets.ModelViewSet):
     )
     def password(self, request, username=None):
         user = self.get_object()
-        serializer = PasswordChangeSerializer(data=request.data)
+        serializer = serializers.PasswordChangeSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         data = serializer.validated_data
 
@@ -82,7 +81,7 @@ class UserViewSet(viewsets.ModelViewSet):
 
 class ServiceViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Service.objects.all()
-    serializer_class = ServiceSerializer
+    serializer_class = serializers.ServiceSerializer
 
     @detail_route(
         methods=['put'],
@@ -90,7 +89,7 @@ class ServiceViewSet(viewsets.ReadOnlyModelViewSet):
     )
     def enabled(self, request, pk=None):
         """Sets the service as enabled or disabled."""
-        serializer = ServiceEnabledSerializer(data=request.data)
+        serializer = serializers.ServiceEnabledSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         data = serializer.validated_data
 
@@ -102,7 +101,7 @@ class ServiceViewSet(viewsets.ReadOnlyModelViewSet):
 
 class NodeViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Node.objects.all()
-    serializer_class = NodeSerializer
+    serializer_class = serializers.NodeSerializer
 
     @detail_route(
         methods=['put'],
@@ -110,7 +109,7 @@ class NodeViewSet(viewsets.ReadOnlyModelViewSet):
     )
     def trusted(self, request, pk=None):
         """Sets the service as enabled or disabled."""
-        serializer = NodeTrustedSerializer(data=request.data)
+        serializer = serializers.NodeTrustedSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         data = serializer.validated_data
 
@@ -151,7 +150,7 @@ class NetworkSettingAPIView(APIView):
 
 class NetworkDomain(NetworkSettingAPIView):
     setting_name = "domain"
-    serializer_class = NetworkDomainSerializer
+    serializer_class = serializers.NetworkDomainSerializer
 
     @staticmethod
     def to_db(value):
@@ -163,15 +162,15 @@ class NetworkDomain(NetworkSettingAPIView):
 
 class NetworkLan(NetworkSettingAPIView):
     setting_name = "lan"
-    serializer_class = LanSerializer
+    serializer_class = serializers.LanSerializer
 
 class NetworkWan(NetworkSettingAPIView):
     setting_name = "wan"
-    serializer_class = WanSerializer
+    serializer_class = serializers.WanSerializer
 
 class NetworkSsh(NetworkSettingAPIView):
     setting_name = "ssh"
-    serializer_class = SshSerializer
+    serializer_class = serializers.SshSerializer
 
 def _get_settings():
     return {s.name: s for s in Setting.objects.all()}
@@ -210,7 +209,7 @@ class Registration(APIView):
                                 status=status.HTTP_400_BAD_REQUEST)
 
             # validate and extract the data
-            serializer = RegistrationSerializer(data=request.data)
+            serializer = serializers.RegistrationSerializer(data=request.data)
             serializer.is_valid(raise_exception=True)
             data = serializer.validated_data
             for key in ['domain', 'lan', 'wan', 'ssh']:
