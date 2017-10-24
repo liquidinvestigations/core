@@ -29,7 +29,7 @@ def valid_domain(domain):
         raise serializers.ValidationError("invalid hostname")
     return domain
 
-class CreateUserSerializer(serializers.HyperlinkedModelSerializer):
+class UserSerializer(serializers.HyperlinkedModelSerializer):
     is_admin = serializers.BooleanField(source='is_staff')
     username = serializers.CharField(validators=[valid_username])
 
@@ -38,21 +38,11 @@ class CreateUserSerializer(serializers.HyperlinkedModelSerializer):
         view_name='user-detail',
         lookup_field='username'
     )
-    class Meta:
-        model = User
-        fields = ('url', 'username', 'first_name',
-                  'last_name', 'is_admin', 'is_active')
 
-class UpdateUserSerializer(serializers.HyperlinkedModelSerializer):
-    # rename the is_staff field
-    is_admin = serializers.BooleanField(source='is_staff')
-    username = serializers.CharField(read_only=True, validators=[valid_username])
+    def update(self, instance, validated_data):
+        if instance.username != validated_data['username']:
+            raise serializers.ValidationError("username cannot be changed")
 
-    # hyperlink urls using username as identity
-    url = serializers.HyperlinkedIdentityField(
-        view_name='user-detail',
-        lookup_field='username'
-    )
     class Meta:
         model = User
         fields = ('url', 'username', 'first_name',

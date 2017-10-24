@@ -15,14 +15,9 @@ from .system import reconfigure_system
 
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
+    serializer_class = UserSerializer
     lookup_field = 'username'
     lookup_value_regex = USERNAME_URL_REGEX
-
-    # don't let the user update the `username` field
-    def get_serializer_class(self):
-        if self.request.method == 'POST':
-            return CreateUserSerializer
-        return UpdateUserSerializer
 
     # @list_route creates an endpoint that doesn't contain the pk.
     # We don't return a list, but that's not a problem.
@@ -39,7 +34,7 @@ class UserViewSet(viewsets.ModelViewSet):
         if not username:
             return Response({"is_authenticated": False})
         queryset = User.objects.get(username=username)
-        data = UpdateUserSerializer(queryset, context={'request':request}).data
+        data = UserSerializer(queryset, context={'request':request}).data
         data["is_authenticated"] = True
         return Response(data)
 

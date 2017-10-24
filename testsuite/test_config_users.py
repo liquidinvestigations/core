@@ -46,6 +46,51 @@ def test_create_users(client, admin_user):
     assert "Tyson" == get_mike.json()['last_name']
     assert True == get_mike.json()['is_active']
 
+def test_admins_cant_change_username(client, admin_user):
+    assert client.login(username='admin', password='q')
+
+    User.objects.create_user(
+        username='mike',
+        password='mike',
+        is_staff=False
+    )
+
+    change_username = client.put("/api/users/mike/", data={
+        "username": "mickey",
+    })
+    assert change_username.status_code == 400
+
+    # make sure nothing has changed
+    user_list = client.get("/api/users/")
+    assert set(u['username'] for u in user_list.json()) == set(["admin", "mike"])
+
+    get_mike = client.get('/api/users/mike/')
+    assert get_mike.status_code == 200
+    assert "mike" == get_mike.json()['username']
+
+def test_users_cant_change_username(client, admin_user):
+    User.objects.create_user(
+        username='mike',
+        password='mike',
+        is_staff=False
+    )
+    assert client.login(username='mike', password='mike')
+
+    change_username = client.put("/api/users/mike/", data={
+        "username": "mickey",
+    })
+    assert change_username.status_code == 403
+    client.logout()
+
+    # make sure nothing has changed
+    assert client.login(username='admin', password='q')
+    user_list = client.get("/api/users/")
+    assert set(u['username'] for u in user_list.json()) == set(["admin", "mike"])
+
+    get_mike = client.get('/api/users/mike/')
+    assert get_mike.status_code == 200
+    assert "mike" == get_mike.json()['username']
+
 def test_password_change_admin_self(client, admin_user):
     assert client.login(username='admin', password='q')
 
