@@ -6,7 +6,8 @@ from django.contrib.auth.models import User
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny, IsAdminUser
 from rest_framework import viewsets
-from rest_framework.decorators import detail_route, list_route, api_view
+from rest_framework.decorators import detail_route, list_route, api_view, \
+     permission_classes
 from rest_framework.views import APIView
 from rest_framework import status
 
@@ -285,3 +286,28 @@ class VPNClientKeyViewSet(viewsets.ReadOnlyModelViewSet):
         response = Response(ovpn_content, content_type=OVPN_CONTENT_TYPE)
         response['Content-Disposition'] = 'attachment; filename="{}"'.format(filename)
         return response
+
+@api_view(['GET'])
+@permission_classes([IsAdminUser])
+def vpn_status(request):
+    def get_description(state):
+        if state['error_message']:
+            return 'Error.'
+        if not state['is_enabled']:
+            return "Disabled."
+        if state['is_running']:
+            return 'Up and running.'
+        else:
+            return 'Starting...'
+
+    vpn_setting = Setting.objects.get(name='vpn')
+    status = vpn_setting.data
+    # TODO get these with system calls
+    status['client']['is_running'] = False
+    status['server']['is_running'] = False
+    status['server']['registered_key_count'] = VPNClientKey.objects.count()
+    status['server']['active_connection_count'] = 0
+
+    status['client']['state_description'] = get_description(status['client'])
+    status['server']['state_description'] = get_description(status['server'])
+    return Response(status)

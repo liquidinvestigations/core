@@ -24,14 +24,15 @@ def test_vpn_system_status(client):
     vpn_status = client.get('/api/vpn/')
     assert 200 == vpn_status.status_code
 
+    print(vpn_status.json())
     client_status = vpn_status.json()['client']
-    assert "Not enabled." == client_status['description']
+    assert "Disabled." == client_status['state_description']
     assert False == client_status['is_enabled']
     assert False == client_status['is_running']
     assert None == client_status['error_message']
 
     server_status = vpn_status.json()['server']
-    assert "Not enabled." == server_status['description']
+    assert "Disabled." == server_status['state_description']
     assert False == server_status['is_enabled']
     assert False == server_status['is_running']
     assert None == server_status['error_message']

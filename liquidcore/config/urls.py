@@ -17,6 +17,7 @@ urlpatterns = format_suffix_patterns([
     url(r'^network/lan/$', views.NetworkLan.as_view()),
     url(r'^network/wan/$', views.NetworkWan.as_view()),
     url(r'^network/ssh/$', views.NetworkSsh.as_view()),
+    url(r'^vpn/$', views.vpn_status),
 ]) + [
     url(r'^', include(router.urls)),
 ]
