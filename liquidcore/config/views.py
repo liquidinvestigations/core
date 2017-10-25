@@ -1,5 +1,5 @@
 import fcntl
-from datetime import datetime
+from django.utils import timezone
 from contextlib import contextmanager
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -13,6 +13,8 @@ from rest_framework import status
 from .models import Service, Setting, Node, VPNClientKey
 from . import serializers
 from .system import reconfigure_system
+
+OVPN_CONTENT_TYPE = 'application/x-openvpn-profile'
 
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
@@ -264,9 +266,22 @@ class VPNClientKeyViewSet(viewsets.ReadOnlyModelViewSet):
         client_key = self.get_object()
         client_key.revoked = True
         client_key.revoked_reason = serializer.validated_data['revoked_reason']
-        client_key.revoked_at = datetime.now()
+        client_key.revoked_at = timezone.now()
         client_key.revoked_by = request.user
         client_key.save()
 
         reconfigure_system()
         return Response(status=status.HTTP_200_OK)
+
+    @detail_route(
+        methods=['get'],
+        permission_classes=[IsAdminUser],
+        url_name='download'
+    )
+    def download(self, request, id=None):
+        # TODO get client key from system call
+        ovpn_content = "dummy key here, don't mind me\n"
+        filename = 'client-key-{}.ovpn'.format(id)
+        response = Response(ovpn_content, content_type=OVPN_CONTENT_TYPE)
+        response['Content-Disposition'] = 'attachment; filename="{}"'.format(filename)
+        return response
