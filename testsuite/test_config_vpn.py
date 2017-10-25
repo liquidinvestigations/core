@@ -24,7 +24,6 @@ def test_vpn_system_status(client):
     vpn_status = client.get('/api/vpn/')
     assert 200 == vpn_status.status_code
 
-    print(vpn_status.json())
     client_status = vpn_status.json()['client']
     assert "Disabled." == client_status['state_description']
     assert False == client_status['is_enabled']
@@ -44,9 +43,6 @@ def test_vpn_server_enable_disable(client):
         'is_enabled': True,
     })
     assert 200 == server_enable.status_code
-
-    vpn_status = client.get('/api/vpn/')
-    assert 200 == vpn_status.status_code
     assert True == client.get('/api/vpn/').json()['server']['is_enabled']
 
     server_disable = client.put('/api/vpn/server/', data={

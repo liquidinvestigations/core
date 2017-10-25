@@ -65,7 +65,7 @@ class ServiceSerializer(serializers.ModelSerializer):
         model = models.Service
         fields = '__all__'
 
-class ServiceEnabledSerializer(serializers.Serializer):
+class IsEnabledSerializer(serializers.Serializer):
     is_enabled = serializers.BooleanField()
 
 class NodeSerializer(serializers.ModelSerializer):

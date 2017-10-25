@@ -93,7 +93,7 @@ class ServiceViewSet(viewsets.ReadOnlyModelViewSet):
     )
     def enabled(self, request, pk=None):
         """Sets the service as enabled or disabled."""
-        serializer = serializers.ServiceEnabledSerializer(data=request.data)
+        serializer = serializers.IsEnabledSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         data = serializer.validated_data
 
@@ -251,9 +251,11 @@ class VPNClientKeyViewSet(viewsets.ReadOnlyModelViewSet):
         serializer = serializers.VPNClientKeyLabelSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         label = serializer.validated_data['label']
-        VPNClientKey.objects.create(label=label)
+        client_key = VPNClientKey.objects.create(label=label)
+        serialized_client_key = serializers.VPNClientKeySerializer(client_key)
         reconfigure_system()
-        return Response(status=status.HTTP_200_OK)
+        return Response(data=serialized_client_key.data,
+            status=status.HTTP_200_OK)
 
     @detail_route(
         methods=['post'],
@@ -311,3 +313,31 @@ def vpn_status(request):
     status['client']['state_description'] = get_description(status['client'])
     status['server']['state_description'] = get_description(status['server'])
     return Response(status)
+
+@api_view(['PUT'])
+@permission_classes([IsAdminUser])
+def vpn_server_enabled(request):
+    serializer = serializers.IsEnabledSerializer(data=request.data)
+    serializer.is_valid(raise_exception=True)
+    enabled = serializer.validated_data['is_enabled']
+    vpn_setting = Setting.objects.get(name='vpn')
+    vpn = vpn_setting.data
+    vpn['server']['is_enabled'] = enabled
+    vpn_setting.data = vpn
+    vpn_setting.save()
+    reconfigure_system()
+    return Response()
+
+@api_view(['PUT'])
+@permission_classes([IsAdminUser])
+def vpn_client_enabled(request):
+    serializer = serializers.IsEnabledSerializer(data=request.data)
+    serializer.is_valid(raise_exception=True)
+    enabled = serializer.validated_data['is_enabled']
+    vpn_setting = Setting.objects.get(name='vpn')
+    vpn = vpn_setting.data
+    vpn['client']['is_enabled'] = enabled
+    vpn_setting.data = vpn
+    vpn_setting.save()
+    reconfigure_system()
+    return Response()
