@@ -1,6 +1,8 @@
 import re
+from collections import OrderedDict
 from django.contrib.auth.models import User
 from rest_framework import serializers
+
 
 from . import models
 
@@ -118,7 +120,24 @@ class RegistrationSerializer(serializers.Serializer):
     wan = WanSerializer()
     ssh = SshSerializer()
 
-class VPNClientKeySerializer(serializers.Serializer):
+class VPNClientKeySerializer(serializers.ModelSerializer):
+    revoked_by = serializers.ReadOnlyField(source='revoked_by.username')
+    def to_representation(self, instance):
+        """Omit null fields from the model"""
+        # stolen from https://stackoverflow.com/a/45569581
+        result = super().to_representation(instance)
+        return OrderedDict([
+                (key, result[key])
+                for key in result
+                if result[key] is not None
+        ])
+
     class Meta:
         model = models.VPNClientKey
         fields = '__all__'
+
+class VPNClientKeyLabelSerializer(serializers.Serializer):
+    label = serializers.CharField(max_length=255)
+
+class VPNClientKeyRevokeSerializer(serializers.Serializer):
+    revoked_reason = serializers.CharField(max_length=255)

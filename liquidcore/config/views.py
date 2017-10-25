@@ -1,4 +1,5 @@
 import fcntl
+from datetime import datetime
 from contextlib import contextmanager
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -236,4 +237,36 @@ class VPNClientKeyViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = VPNClientKey.objects.all()
     serializer_class = serializers.VPNClientKeySerializer
     lookup_field = 'id'
-    lookup_value_regex = r'^\d+$'
+    lookup_value_regex = r'[1-9][0-9]*'
+
+    @list_route(
+        methods=['post'],
+        permission_classes=[IsAdminUser],
+        url_name='generate'
+    )
+    def generate(sef, request):
+        serializer = serializers.VPNClientKeyLabelSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        label = serializer.validated_data['label']
+        VPNClientKey.objects.create(label=label)
+        reconfigure_system()
+        return Response(status=status.HTTP_200_OK)
+
+    @detail_route(
+        methods=['post'],
+        permission_classes=[IsAdminUser],
+        url_name='revoke'
+    )
+    def revoke(self, request, id=None):
+        serializer = serializers.VPNClientKeyRevokeSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        client_key = self.get_object()
+        client_key.revoked = True
+        client_key.revoked_reason = serializer.validated_data['revoked_reason']
+        client_key.revoked_at = datetime.now()
+        client_key.revoked_by = request.user
+        client_key.save()
+
+        reconfigure_system()
+        return Response(status=status.HTTP_200_OK)
