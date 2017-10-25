@@ -4,10 +4,11 @@ from contextlib import contextmanager
 from django.conf import settings
 from django.contrib.auth.models import User
 from rest_framework.response import Response
+from rest_framework.parsers import BaseParser
 from rest_framework.permissions import IsAuthenticated, AllowAny, IsAdminUser
 from rest_framework import viewsets
 from rest_framework.decorators import detail_route, list_route, api_view, \
-     permission_classes
+     permission_classes, parser_classes
 from rest_framework.views import APIView
 from rest_framework import status
 
@@ -341,3 +342,19 @@ def vpn_client_enabled(request):
     vpn_setting.save()
     reconfigure_system()
     return Response()
+
+class OVPNParser(BaseParser):
+    media_type = OVPN_CONTENT_TYPE
+
+    def parse(self, stream, media_type=None, parser_context=None):
+        """Simply return a string representing the body of the request."""
+        return stream.read()
+
+@api_view(['POST'])
+@permission_classes([IsAdminUser])
+@parser_classes([OVPNParser])
+def vpn_client_upload(request):
+    ovpn_content = request.data
+    # TODO send ovpn content somewhere in a try/except
+    # that handles invalid ovpn files and/or errors
+    return Response(data={'detail': 'Upload done.'})
