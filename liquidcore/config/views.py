@@ -9,7 +9,7 @@ from rest_framework.decorators import detail_route, list_route, api_view
 from rest_framework.views import APIView
 from rest_framework import status
 
-from .models import Service, Setting, Node
+from .models import Service, Setting, Node, VPNClientKey
 from . import serializers
 from .system import reconfigure_system
 
@@ -231,3 +231,9 @@ class Registration(APIView):
             initialized.save()
 
         return Response()
+
+class VPNClientKeyViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = VPNClientKey.objects.all()
+    serializer_class = serializers.VPNClientKeySerializer
+    lookup_field = 'id'
+    lookup_value_regex = r'^\d+$'

@@ -117,3 +117,8 @@ class RegistrationSerializer(serializers.Serializer):
     lan = LanSerializer()
     wan = WanSerializer()
     ssh = SshSerializer()
+
+class VPNClientKeySerializer(serializers.Serializer):
+    class Meta:
+        model = models.VPNClientKey
+        fields = '__all__'

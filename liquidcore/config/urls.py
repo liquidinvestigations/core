@@ -8,6 +8,7 @@ router = routers.DefaultRouter()
 router.register(r'users', views.UserViewSet)
 router.register(r'services', views.ServiceViewSet)
 router.register(r'nodes', views.NodeViewSet)
+router.register(r'vpn/server/keys', views.VPNClientKeyViewSet)
 
 urlpatterns = format_suffix_patterns([
     url(r'^network/status/$', views.network_status),
