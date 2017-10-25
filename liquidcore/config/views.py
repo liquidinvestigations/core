@@ -56,7 +56,7 @@ class UserViewSet(viewsets.ModelViewSet):
 
         user.is_active = data['is_active']
         user.save()
-        return Response(status=status.HTTP_200_OK)
+        return Response()
 
     @detail_route(
         methods=['post'],
@@ -81,7 +81,7 @@ class UserViewSet(viewsets.ModelViewSet):
                                 status=status.HTTP_400_BAD_REQUEST)
         user.set_password(data['new_password'])
         user.save()
-        return Response(status=status.HTTP_200_OK)
+        return Response()
 
 
 class ServiceViewSet(viewsets.ReadOnlyModelViewSet):
@@ -102,7 +102,7 @@ class ServiceViewSet(viewsets.ReadOnlyModelViewSet):
         service.is_enabled = data['is_enabled']
         service.save()
         reconfigure_system()
-        return Response(status=status.HTTP_200_OK)
+        return Response()
 
 class NodeViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Node.objects.all()
@@ -122,7 +122,7 @@ class NodeViewSet(viewsets.ReadOnlyModelViewSet):
         node.trusted = data['is_trusted']
         node.save()
         reconfigure_system()
-        return Response(status=status.HTTP_200_OK)
+        return Response()
 
 
 @api_view()
@@ -255,8 +255,7 @@ class VPNClientKeyViewSet(viewsets.ReadOnlyModelViewSet):
         client_key = VPNClientKey.objects.create(label=label)
         serialized_client_key = serializers.VPNClientKeySerializer(client_key)
         reconfigure_system()
-        return Response(data=serialized_client_key.data,
-            status=status.HTTP_200_OK)
+        return Response(data=serialized_client_key.data)
 
     @detail_route(
         methods=['post'],
@@ -275,7 +274,7 @@ class VPNClientKeyViewSet(viewsets.ReadOnlyModelViewSet):
         client_key.save()
 
         reconfigure_system()
-        return Response(status=status.HTTP_200_OK)
+        return Response()
 
     @detail_route(
         methods=['get'],
