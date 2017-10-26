@@ -1,4 +1,5 @@
 import json
+from django.contrib.auth.models import User
 from django.conf import settings
 from django.db import models
 
@@ -68,3 +69,12 @@ class Node(models.Model):
 
     def __str__(self):
         return "{!r} = {}".format(self.name, self.data)
+
+class VPNClientKey(models.Model):
+    label = models.CharField(max_length=255, editable=False)
+    revoked = models.BooleanField(default=False)
+    revoked_reason = models.CharField(max_length=255, null=True)
+    revoked_at = models.DateTimeField(null=True)
+    revoked_by = models.ForeignKey(User,
+            on_delete=models.PROTECT,
+            null=True)

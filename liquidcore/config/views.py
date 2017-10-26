@@ -1,17 +1,22 @@
 import fcntl
+from django.utils import timezone
 from contextlib import contextmanager
 from django.conf import settings
 from django.contrib.auth.models import User
 from rest_framework.response import Response
+from rest_framework.parsers import BaseParser
 from rest_framework.permissions import IsAuthenticated, AllowAny, IsAdminUser
 from rest_framework import viewsets
-from rest_framework.decorators import detail_route, list_route, api_view
+from rest_framework.decorators import detail_route, list_route, api_view, \
+     permission_classes, parser_classes
 from rest_framework.views import APIView
 from rest_framework import status
 
-from .models import Service, Setting, Node
+from .models import Service, Setting, Node, VPNClientKey
 from . import serializers
 from .system import reconfigure_system
+
+OVPN_CONTENT_TYPE = 'application/x-openvpn-profile'
 
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
@@ -51,7 +56,7 @@ class UserViewSet(viewsets.ModelViewSet):
 
         user.is_active = data['is_active']
         user.save()
-        return Response(status=status.HTTP_200_OK)
+        return Response()
 
     @detail_route(
         methods=['post'],
@@ -76,7 +81,7 @@ class UserViewSet(viewsets.ModelViewSet):
                                 status=status.HTTP_400_BAD_REQUEST)
         user.set_password(data['new_password'])
         user.save()
-        return Response(status=status.HTTP_200_OK)
+        return Response()
 
 
 class ServiceViewSet(viewsets.ReadOnlyModelViewSet):
@@ -89,7 +94,7 @@ class ServiceViewSet(viewsets.ReadOnlyModelViewSet):
     )
     def enabled(self, request, pk=None):
         """Sets the service as enabled or disabled."""
-        serializer = serializers.ServiceEnabledSerializer(data=request.data)
+        serializer = serializers.IsEnabledSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         data = serializer.validated_data
 
@@ -97,7 +102,7 @@ class ServiceViewSet(viewsets.ReadOnlyModelViewSet):
         service.is_enabled = data['is_enabled']
         service.save()
         reconfigure_system()
-        return Response(status=status.HTTP_200_OK)
+        return Response()
 
 class NodeViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Node.objects.all()
@@ -117,7 +122,7 @@ class NodeViewSet(viewsets.ReadOnlyModelViewSet):
         node.trusted = data['is_trusted']
         node.save()
         reconfigure_system()
-        return Response(status=status.HTTP_200_OK)
+        return Response()
 
 
 @api_view()
@@ -231,3 +236,127 @@ class Registration(APIView):
             initialized.save()
 
         return Response()
+
+class VPNClientKeyViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = VPNClientKey.objects.all()
+    serializer_class = serializers.VPNClientKeySerializer
+    lookup_field = 'id'
+    lookup_value_regex = r'[1-9][0-9]*'
+
+    @list_route(
+        methods=['post'],
+        permission_classes=[IsAdminUser],
+        url_name='generate'
+    )
+    def generate(sef, request):
+        serializer = serializers.VPNClientKeyLabelSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        label = serializer.validated_data['label']
+        client_key = VPNClientKey.objects.create(label=label)
+        serialized_client_key = serializers.VPNClientKeySerializer(client_key)
+        reconfigure_system()
+        return Response(data=serialized_client_key.data)
+
+    @detail_route(
+        methods=['post'],
+        permission_classes=[IsAdminUser],
+        url_name='revoke'
+    )
+    def revoke(self, request, id=None):
+        serializer = serializers.VPNClientKeyRevokeSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        client_key = self.get_object()
+        client_key.revoked = True
+        client_key.revoked_reason = serializer.validated_data['revoked_reason']
+        client_key.revoked_at = timezone.now()
+        client_key.revoked_by = request.user
+        client_key.save()
+
+        reconfigure_system()
+        return Response()
+
+    @detail_route(
+        methods=['get'],
+        permission_classes=[IsAdminUser],
+        url_name='download'
+    )
+    def download(self, request, id=None):
+        # TODO get client key from system call
+        ovpn_content = "dummy key here, don't mind me\n"
+        filename = 'client-key-{}.ovpn'.format(id)
+        response = Response(ovpn_content, content_type=OVPN_CONTENT_TYPE)
+        response['Content-Disposition'] = 'attachment; filename="{}"'.format(filename)
+        return response
+
+@api_view(['GET'])
+@permission_classes([IsAdminUser])
+def vpn_status(request):
+    def get_description(state):
+        if state['error_message']:
+            return 'Error.'
+        if not state['is_enabled']:
+            return "Disabled."
+        if state['is_running']:
+            return 'Up and running.'
+        else:
+            return 'Starting...'
+
+    vpn_setting = Setting.objects.get(name='vpn')
+    status = vpn_setting.data
+    # TODO get these with system calls
+    status['client']['is_running'] = False
+    status['server']['is_running'] = False
+    status['server']['registered_key_count'] = VPNClientKey.objects.count()
+    status['server']['active_connection_count'] = 0
+
+    status['client']['state_description'] = get_description(status['client'])
+    status['server']['state_description'] = get_description(status['server'])
+    return Response(status)
+
+def _vpn_set_enabled(module, enabled):
+    """Sets the VPN server/client as enabled or disabled.
+    module -- one of "server" or "client"
+    enabled -- True or False
+    """
+    vpn_setting = Setting.objects.get(name='vpn')
+    vpn = vpn_setting.data
+    vpn[module]['is_enabled'] = enabled
+    vpn_setting.data = vpn
+    vpn_setting.save()
+
+@api_view(['PUT'])
+@permission_classes([IsAdminUser])
+def vpn_server_enabled(request):
+    serializer = serializers.IsEnabledSerializer(data=request.data)
+    serializer.is_valid(raise_exception=True)
+    enabled = serializer.validated_data['is_enabled']
+    _vpn_set_enabled('server', enabled)
+    reconfigure_system()
+    return Response()
+
+@api_view(['PUT'])
+@permission_classes([IsAdminUser])
+def vpn_client_enabled(request):
+    serializer = serializers.IsEnabledSerializer(data=request.data)
+    serializer.is_valid(raise_exception=True)
+    enabled = serializer.validated_data['is_enabled']
+    _vpn_set_enabled('client', enabled)
+    reconfigure_system()
+    return Response()
+
+class OVPNParser(BaseParser):
+    media_type = OVPN_CONTENT_TYPE
+
+    def parse(self, stream, media_type=None, parser_context=None):
+        """Simply return a string representing the body of the request."""
+        return stream.read()
+
+@api_view(['POST'])
+@permission_classes([IsAdminUser])
+@parser_classes([OVPNParser])
+def vpn_client_upload(request):
+    ovpn_content = request.data
+    # TODO send ovpn content somewhere in a try/except
+    # that handles invalid ovpn files and/or errors
+    return Response(data={'detail': 'Upload done.'})

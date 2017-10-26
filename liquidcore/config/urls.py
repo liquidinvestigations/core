@@ -8,6 +8,7 @@ router = routers.DefaultRouter()
 router.register(r'users', views.UserViewSet)
 router.register(r'services', views.ServiceViewSet)
 router.register(r'nodes', views.NodeViewSet)
+router.register(r'vpn/server/keys', views.VPNClientKeyViewSet)
 
 urlpatterns = format_suffix_patterns([
     url(r'^network/status/$', views.network_status),
@@ -16,6 +17,10 @@ urlpatterns = format_suffix_patterns([
     url(r'^network/lan/$', views.NetworkLan.as_view()),
     url(r'^network/wan/$', views.NetworkWan.as_view()),
     url(r'^network/ssh/$', views.NetworkSsh.as_view()),
+    url(r'^vpn/$', views.vpn_status),
+    url(r'^vpn/client/$', views.vpn_client_enabled),
+    url(r'^vpn/client/upload/$', views.vpn_client_upload),
+    url(r'^vpn/server/$', views.vpn_server_enabled),
 ]) + [
     url(r'^', include(router.urls)),
 ]
