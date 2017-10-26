@@ -314,17 +314,24 @@ def vpn_status(request):
     status['server']['state_description'] = get_description(status['server'])
     return Response(status)
 
+def _vpn_set_enabled(module, enabled):
+    """Sets the VPN server/client as enabled or disabled.
+    module -- one of "server" or "client"
+    enabled -- True or False
+    """
+    vpn_setting = Setting.objects.get(name='vpn')
+    vpn = vpn_setting.data
+    vpn[module]['is_enabled'] = enabled
+    vpn_setting.data = vpn
+    vpn_setting.save()
+
 @api_view(['PUT'])
 @permission_classes([IsAdminUser])
 def vpn_server_enabled(request):
     serializer = serializers.IsEnabledSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
     enabled = serializer.validated_data['is_enabled']
-    vpn_setting = Setting.objects.get(name='vpn')
-    vpn = vpn_setting.data
-    vpn['server']['is_enabled'] = enabled
-    vpn_setting.data = vpn
-    vpn_setting.save()
+    _vpn_set_enabled('server', enabled)
     reconfigure_system()
     return Response()
 
@@ -334,11 +341,7 @@ def vpn_client_enabled(request):
     serializer = serializers.IsEnabledSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
     enabled = serializer.validated_data['is_enabled']
-    vpn_setting = Setting.objects.get(name='vpn')
-    vpn = vpn_setting.data
-    vpn['client']['is_enabled'] = enabled
-    vpn_setting.data = vpn
-    vpn_setting.save()
+    _vpn_set_enabled('client', enabled)
     reconfigure_system()
     return Response()
 
