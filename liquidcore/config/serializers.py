@@ -124,7 +124,6 @@ class VPNClientKeySerializer(serializers.ModelSerializer):
     revoked_by = serializers.ReadOnlyField(source='revoked_by.username')
     def to_representation(self, instance):
         """Omit null fields from the model"""
-        # stolen from https://stackoverflow.com/a/45569581
         result = super().to_representation(instance)
         return OrderedDict([
                 (key, result[key])
