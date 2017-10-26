@@ -28,8 +28,8 @@ def test_get_services(client, admin_user):
     assert client.login(username='admin', password='q')
 
     get_service_list = client.get('/api/services/')
-    assert 200 == get_service_list.status_code
-    assert set(SERVICES) == set(s['name'] for s in get_service_list.json())
+    assert get_service_list.status_code == 200
+    assert set(s['name'] for s in get_service_list.json()) == set(SERVICES)
 
 @pytest.mark.parametrize("app_name", SERVICES)
 def test_set_service_enabled(client, admin_user, app_name):
@@ -39,11 +39,11 @@ def test_set_service_enabled(client, admin_user, app_name):
 
     for is_enabled in True, False:
         put = client.put(enabled_endpoint, data={'is_enabled': is_enabled})
-        assert 200 == put.status_code
+        assert put.status_code == 200
 
         get = client.get(get_endpoint)
-        assert 200 == get.status_code
-        assert is_enabled == get.json()['is_enabled']
+        assert get.status_code == 200
+        assert get.json()['is_enabled'] == is_enabled
 
 def test_service_permissions(client):
     app_name = SERVICES[0]
@@ -52,9 +52,9 @@ def test_service_permissions(client):
 
     # try to get/put without being logged in
     get = client.get(get_endpoint)
-    assert 403 == get.status_code
+    assert get.status_code == 403
     put = client.put(enabled_endpoint, data={'is_enabled': False})
-    assert 403 == put.status_code
+    assert put.status_code == 403
 
     # make a normal user and login
     User.objects.create_user(
@@ -66,6 +66,6 @@ def test_service_permissions(client):
 
     # try to get/put without admin rights
     get = client.get(get_endpoint)
-    assert 403 == get.status_code
+    assert get.status_code == 403
     put = client.put(enabled_endpoint, data={'is_enabled': False})
-    assert 403 == put.status_code
+    assert put.status_code == 403

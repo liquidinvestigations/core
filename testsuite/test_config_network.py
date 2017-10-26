@@ -145,12 +145,12 @@ def client():
 def check_get_response(client, endpoint, obj):
     get = client.get(endpoint)
     assert obj == get.json()
-    assert 200 == get.status_code
+    assert get.status_code == 200
 
 def test_initial_registration_default(client):
     get = client.get('/api/registration/')
-    assert 200 == get.status_code
-    assert REGISTRATION_DEFAULT == get.json()
+    assert get.status_code == 200
+    assert get.json() == REGISTRATION_DEFAULT
 
 @pytest.mark.parametrize("data", [
     REGISTRATION1,
@@ -158,7 +158,7 @@ def test_initial_registration_default(client):
 ])
 def test_initial_registration_setup(client, data):
     post = client.post('/api/registration/', data=data, format='json')
-    assert 200 == post.status_code
+    assert post.status_code == 200
 
     # try to login
     assert client.login(username=data['username'], password=data['password'])
@@ -170,12 +170,12 @@ def test_initial_registration_setup(client, data):
 
     # post-registration, all calls to /api/registration should fail
     get = client.get('/api/registration/')
-    assert 400 == get.status_code
-    assert {'detail': "Registration already done"} == get.json()
+    assert get.status_code == 400
+    assert get.json() == {'detail': "Registration already done"}
 
     post = client.post('/api/registration/', data=data, format='json')
-    assert 400 == post.status_code
-    assert {'detail': "Registration already done"} == post.json()
+    assert post.status_code == 400
+    assert post.json() == {'detail': "Registration already done"}
 
 GOOD_DOMAINS = [{'domain': d} for d in [
     'liquidnode.local',
@@ -203,18 +203,17 @@ def test_network_configuration(client, endpoint, vals, broken_vals):
     registration_post = client.post('/api/registration/',
                                     data=REGISTRATION1,
                                     format='json')
-    assert 200 == registration_post.status_code
+    assert registration_post.status_code == 200
     assert client.login(username=REGISTRATION1['username'],
                         password=REGISTRATION1['password'])
 
     for val in vals:
         put = client.put(endpoint, data=val, format='json')
-        assert 200 == put.status_code
+        assert put.status_code == 200
         check_get_response(client, endpoint, val)
 
     for val in broken_vals:
         put = client.put(endpoint, data=val, format='json')
-        if 200 == put.status_code: print(put.json())
-        assert 400 == put.status_code
+        assert put.status_code == 400
         # check that the last successful update is still there
         check_get_response(client, endpoint, vals[-1])

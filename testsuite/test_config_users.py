@@ -40,11 +40,11 @@ def test_create_users(client, admin_user):
 
     get_mike = client.get('/api/users/mike/')
     assert get_mike.status_code == 200
-    assert "mike" == get_mike.json()['username']
-    assert False == get_mike.json()['is_admin']
-    assert "Mike" == get_mike.json()['first_name']
-    assert "Tyson" == get_mike.json()['last_name']
-    assert True == get_mike.json()['is_active']
+    assert get_mike.json()['username'] == "mike"
+    assert get_mike.json()['is_admin'] == False
+    assert get_mike.json()['first_name'] == "Mike"
+    assert get_mike.json()['last_name'] == "Tyson"
+    assert get_mike.json()['is_active'] == True
 
 def test_admins_cant_change_username(client, admin_user):
     assert client.login(username='admin', password='q')
@@ -66,7 +66,7 @@ def test_admins_cant_change_username(client, admin_user):
 
     get_mike = client.get('/api/users/mike/')
     assert get_mike.status_code == 200
-    assert "mike" == get_mike.json()['username']
+    assert get_mike.json()['username'] == "mike"
 
 def test_users_cant_change_username(client, admin_user):
     User.objects.create_user(
@@ -89,7 +89,7 @@ def test_users_cant_change_username(client, admin_user):
 
     get_mike = client.get('/api/users/mike/')
     assert get_mike.status_code == 200
-    assert "mike" == get_mike.json()['username']
+    assert get_mike.json()['username'] == "mike"
 
 def test_password_change_admin_self(client, admin_user):
     assert client.login(username='admin', password='q')
@@ -135,7 +135,7 @@ def test_password_change_nonadmin(client):
         "new_password": "12345678",
     })
     assert password.status_code == 400
-    assert "old_password not specified" == password.json()['detail']
+    assert password.json()['detail'] == "old_password not specified"
 
     # change the password by giving a wrong old one
     password = client.post("/api/users/mike/password/", data={
@@ -143,7 +143,7 @@ def test_password_change_nonadmin(client):
         "new_password": "12345678",
     })
     assert password.status_code == 400
-    assert "Wrong Password" == password.json()['old_password'][0]
+    assert password.json()['old_password'][0] == "Wrong Password"
 
     # change the password properly
     password = client.post("/api/users/mike/password/", data={
@@ -181,7 +181,7 @@ def test_set_users_active(client, admin_user):
     # make sure the user is active
     get_mike = client.get('/api/users/mike/')
     assert get_mike.status_code == 200
-    assert True == get_mike.json()['is_active']
+    assert get_mike.json()['is_active'] == True
 
     # set mike as inactive
     set_inactive_mike = client.put('/api/users/mike/active/', data={
@@ -190,7 +190,7 @@ def test_set_users_active(client, admin_user):
     assert set_inactive_mike.status_code == 200
     get_mike = client.get('/api/users/mike/')
     assert get_mike.status_code == 200
-    assert False == get_mike.json()['is_active']
+    assert get_mike.json()['is_active'] == False
 
     # set mike as active again
     set_active_mike = client.put('/api/users/mike/active/', data={
@@ -199,7 +199,7 @@ def test_set_users_active(client, admin_user):
     assert set_active_mike.status_code == 200
     get_mike = client.get('/api/users/mike/')
     assert get_mike.status_code == 200
-    assert True == get_mike.json()['is_active']
+    assert get_mike.json()['is_active'] == True
 
     # set a password for mike for us to log on to
     password = client.post("/api/users/mike/password/", data={
@@ -217,20 +217,20 @@ def test_set_users_active(client, admin_user):
 
 def test_whoami(client, admin_user):
     whoami = client.get('/api/users/whoami/')
-    assert 200 == whoami.status_code
-    assert {'is_authenticated': False} == whoami.json()
+    assert whoami.status_code == 200
+    assert whoami.json() == {'is_authenticated': False}
 
     assert client.login(username='admin', password='q')
     whoami = client.get('/api/users/whoami/')
-    assert 200 == whoami.status_code
-    assert True == whoami.json()['is_authenticated']
-    assert 'admin' == whoami.json()['username']
-    assert True == whoami.json()['is_admin']
+    assert whoami.status_code == 200
+    assert whoami.json()['is_authenticated'] == True
+    assert whoami.json()['username'] == 'admin'
+    assert whoami.json()['is_admin'] == True
 
     client.logout()
     whoami = client.get('/api/users/whoami/')
-    assert 200 == whoami.status_code
-    assert {'is_authenticated': False} == whoami.json()
+    assert whoami.status_code == 200
+    assert whoami.json() == {'is_authenticated': False}
 
 def test_username_validation(client, admin_user):
     GOOD_USERNAMES = [
@@ -261,10 +261,10 @@ def test_username_validation(client, admin_user):
         data = USER_STUB.copy()
         data['username'] = username
         post = client.post('/api/users/', data=data)
-        assert 201 == post.status_code
+        assert post.status_code == 201
 
     for username in BAD_USERNAMES:
         data = USER_STUB.copy()
         data['username'] = username
         post = client.post('/api/users/', data=data, format='json')
-        assert 400 == post.status_code
+        assert post.status_code == 400
