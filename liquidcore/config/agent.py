@@ -157,6 +157,7 @@ class Job:
         while True:
             if not self.options_file.exists():
                 # the job finished and deleted its options file
+                dump_the_logs()
                 return
 
             try:

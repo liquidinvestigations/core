@@ -10,6 +10,7 @@
     {% if request.user.is_staff %}
       <a href="/admin-ui/">[admin]</a>
       <a href="/admin/">[django admin]</a>
+      <a href="/admin/reconfigure/">[reconfigure]</a>
     {% endif %}
   {% else %}
     <a href="/accounts/login/">[login]</a>

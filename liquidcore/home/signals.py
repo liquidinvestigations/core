@@ -1,25 +1,43 @@
 import os
 import json
 import subprocess
+import shlex
 from django.db.models.signals import post_save, pre_delete
 from django.contrib.auth.models import User
 from django.conf import settings
 
 
 def invoke_hook(name, *args, env={}):
-    invoke_line = settings.INVOKE_HOOK + " " + name + " ".join(args)
-    subprocess.run(
-        [invoke_line],
-        env=dict(os.environ, **env),
-        check=True,
-        shell=True,
-    )
+    quoted_args = ' '.join(shlex.quote(a) for a in [name] + list(args))
+    command = settings.INVOKE_HOOK + " " + quoted_args
+    print('invoke hook', command)
+
+    try:
+        subprocess.run(
+            command,
+            env=dict(os.environ, **env),
+            check=True,
+            shell=True,
+        )
+    except Exception as e:
+        print('something failed :(', e)
+        raise
+
+
+def random_password():
+    import random
+    urandom = random.SystemRandom()
+    vocabulary = ('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
+                  '0123456789!@#$%^&*()-=+[]{}:.<>/?')
+    return ''.join(urandom.choice(vocabulary) for _ in range(16))
 
 
 def on_user_save(sender, instance, created, **kwargs):
     if created:
         username = instance.get_username()
         password = instance._password
+        if not password:
+            password = random_password()
         invoke_hook('user-created', username, env={
             'LIQUID_HOOK_DATA': json.dumps({
                 'password': password,
@@ -30,7 +48,7 @@ def on_user_save(sender, instance, created, **kwargs):
         password = instance._password
         if password is not None:
             username = instance.get_username()
-            invoke_hook('user-created', username, env={
+            invoke_hook('user-passwd', username, env={
                 'LIQUID_HOOK_DATA': json.dumps({
                     'password': password,
                 }),
