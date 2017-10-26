@@ -29,7 +29,7 @@ def random_password():
     urandom = random.SystemRandom()
     vocabulary = ('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
                   '0123456789!@#$%^&*()-=+[]{}:.<>/?')
-    return ''.join(urandom.choice(vocabulary) for _ in range(8))
+    return ''.join(urandom.choice(vocabulary) for _ in range(16))
 
 
 def on_user_save(sender, instance, created, **kwargs):
