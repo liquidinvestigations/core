@@ -12,6 +12,13 @@ SERVICE_URLS = {
 }
 
 
+def short_json_dump(value):
+    rv = json.dumps(value)
+    if len(rv) > 256:
+        rv = rv[:250] + ' [...]'
+    return rv
+
+
 class Service(models.Model):
     name = models.CharField(max_length=30, primary_key=True)
     is_enabled = models.BooleanField()
@@ -34,7 +41,7 @@ class Service(models.Model):
         }
 
     def __str__(self):
-        return "{} = {}".format(self.name, json.dumps(self.data))
+        return "{} = {}".format(self.name, short_json_dump(self.data))
 
 
 class Setting(models.Model):
@@ -50,7 +57,7 @@ class Setting(models.Model):
         self.data_text = json.dumps(data)
 
     def __str__(self):
-        return "{} = {}".format(self.name, json.dumps(self.data))
+        return "{} = {}".format(self.name, short_json_dump(self.data))
 
 
 class Node(models.Model):
@@ -68,7 +75,7 @@ class Node(models.Model):
         self.data_text = json.dumps(data)
 
     def __str__(self):
-        return "{} = {}".format(self.name, json.dumps(self.data))
+        return "{} = {}".format(self.name, short_json_dump(self.data))
 
 class VPNClientKey(models.Model):
     label = models.CharField(max_length=255)
