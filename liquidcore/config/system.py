@@ -8,6 +8,11 @@ def get_configuration():
         for item in models.Setting.objects.all()
     }
 
+    client_keys = [
+        {'id': str(key.id), 'revoked': key.revoked}
+        for key in models.VPNClientKey.objects.all()
+    ]
+
     return {
         'domain': settings['domain'],
         'lan': settings['lan'],
@@ -16,6 +21,11 @@ def get_configuration():
         'services': {
             s.name: {'enabled': s.is_enabled}
             for s in models.Service.objects.all()
+        },
+        'vpn': {
+            'server': {
+                'client_keys': client_keys,
+            },
         },
     }
 
