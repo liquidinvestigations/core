@@ -356,7 +356,9 @@ class OVPNParser(BaseParser):
 @permission_classes([IsAdminUser])
 @parser_classes([OVPNParser])
 def vpn_client_upload(request):
-    ovpn_content = request.data
-    # TODO send ovpn content somewhere in a try/except
-    # that handles invalid ovpn files and/or errors
+    ovpn_content = request.data.decode('latin1')
+    setting = Setting.objects.get(name='vpn_client_config_file')
+    setting.data = ovpn_content
+    setting.save()
+    reconfigure_system()
     return Response(data={'detail': 'Upload done.'})
