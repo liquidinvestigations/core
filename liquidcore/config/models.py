@@ -71,10 +71,16 @@ class Node(models.Model):
         return "{} = {}".format(self.name, json.dumps(self.data))
 
 class VPNClientKey(models.Model):
-    label = models.CharField(max_length=255, editable=False)
+    label = models.CharField(max_length=255)
     revoked = models.BooleanField(default=False)
-    revoked_reason = models.CharField(max_length=255, null=True)
-    revoked_at = models.DateTimeField(null=True)
+    revoked_reason = models.CharField(max_length=255, blank=True)
+    revoked_at = models.DateTimeField(blank=True, null=True)
     revoked_by = models.ForeignKey(User,
             on_delete=models.PROTECT,
-            null=True)
+            blank=True, null=True)
+
+    def __str__(self):
+        rv = self.label
+        if self.revoked:
+            rv += " (revoked)"
+        return rv
