@@ -34,7 +34,7 @@ class Service(models.Model):
         }
 
     def __str__(self):
-        return "{!r} = {}".format(self.name, self.data)
+        return "{} = {}".format(self.name, json.dumps(self.data))
 
 
 class Setting(models.Model):
@@ -50,7 +50,7 @@ class Setting(models.Model):
         self.data_text = json.dumps(data)
 
     def __str__(self):
-        return "{!r} = {}".format(self.name, self.data)
+        return "{} = {}".format(self.name, json.dumps(self.data))
 
 
 class Node(models.Model):
@@ -68,7 +68,7 @@ class Node(models.Model):
         self.data_text = json.dumps(data)
 
     def __str__(self):
-        return "{!r} = {}".format(self.name, self.data)
+        return "{} = {}".format(self.name, json.dumps(self.data))
 
 class VPNClientKey(models.Model):
     label = models.CharField(max_length=255, editable=False)

@@ -1,5 +1,8 @@
 from django.conf.urls import url
-from django.contrib.admin import AdminSite, site as default_site
+from django.contrib.admin import AdminSite
+from django.contrib.admin import ModelAdmin
+from django.contrib.admin import site as default_site
+from ..config import models as config_models
 from ..config import admin as config_admin
 
 
@@ -20,3 +23,7 @@ class LiquidAdminSite(AdminSite):
 
 
 admin_site = LiquidAdminSite()
+admin_site.register(config_models.Setting, ModelAdmin)
+admin_site.register(config_models.Service, ModelAdmin)
+admin_site.register(config_models.Node, ModelAdmin)
+admin_site.register(config_models.VPNClientKey, ModelAdmin)
