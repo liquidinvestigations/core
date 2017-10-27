@@ -13,12 +13,6 @@ def get_configuration():
         for key in models.VPNClientKey.objects.all()
     ]
 
-    vpn_client_config_file = settings['vpn_client_config_file']
-    if vpn_client_config_file:
-        vpn_client = {'config_file': vpn_client_config_file}
-    else:
-        vpn_client = None
-
     return {
         'domain': settings['domain'],
         'lan': settings['lan'],
@@ -32,7 +26,9 @@ def get_configuration():
             'server': {
                 'client_keys': client_keys,
             },
-            'client': vpn_client,
+            'client': {
+                'config': settings['vpn_client_config'],
+            },
         },
     }
 

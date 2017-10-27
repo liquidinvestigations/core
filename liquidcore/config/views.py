@@ -357,7 +357,7 @@ class OVPNParser(BaseParser):
 @parser_classes([OVPNParser])
 def vpn_client_upload(request):
     ovpn_content = request.data.decode('latin1')
-    setting = Setting.objects.get(name='vpn_client_config_file')
+    setting = Setting.objects.get(name='vpn_client_config')
     setting.data = ovpn_content
     setting.save()
     reconfigure_system()

@@ -8,7 +8,7 @@ from django.db import migrations
 
 def create_vpn_client_config(apps, schema_editor):
     Setting = apps.get_model("config", "Setting")
-    Setting(name='vpn_client_config_file', data_text=json.dumps(None)).save()
+    Setting(name='vpn_client_config', data_text=json.dumps(None)).save()
 
 
 class Migration(migrations.Migration):
