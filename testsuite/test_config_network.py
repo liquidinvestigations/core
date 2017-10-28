@@ -96,7 +96,7 @@ SSH_BROKEN = {
 REGISTRATION_DEFAULT = {
     "username": "admin",
     "password": "",
-    "domain": "liquidnode.liquid",
+    "domain": "liquid.example.org",
     "lan": {
         "ip": "10.0.0.1",
         "netmask": "255.255.255.0",
@@ -123,7 +123,7 @@ REGISTRATION_DEFAULT = {
 REGISTRATION1 =  {
     "username": "johnDoe",
     "password": "123b456x",
-    "domain": "liquidnode.liquid",
+    "domain": "liquid.example.org",
     "lan": LAN1,
     "wan": WAN1,
     "ssh": SSH1
