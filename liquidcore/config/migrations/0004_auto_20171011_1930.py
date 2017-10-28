@@ -16,8 +16,8 @@ def create_setting_instances(apps, schema_editor):
             "netmask": "255.255.255.0",
             "dhcp_range": "10.0.0.100-255",
             "hotspot": {
-                "ssid": "",
-                "password": "",
+                "ssid": "liquid",
+                "password": "investigations",
             },
             "eth": False,
         },
