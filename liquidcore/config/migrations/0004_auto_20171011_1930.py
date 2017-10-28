@@ -10,7 +10,7 @@ def create_setting_instances(apps, schema_editor):
     Setting = apps.get_model("config", "Setting")
     defaults = {
         "initialized": False,
-        "domain": "liquidnode.liquid",
+        "domain": "liquid.example.org",
         "lan": {
             "ip": "10.0.0.1",
             "netmask": "255.255.255.0",
