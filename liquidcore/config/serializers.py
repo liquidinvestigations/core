@@ -123,12 +123,12 @@ class RegistrationSerializer(serializers.Serializer):
 class VPNClientKeySerializer(serializers.ModelSerializer):
     revoked_by = serializers.ReadOnlyField(source='revoked_by.username')
     def to_representation(self, instance):
-        """Omit null fields from the model"""
+        """Omit blank and null fields from the model"""
         result = super().to_representation(instance)
         return OrderedDict([
                 (key, result[key])
                 for key in result
-                if result[key] is not None
+                if result[key] not in ['', None]
         ])
 
     class Meta:

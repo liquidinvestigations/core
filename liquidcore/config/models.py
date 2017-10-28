@@ -12,6 +12,13 @@ SERVICE_URLS = {
 }
 
 
+def short_json_dump(value):
+    rv = json.dumps(value)
+    if len(rv) > 256:
+        rv = rv[:250] + ' [...]'
+    return rv
+
+
 class Service(models.Model):
     name = models.CharField(max_length=30, primary_key=True)
     is_enabled = models.BooleanField()
@@ -34,7 +41,7 @@ class Service(models.Model):
         }
 
     def __str__(self):
-        return "{!r} = {}".format(self.name, self.data)
+        return "{} = {}".format(self.name, short_json_dump(self.data))
 
 
 class Setting(models.Model):
@@ -50,7 +57,7 @@ class Setting(models.Model):
         self.data_text = json.dumps(data)
 
     def __str__(self):
-        return "{!r} = {}".format(self.name, self.data)
+        return "{} = {}".format(self.name, short_json_dump(self.data))
 
 
 class Node(models.Model):
@@ -68,13 +75,19 @@ class Node(models.Model):
         self.data_text = json.dumps(data)
 
     def __str__(self):
-        return "{!r} = {}".format(self.name, self.data)
+        return "{} = {}".format(self.name, short_json_dump(self.data))
 
 class VPNClientKey(models.Model):
-    label = models.CharField(max_length=255, editable=False)
+    label = models.CharField(max_length=255)
     revoked = models.BooleanField(default=False)
-    revoked_reason = models.CharField(max_length=255, null=True)
-    revoked_at = models.DateTimeField(null=True)
+    revoked_reason = models.CharField(max_length=255, blank=True)
+    revoked_at = models.DateTimeField(blank=True, null=True)
     revoked_by = models.ForeignKey(User,
             on_delete=models.PROTECT,
-            null=True)
+            blank=True, null=True)
+
+    def __str__(self):
+        rv = self.label
+        if self.revoked:
+            rv += " (revoked)"
+        return rv
