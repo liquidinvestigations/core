@@ -15,7 +15,7 @@ from rest_framework import status
 
 from .models import Service, Setting, Node, VPNClientKey
 from . import serializers
-from .system import reconfigure_system
+from .system import reconfigure_system, get_vpn_client_config
 
 OVPN_CONTENT_TYPE = 'application/x-openvpn-profile'
 
@@ -293,10 +293,9 @@ class VPNClientKeyViewSet(viewsets.ReadOnlyModelViewSet):
         url_name='download'
     )
     def download(self, request, id=None):
-        # TODO get client key from system call
-        ovpn_content = bytes("dummy key here, don't mind me\n", encoding='latin-1')
+        ovpn_content = get_vpn_client_config(id)
         filename = 'client-key-{}.ovpn'.format(id)
-        response = Response(bytes(ovpn_content), content_type=OVPN_CONTENT_TYPE)
+        response = Response(ovpn_content, content_type=OVPN_CONTENT_TYPE)
         response['Content-Disposition'] = 'attachment; filename="{}"'.format(filename)
         return response
 
