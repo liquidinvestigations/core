@@ -26,9 +26,11 @@ def get_configuration():
         'vpn': {
             'server': {
                 'client_keys': client_keys,
+                'enabled': settings['vpn']['server']['is_enabled'],
             },
             'client': {
                 'config': settings['vpn_client_config'],
+                'enabled': settings['vpn']['client']['is_enabled'],
             },
         },
     }
