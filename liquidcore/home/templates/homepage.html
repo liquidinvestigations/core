@@ -50,7 +50,7 @@
 
 <h2>Discovered nodes</h2>
 
-{% if nodes %}
+{% if node_list %}
   <table class="table table-hover">
     <thead>
       <tr>
@@ -61,25 +61,17 @@
       </tr>
     </thead>
     <tbody>
-  {% for interface, interface_nodes in nodes.items %}
-    {% for name, node in interface_nodes.items %}
-      {% if interface == status.dns_interface or not status.dns_interface %}
-        <tr>
-            <td>{{ interface }}</td>
-            <td>
-                <a href="http://{{ node.hostname }}">
-                    {{ node.hostname }}
-                </a>
-                {% if node.is_local %}
-                  (this node)
-                {% endif %}
-            </td>
-            <td>{{ node.address }}</td>
-            <td>{{ node.discovered_at_datetime | timesince }} ago</td>
-        </tr>
-      {% endif %}
+    {% for node in node_list %}
+      <tr>
+          <td>
+              <a href="http://{{ node.hostname }}">
+                  {{ node.hostname }}
+              </a>
+          </td>
+          <td>{{ node.address }}</td>
+          <td>{{ node.discovered_at_datetime | timesince }} ago</td>
+      </tr>
     {% endfor %}
-  {% endfor %}
     </tbody>
   </table>
 {% else %}
