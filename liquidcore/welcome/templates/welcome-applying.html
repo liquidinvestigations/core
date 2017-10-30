@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Liquid Investigations - Welcome!</h1>
+
+<div style="height: 30px"></div>
+
+<p>
+  Your settings are being applied. Wait a minute and connect to the
+  <tt>{{ ssid }}</tt> hotspot, then point your browser to
+  <a href="{{ url }}">{{ url }}</a>.
+</p>
+
+{% endblock %}
