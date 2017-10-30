@@ -294,11 +294,17 @@ def do_the_job(job_id, var):
                     raise RuntimeError(
                         "Another job was running and did not finish")
 
+            last_job = state_db.load().get('last_job')
+            if last_job and last_job > job_id:
+                log("A job, started after me, already completed. aborting.")
+                job.options_file.unlink()
+                return
+
             state_db.patch(job=job_id)
 
             run_task(**task_data)
 
-            state_db.patch(job=None)
+            state_db.patch(job=None, last_job=job_id)
 
             if repair:
                 delete_old_jobs(var, keep=job_id)
