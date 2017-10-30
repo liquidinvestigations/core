@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Liquid Investigations - Welcome!</h1>
+
+<div style="height: 30px"></div>
+
+<p>Congratulations, your liquid node works! Now it's time to configure some
+basic options.</p>
+
+<div style="height: 50px"></div>
+
+
+<form method="post">
+  {% csrf_token %}
+
+  <fieldset class="form-group row">
+    <div class="col-sm-2"></div>
+    <label for="welcome-domain" class="form-control-label col-sm-2">
+      Domain name:
+    </label>
+    <div class="col-sm-4">
+      <input class="form-control"
+        id="welcome-domain" name="domain"
+        value="liquid.example.org"
+        autofocus required>
+    </div>
+  </fieldset>
+
+  <div class="row">
+    <div class="col-sm-2"></div>
+    <div class="col-sm-6">
+      <hr>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-sm-2"></div>
+    <div class="col-sm-9">
+      <h3>Administrator account</h3>
+    </div>
+  </div>
+
+  <fieldset class="form-group row">
+    <div class="col-sm-2"></div>
+    <label for="welcome-admin-username" class="form-control-label col-sm-2">
+      Username:
+    </label>
+    <div class="col-sm-4">
+      <input class="form-control"
+        id="welcome-admin-username" name="admin-username"
+        value="admin"
+        autofocus required>
+    </div>
+  </fieldset>
+
+  <fieldset class="form-group row">
+    <div class="col-sm-2"></div>
+    <label for="welcome-user-password" class="form-control-label col-sm-2">
+      Password:
+    </label>
+    <div class="col-sm-4">
+      <input class="form-control"
+        id="welcome-admin-password" name="admin-password"
+        type="password"
+        autofocus required>
+    </div>
+  </fieldset>
+
+  <div class="row">
+    <div class="col-sm-2"></div>
+    <div class="col-sm-6">
+      <hr>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-sm-2"></div>
+    <div class="col-sm-9">
+      <h3>Hotspot</h3>
+    </div>
+  </div>
+
+  <fieldset class="form-group row">
+    <div class="col-sm-2"></div>
+    <label for="welcome-hotspot-ssid" class="form-control-label col-sm-2">
+      SSID:
+    </label>
+    <div class="col-sm-4">
+      <input class="form-control"
+        id="welcome-hotspot-ssid" name="hotspot-ssid"
+        value="liquid"
+        autofocus required>
+    </div>
+  </fieldset>
+
+  <fieldset class="form-group row">
+    <div class="col-sm-2"></div>
+    <label for="welcome-user-password" class="form-control-label col-sm-2">
+      Password:
+    </label>
+    <div class="col-sm-4">
+      <input class="form-control"
+        id="welcome-hotspot-password" name="hotspot-password"
+        type="password"
+        autofocus required>
+    </div>
+  </fieldset>
+
+  <div class="row">
+    <div class="col-sm-2"></div>
+    <div class="col-sm-2">
+      <button type="submit" class="btn btn-primary">Apply</button>
+    </div>
+  </div>
+</form>
+
+{% endblock %}

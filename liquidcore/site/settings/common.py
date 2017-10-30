@@ -16,6 +16,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'liquidcore.home.apps.HomeConfig',
     'liquidcore.config',
+    'liquidcore.welcome',
 ]
 
 MIDDLEWARE = [
@@ -28,6 +29,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'corsheaders.middleware.CorsMiddleware',
+    'liquidcore.welcome.middleware.welcome_middleware',
 ]
 
 AUTHENTICATION_BACKENDS = [

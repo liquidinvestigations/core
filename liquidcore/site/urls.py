@@ -9,5 +9,6 @@ urlpatterns = [
     url(r'^o/', include('oauth2_provider.urls', namespace='oauth2_provider')),
     url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     url(r'^api/', include('liquidcore.config.urls')),
+    url(r'^welcome/', include('liquidcore.welcome.urls')),
     url(r'^', include('liquidcore.home.urls')),
 ]
