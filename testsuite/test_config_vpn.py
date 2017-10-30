@@ -118,7 +118,12 @@ def test_vpn_server_revoke_client_key(client):
     assert revoked_key['revoked_at']
     assert revoked_key['revoked_reason'] == 'yyy'
 
-def test_vpn_server_download_client_keys(client):
+def test_vpn_server_download_client_keys(client, monkeypatch):
+    def mock_get_ovpn(client_id):
+        return 'mock client {}.ovpn'.format(client_id).encode('utf8')
+    from liquidcore.config import views
+    monkeypatch.setattr(views, 'get_vpn_client_config', mock_get_ovpn)
+
     generate = client.post('/api/vpn/server/keys/generate/', data={
         'label': 'xxx',
     })
@@ -127,6 +132,7 @@ def test_vpn_server_download_client_keys(client):
     download = client.get('/api/vpn/server/keys/1/download/')
     assert download.status_code == 200
     assert download['Content-Type'] == OVPN_CONTENT_TYPE
+    assert download.content == b'mock client 1.ovpn'
 
 def test_vpn_client_upload_ovpn(client):
     OVPN_CONTENT = 'dummy ovpn file content'
