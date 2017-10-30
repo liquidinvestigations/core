@@ -7,7 +7,6 @@ from . import views
 router = routers.DefaultRouter()
 router.register(r'users', views.UserViewSet)
 router.register(r'services', views.ServiceViewSet)
-router.register(r'nodes', views.NodeViewSet)
 router.register(r'vpn/server/keys', views.VPNClientKeyViewSet)
 
 urlpatterns = format_suffix_patterns([
@@ -21,6 +20,7 @@ urlpatterns = format_suffix_patterns([
     url(r'^vpn/client/$', views.vpn_client_enabled),
     url(r'^vpn/client/upload/$', views.vpn_client_upload),
     url(r'^vpn/server/$', views.vpn_server_enabled),
+    url(r'^nodes/$', views.node_list),
 ]) + [
     url(r'^', include(router.urls)),
 ]

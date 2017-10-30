@@ -45,6 +45,7 @@ SERIALIZED_NODE = {
     'hostname': 'first.node'
 }
 
+@pytest.mark.skip
 def test_get_nodes(client, admin_user, example_node):
     assert client.login(username='admin', password='q')
 
@@ -52,6 +53,7 @@ def test_get_nodes(client, admin_user, example_node):
     assert node_list.status_code == 200
     assert node_list.json() == [SERIALIZED_NODE]
 
+@pytest.mark.skip
 def test_set_enabled(client, admin_user, example_node):
     assert client.login(username='admin', password='q')
 

@@ -105,26 +105,14 @@ class ServiceViewSet(viewsets.ReadOnlyModelViewSet):
         reconfigure_system()
         return Response()
 
-class NodeViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = Node.objects.all()
-    serializer_class = serializers.NodeSerializer
-
-    @detail_route(
-        methods=['put'],
-        permission_classes=[IsAdminUser],
-    )
-    def trusted(self, request, pk=None):
-        """Sets the service as enabled or disabled."""
-        serializer = serializers.NodeTrustedSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        data = serializer.validated_data
-
-        node = Node.objects.get(id=pk)
-        node.trusted = data['is_trusted']
-        node.save()
-        reconfigure_system()
-        return Response()
-
+@api_view()
+def node_list(request):
+    from ..home import discover
+    nodes = discover.get_node_list()
+    for id, node in enumerate(nodes, 1):
+        node['id'] = id
+        node['is_trusted'] = True
+    return Response(nodes)
 
 @api_view()
 def network_status(request):
