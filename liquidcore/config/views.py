@@ -5,6 +5,7 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from rest_framework.response import Response
 from rest_framework.parsers import BaseParser
+from rest_framework.renderers import BaseRenderer
 from rest_framework.permissions import IsAuthenticated, AllowAny, IsAdminUser
 from rest_framework import viewsets
 from rest_framework.decorators import detail_route, list_route, api_view, \
@@ -237,6 +238,15 @@ class Registration(APIView):
 
         return Response()
 
+class OVPNRenderer(BaseRenderer):
+    media_type = OVPN_CONTENT_TYPE
+    format = 'ovpn'
+    charset = None
+    render_style = 'binary'
+
+    def render(self, data, media_type=None, renderer_context=None):
+        return data
+
 class VPNClientKeyViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = VPNClientKey.objects.all()
     serializer_class = serializers.VPNClientKeySerializer
@@ -279,13 +289,14 @@ class VPNClientKeyViewSet(viewsets.ReadOnlyModelViewSet):
     @detail_route(
         methods=['get'],
         permission_classes=[IsAdminUser],
+        renderer_classes=[OVPNRenderer],
         url_name='download'
     )
     def download(self, request, id=None):
         # TODO get client key from system call
-        ovpn_content = "dummy key here, don't mind me\n"
+        ovpn_content = bytes("dummy key here, don't mind me\n", encoding='latin-1')
         filename = 'client-key-{}.ovpn'.format(id)
-        response = Response(ovpn_content, content_type=OVPN_CONTENT_TYPE)
+        response = Response(bytes(ovpn_content), content_type=OVPN_CONTENT_TYPE)
         response['Content-Disposition'] = 'attachment; filename="{}"'.format(filename)
         return response
 
