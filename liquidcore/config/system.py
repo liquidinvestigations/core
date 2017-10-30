@@ -1,3 +1,4 @@
+import subprocess
 from . import models
 from . import agent
 
@@ -79,3 +80,9 @@ def put_config(key_str, value):
 
     else:
         raise ValueError('Unknown key[0] = {!r}'.format(key[0]))
+
+
+def get_vpn_client_config(client_id):
+    """ Generate an `.ovpn` configuration file for this client. """
+    cmd = ['/opt/setup/libexec/vpn-client-config', str(client_id)]
+    return subprocess.check_output(cmd)
