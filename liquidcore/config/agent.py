@@ -73,7 +73,10 @@ def launch(options, repair):
 
 def status():
     from django.conf import settings
-    return enumerate_jobs(Path(settings.LIQUID_CORE_VAR))
+    var = Path(settings.LIQUID_CORE_VAR)
+    return {
+        'jobs': enumerate_jobs(var),
+    }
 
 
 def enumerate_jobs(var):

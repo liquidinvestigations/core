@@ -365,8 +365,11 @@ def vpn_client_upload(request):
 @api_view()
 @permission_classes([IsAdminUser])
 def configure_status(request):
-    job_map = agent.status()
-    pending = any(properties.get('options') for properties in job_map.values())
+    job_status = agent.status()
+    pending = any(
+        properties.get('options')
+        for properties in job_status['jobs'].values()
+    )
 
     if pending:
         state = 'configuring'
