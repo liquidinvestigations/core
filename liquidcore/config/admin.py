@@ -6,7 +6,7 @@ from . import agent
 
 @staff_member_required
 def reconfigure(request):
-    jobs = sorted(agent.status().items())
+    jobs = sorted(agent.status()['jobs'].items())
     return render(request, 'liquidcore/config.html', {
         'jobs': jobs,
     })
@@ -14,6 +14,6 @@ def reconfigure(request):
 
 @staff_member_required
 def reconfigure_job_log(request, job_id):
-    job = agent.status()[job_id]['job']
+    job = agent.status()['jobs'][job_id]['job']
     with job.open_logfile() as f:
         return HttpResponse(f.read(), content_type='text/plain')
