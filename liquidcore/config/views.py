@@ -371,7 +371,9 @@ def configure_status(request):
         for properties in job_status['jobs'].values()
     )
 
-    if pending:
+    if job_status['is_broken']:
+        state = 'broken'
+    elif pending:
         state = 'configuring'
     else:
         state = 'ok'

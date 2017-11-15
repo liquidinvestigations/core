@@ -76,6 +76,7 @@ def status():
     var = Path(settings.LIQUID_CORE_VAR)
     return {
         'jobs': enumerate_jobs(var),
+        'is_broken': is_broken(var),
     }
 
 
@@ -109,6 +110,16 @@ def enumerate_jobs(var):
         jobs[job_id]['job'] = Job(job_id, var)
 
     return dict(jobs)
+
+
+def is_broken(var):
+    state_db = State(var)
+    with lock(var / 'agent.lock'):
+        if state_db.load().get('job'):
+            return True
+        else:
+            return False
+
 
 
 def delete_old_jobs(var, keep):
