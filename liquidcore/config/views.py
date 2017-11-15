@@ -16,6 +16,7 @@ from rest_framework import status
 from .models import Service, Setting, Node, VPNClientKey
 from . import serializers
 from .system import reconfigure_system, get_vpn_client_config
+from . import agent
 
 OVPN_CONTENT_TYPE = 'application/x-openvpn-profile'
 
@@ -360,3 +361,16 @@ def vpn_client_upload(request):
     setting.save()
     reconfigure_system()
     return Response(data={'detail': 'Upload done.'})
+
+@api_view()
+@permission_classes([IsAdminUser])
+def configure_status(request):
+    job_map = agent.status()
+    pending = any(properties.get('options') for properties in job_map.values())
+
+    if pending:
+        state = 'configuring'
+    else:
+        state = 'ok'
+
+    return Response({'state': state})

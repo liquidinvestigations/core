@@ -21,6 +21,7 @@ urlpatterns = format_suffix_patterns([
     url(r'^vpn/client/upload/$', views.vpn_client_upload),
     url(r'^vpn/server/$', views.vpn_server_enabled),
     url(r'^nodes/$', views.node_list),
+    url(r'^configure/status/$', views.configure_status),
 ]) + [
     url(r'^', include(router.urls)),
 ]
