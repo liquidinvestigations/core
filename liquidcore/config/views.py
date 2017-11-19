@@ -372,10 +372,10 @@ def configure_status(request):
     )
 
     if job_status['is_broken']:
-        state = 'broken'
+        status = 'broken'
     elif pending:
-        state = 'configuring'
+        status = 'configuring'
     else:
-        state = 'ok'
+        status = 'ok'
 
-    return Response({'state': state})
+    return Response({'status': status})
