@@ -362,7 +362,7 @@ def vpn_client_upload(request):
     reconfigure_system()
     return Response(data={'detail': 'Upload done.'})
 
-@api_view()
+@api_view(['GET'])
 @permission_classes([IsAdminUser])
 def configure_status(request):
     job_status = agent.status()
@@ -372,10 +372,27 @@ def configure_status(request):
     )
 
     if job_status['is_broken']:
-        status = 'broken'
+        return Response({
+            'status': 'broken',
+            'detail': "Configuration is broken.",
+        })
     elif pending:
         status = 'configuring'
+        return Response({
+            'status': 'configuring',
+            'detail': "System is reconfiguring.",
+        })
     else:
-        status = 'ok'
+        return Response({
+            'status': 'ok',
+            'detail': "Configuration finished.",
+        })
 
-    return Response({'status': status})
+@api_view(['POST'])
+@permission_classes([IsAdminUser])
+def configure_repair(request):
+    reconfigure_system(repair=True)
+    return Response({
+        'status': 'ok',
+        'detail': "Repair job started.",
+    })
