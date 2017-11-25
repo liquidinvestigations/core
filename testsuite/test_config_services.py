@@ -66,6 +66,6 @@ def test_service_permissions(client):
 
     # try to get/put without admin rights
     get = client.get(get_endpoint)
-    assert get.status_code == 403
+    assert get.status_code == 200
     put = client.put(enabled_endpoint, data={'is_enabled': False})
     assert put.status_code == 403

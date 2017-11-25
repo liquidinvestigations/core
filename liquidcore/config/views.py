@@ -89,6 +89,7 @@ class UserViewSet(viewsets.ModelViewSet):
 class ServiceViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Service.objects.all()
     serializer_class = serializers.ServiceSerializer
+    permission_classes = [IsAuthenticated]
 
     @detail_route(
         methods=['put'],
