@@ -102,8 +102,8 @@ REGISTRATION_DEFAULT = {
         "netmask": "255.255.255.0",
         "dhcp_range": "10.0.0.100-255",
         "hotspot": {
-            "ssid": "",
-            "password": ""
+            "ssid": "liquid",
+            "password": "investigations"
         },
         "eth": False
     },
