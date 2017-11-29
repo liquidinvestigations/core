@@ -28,12 +28,14 @@ def test_create_users(client, admin_user):
 
     create = client.post('/api/users/', data={
         "username": "mike",
+        "password": "1234567890",
         "is_admin": False,
         "first_name": "Mike",
         "last_name": "Tyson",
         "is_active": True,
     })
     assert create.status_code == 201
+    assert 'password' not in create.json()
 
     user_list = client.get("/api/users/")
     assert set(u['username'] for u in user_list.json()) == set(["admin", "mike"])
@@ -45,6 +47,9 @@ def test_create_users(client, admin_user):
     assert get_mike.json()['first_name'] == "Mike"
     assert get_mike.json()['last_name'] == "Tyson"
     assert get_mike.json()['is_active'] == True
+
+    mike = User.objects.get(username='mike')
+    assert mike.check_password('1234567890')
 
 def test_admins_cant_change_username(client, admin_user):
     assert client.login(username='admin', password='q')
