@@ -26,6 +26,16 @@ class UserViewSet(viewsets.ModelViewSet):
     lookup_field = 'username'
     lookup_value_regex = serializers.USERNAME_URL_REGEX
 
+    def create(self, request):
+        serializer = serializers.UserCreateSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        User.objects.create_user(**serializer.validated_data)
+
+        clean_data = serializer.validated_data
+        clean_data.pop('password', None)
+        return Response(clean_data, status=status.HTTP_201_CREATED)
+
     # @list_route creates an endpoint that doesn't contain the pk.
     # We don't return a list, but that's not a problem.
     @list_route(

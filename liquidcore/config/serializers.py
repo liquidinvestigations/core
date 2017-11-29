@@ -51,6 +51,14 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
         fields = ('url', 'username', 'first_name',
                   'last_name', 'is_admin', 'is_active')
 
+class UserCreateSerializer(UserSerializer):
+    password = serializers.CharField(validators=[valid_password],
+        required=False)
+
+    class Meta:
+        model = UserSerializer.Meta.model
+        fields = UserSerializer.Meta.fields + ('password',)
+
 class UserActiveSerializer(serializers.Serializer):
     is_active = serializers.BooleanField()
 
