@@ -21,13 +21,6 @@ def welcome(request):
         domain.data = request.POST['domain']
         domain.save()
 
-        lan = Setting.objects.get(name='lan')
-        lan.data = dict(lan.data, hotspot={
-            'ssid': request.POST['hotspot-ssid'],
-            'password': request.POST['hotspot-password'],
-        })
-        lan.save()
-
         User.objects.create_user(
             username=request.POST['admin-username'],
             password=request.POST['admin-password'],
@@ -40,7 +33,6 @@ def welcome(request):
         WELCOME_DONE.touch()
 
         return render(request, 'welcome-applying.html', {
-            'ssid': request.POST['hotspot-ssid'],
             'url': 'http://' + request.POST['domain'],
         })
 
