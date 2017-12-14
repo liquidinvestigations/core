@@ -28,7 +28,7 @@ def create_setting_instances(apps, schema_editor):
             },
         },
         "ssh": {
-            "enabled": False,
+            "enabled": True,
             "authorized_keys": [],
             "port": 22,
         },
