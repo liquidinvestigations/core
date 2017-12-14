@@ -114,7 +114,7 @@ REGISTRATION_DEFAULT = {
         }
     },
     "ssh": {
-        "enabled": False,
+        "enabled": True,
         "authorized_keys": [],
         "port": 22
     }
