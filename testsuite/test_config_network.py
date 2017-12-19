@@ -197,7 +197,6 @@ BAD_DOMAINS = [{'domain': d} for d in [
     ("/api/network/lan/", [LAN1, LAN2], [LAN_BROKEN]),
     ("/api/network/wan/", [WAN1, WAN2], [WAN_BROKEN]),
     ("/api/network/ssh/", [SSH1, SSH2], [SSH_BROKEN]),
-    ("/api/network/domain/", GOOD_DOMAINS, BAD_DOMAINS),
 ])
 def test_network_configuration(client, endpoint, vals, broken_vals):
     registration_post = client.post('/api/registration/',
@@ -217,3 +216,26 @@ def test_network_configuration(client, endpoint, vals, broken_vals):
         assert put.status_code == 400
         # check that the last successful update is still there
         check_get_response(client, endpoint, vals[-1])
+
+@pytest.mark.parametrize("vals,broken_vals", [
+    (GOOD_DOMAINS, BAD_DOMAINS),
+])
+def test_network_configuration_domain_immutable(client, vals, broken_vals):
+    registration_post = client.post('/api/registration/',
+                                    data=REGISTRATION1,
+                                    format='json')
+    assert registration_post.status_code == 200
+    assert client.login(username=REGISTRATION1['username'],
+                        password=REGISTRATION1['password'])
+
+    for val in vals:
+        put = client.put("/api/network/domain/", data=val, format='json')
+        assert put.status_code == 405
+
+    for val in broken_vals:
+        put = client.put("/api/network/domain/", data=val, format='json')
+        assert put.status_code == 405
+
+    domain = client.get("/api/network/domain/")
+    assert domain.status_code == 200
+    assert domain.json() == {"domain": REGISTRATION1["domain"]}
