@@ -158,9 +158,8 @@ class NetworkDomain(NetworkSettingAPIView):
     setting_name = "domain"
     serializer_class = serializers.NetworkDomainSerializer
 
-    @staticmethod
-    def to_db(value):
-        return value["domain"]
+    def put(self, request, format=None):
+        return Response("network.domain is read-only", status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
     @staticmethod
     def from_db(value):
