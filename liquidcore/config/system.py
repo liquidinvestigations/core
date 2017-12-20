@@ -88,3 +88,7 @@ def get_vpn_client_config(client_id):
     """ Generate an `.ovpn` configuration file for this client. """
     cmd = ['sudo', '/opt/setup/libexec/vpn-client-config', str(client_id)]
     return subprocess.check_output(cmd)
+
+def shutdown(action):
+    cmd = ['sudo', '/opt/setup/libexec/shutdown', action]
+    subprocess.check_call(cmd)

@@ -15,7 +15,7 @@ from rest_framework import status
 
 from .models import Service, Setting, Node, VPNClientKey
 from . import serializers
-from .system import reconfigure_system, get_vpn_client_config
+from .system import reconfigure_system, get_vpn_client_config, shutdown
 from . import agent
 
 OVPN_CONTENT_TYPE = 'application/x-openvpn-profile'
@@ -406,3 +406,17 @@ def configure_repair(request):
         'status': 'ok',
         'detail': "Repair job started.",
     })
+
+@api_view(['POST'])
+@permission_classes([IsAdminUser])
+def shutdown(request):
+    action = request.data.get('action')
+    if action == 'poweroff':
+        shutdown(action)
+        return Response({"detail": "System is powering off."})
+    elif action == 'reboot':
+        shutdown(action)
+        return Response({"detail": "System is powering rebooting."})
+    else:
+        return Response({"detail": "Unknown action: {}".format(action)},
+                        status=status.HTTP_400_BAD_REQUEST)
