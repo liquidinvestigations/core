@@ -21,14 +21,14 @@ def welcome(request):
         domain.data = request.POST['domain']
         domain.save()
 
+        reconfigure_system()
+
         User.objects.create_user(
             username=request.POST['admin-username'],
             password=request.POST['admin-password'],
             is_staff=True,
             is_superuser=True
         )
-
-        reconfigure_system()
 
         WELCOME_DONE.touch()
 
