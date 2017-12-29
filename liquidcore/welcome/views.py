@@ -33,8 +33,6 @@ def welcome(request):
 
         reconfigure_system()
 
-        WELCOME_DONE.touch()
-
         return render(request, 'welcome-applying.html', {
             'url': 'http://' + request.POST['domain'],
         })
