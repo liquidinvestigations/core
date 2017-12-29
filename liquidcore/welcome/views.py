@@ -1,3 +1,4 @@
+import json
 from pathlib import Path
 from django.shortcuts import render
 from django.contrib.auth.models import User
@@ -6,6 +7,7 @@ from ..config.models import Setting
 from ..config.system import reconfigure_system
 
 WELCOME_DONE = Path('/var/lib/liquid/core/welcome_done')
+USERS_FILE = Path('/var/lib/liquid/core/users.json')
 
 
 def should_welcome():
@@ -21,14 +23,15 @@ def welcome(request):
         domain.data = request.POST['domain']
         domain.save()
 
-        reconfigure_system()
-
-        User.objects.create_user(
+        user_info = dict(
             username=request.POST['admin-username'],
             password=request.POST['admin-password'],
-            is_staff=True,
-            is_superuser=True
+            is_admin=True,
         )
+        with USERS_FILE.open('w') as f:
+            json.dump(user_info, f)
+
+        reconfigure_system()
 
         WELCOME_DONE.touch()
 
