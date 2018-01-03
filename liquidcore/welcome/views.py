@@ -50,7 +50,7 @@ def welcome(request):
             is_admin=True,
         )
         with USERS_FILE.open('w') as f:
-            json.dump(user_info, f)
+            json.dump([user_info], f)
 
         reconfigure_system()
 
