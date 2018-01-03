@@ -24,6 +24,7 @@ urlpatterns = format_suffix_patterns([
     url(r'^configure/status/$', views.configure_status),
     url(r'^configure/repair/$', views.configure_repair),
     url(r'^shutdown/$', views.shutdown),
+    url(r'^status/$', views.general_status),
 ]) + [
     url(r'^', include(router.urls)),
 ]

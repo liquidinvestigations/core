@@ -1,4 +1,5 @@
 import fcntl
+import subprocess
 from django.utils import timezone
 from contextlib import contextmanager
 from django.conf import settings
@@ -420,3 +421,13 @@ def shutdown(request):
     else:
         return Response({"detail": "Unknown action: {}".format(action)},
                         status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['GET'])
+@permission_classes([IsAdminUser])
+def general_status(request):
+    uptime_text = subprocess.check_output(['uptime']).decode('latin1')
+    return Response({
+        'messages': [
+            {"title": "uptime", "text": uptime_text},
+        ],
+    })
