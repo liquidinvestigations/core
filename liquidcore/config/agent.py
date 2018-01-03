@@ -114,11 +114,15 @@ def enumerate_jobs(var):
 
 def is_broken(var):
     state_db = State(var)
-    with lock(var / 'agent.lock'):
-        if state_db.load().get('job'):
+    job_id = state_db.load().get('job')
+    if job_id:
+        job = Job(job_id, var)
+        with job.pid_file.open(encoding='latin1') as f:
+            pid = int(f.read())
+        if not psutil.pid_exists(pid):
             return True
-        else:
-            return False
+
+    return False
 
 
 
