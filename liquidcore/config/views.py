@@ -410,7 +410,7 @@ def configure_repair(request):
 
 @api_view(['POST'])
 @permission_classes([IsAdminUser])
-def shutdown(request):
+def api_shutdown(request):
     action = request.data.get('action')
     if action == 'poweroff':
         shutdown(action)
