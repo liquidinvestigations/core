@@ -38,20 +38,20 @@ WAN_BROKEN = {
 }
 
 LAN1 = {
-  "ip": "10.0.0.1",
+  "ip": "10.103.0.1",
   "netmask": "255.255.255.0",
-  "dhcp_range": "10.0.0.100-255",
+  "dhcp_range": "10.103.0.100,10.103.0.200,72h",
   "hotspot": {
     "ssid": "foo",
     "password": "barbaxqux"
   },
-  "eth": False
+  "eth": True
 }
 
 LAN2 = {
   "ip": "192.168.0.1",
   "netmask": "255.255.0.0",
-  "dhcp_range": "192.0.0.2-255",
+  "dhcp_range": "192.0.0.2,192.0.0.254,72h",
   "hotspot": {
     "ssid": "yet another hotspot",
     "password": "more passwords!"
@@ -62,7 +62,7 @@ LAN2 = {
 LAN_BROKEN = {
   "ip": "not an ip address",
   "netmask": "255.255.0.0",
-  "dhcp_range": "192.0.0.2-255",
+  "dhcp_range": "192.0.0.2,192.0.0.254,72h",
   "hotspot": {
     "ssid": "yet another hotspot",
     "password": "more passwords!"
@@ -98,14 +98,14 @@ REGISTRATION_DEFAULT = {
     "password": "",
     "domain": "liquid.example.org",
     "lan": {
-        "ip": "10.0.0.1",
+        "ip": "10.103.0.1",
         "netmask": "255.255.255.0",
-        "dhcp_range": "10.0.0.100-255",
+        "dhcp_range": "10.103.0.100,10.103.0.200,72h",
         "hotspot": {
             "ssid": "",
             "password": ""
         },
-        "eth": False
+        "eth": True
     },
     "wan": {
         "wifi": {
