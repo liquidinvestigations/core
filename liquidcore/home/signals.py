@@ -4,6 +4,7 @@ import subprocess
 import shlex
 from django.db.models.signals import post_save, pre_delete
 from django.contrib.auth.models import User
+from django.contrib.auth.signals import user_logged_out
 from django.conf import settings
 
 
@@ -70,3 +71,12 @@ pre_delete.connect(
     sender=User,
     dispatch_uid='on_user_delete',
 )
+
+
+def on_logout(sender, **kwargs):
+    user = kwargs['user']
+    user.accesstoken_set.all().delete()
+    user.refreshtoken_set.all().delete()
+
+
+user_logged_out.connect(on_logout)
