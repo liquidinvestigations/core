@@ -6,16 +6,16 @@ from django.db import migrations
 
 def create_service_instances(apps, schema_editor):
     Service = apps.get_model("config", "Service")
-    service_name_list = [
-        'hoover',
-        'hypothesis',
-        'matrix',
-        'dokuwiki',
-        'davros',
+    service_list = [
+        {'name': 'hoover', 'is_enabled': True},
+        {'name': 'hypothesis', 'is_enabled': False},
+        {'name': 'matrix', 'is_enabled': False},
+        {'name': 'dokuwiki', 'is_enabled': True},
+        {'name': 'davros', 'is_enabled': True},
     ]
 
-    for name in service_name_list:
-        service = Service(name=name, is_enabled=True)
+    for kwargs in service_list:
+        service = Service(**kwargs)
         service.save()
 
 class Migration(migrations.Migration):
