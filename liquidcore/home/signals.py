@@ -75,8 +75,9 @@ pre_delete.connect(
 
 def on_logout(sender, **kwargs):
     user = kwargs['user']
-    user.accesstoken_set.all().delete()
-    user.refreshtoken_set.all().delete()
+    if user:
+        user.accesstoken_set.all().delete()
+        user.refreshtoken_set.all().delete()
 
 
 user_logged_out.connect(on_logout)
