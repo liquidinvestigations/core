@@ -18,6 +18,7 @@ from .models import Service, Setting, Node, VPNClientKey
 from . import serializers
 from .system import reconfigure_system, get_vpn_client_config, shutdown
 from . import agent
+from . import supervisor
 
 OVPN_CONTENT_TYPE = 'application/x-openvpn-profile'
 
@@ -314,9 +315,13 @@ def vpn_status(request):
 
     vpn_setting = Setting.objects.get(name='vpn')
     status = vpn_setting.data
-    # TODO get these with system calls
-    status['client']['is_running'] = False
-    status['server']['is_running'] = False
+
+    supervisor_status = supervisor.status()
+    vpn_client_running = supervisor_status.get('vpn-client') == 'running'
+    vpn_server_running = supervisor_status.get('vpn-server') == 'running'
+    status['client']['is_running'] = vpn_client_running
+    status['server']['is_running'] = vpn_server_running
+
     status['server']['registered_key_count'] = VPNClientKey.objects.count()
     status['server']['active_connection_count'] = 0
 

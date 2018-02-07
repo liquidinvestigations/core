@@ -20,6 +20,13 @@ def client():
 
 OVPN_CONTENT_TYPE = 'application/x-openvpn-profile'
 
+
+@pytest.fixture(autouse=True)
+def stub_supervisor(monkeypatch):
+    from liquidcore.config import supervisor
+    monkeypatch.setattr(supervisor, 'status', lambda: {})
+
+
 def test_vpn_system_status(client):
     vpn_status = client.get('/api/vpn/')
     assert vpn_status.status_code == 200
