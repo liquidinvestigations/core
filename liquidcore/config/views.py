@@ -352,6 +352,16 @@ def vpn_server_enabled(request):
 
 @api_view(['PUT'])
 @permission_classes([IsAdminUser])
+def vpn_server_address(request):
+    vpn_setting = Setting.objects.get(name='vpn')
+    vpn = vpn_setting.data
+    vpn['server']['address'] = request.data
+    vpn_setting.data = vpn
+    vpn_setting.save()
+    return Response()
+
+@api_view(['PUT'])
+@permission_classes([IsAdminUser])
 def vpn_client_enabled(request):
     serializer = serializers.IsEnabledSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)

@@ -45,6 +45,12 @@ def test_vpn_system_status(client):
     assert server_status['registered_key_count'] == 0
     assert server_status['active_connection_count'] == 0
 
+def test_vpn_server_change_address(client):
+    value = {'address': '1.2.3.4', 'port': '2332'}
+    resp = client.put('/api/vpn/server/address/', data=value)
+    assert resp.status_code == 200
+    assert client.get('/api/vpn/').json()['server']['address'] == value
+
 def test_vpn_server_enable_disable(client):
     server_enable = client.put('/api/vpn/server/', data={
         'is_enabled': True,

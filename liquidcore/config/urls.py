@@ -20,6 +20,7 @@ urlpatterns = format_suffix_patterns([
     url(r'^vpn/client/$', views.vpn_client_enabled),
     url(r'^vpn/client/upload/$', views.vpn_client_upload),
     url(r'^vpn/server/$', views.vpn_server_enabled),
+    url(r'^vpn/server/address/$', views.vpn_server_address),
     url(r'^nodes/$', views.node_list),
     url(r'^configure/status/$', views.configure_status),
     url(r'^configure/repair/$', views.configure_repair),

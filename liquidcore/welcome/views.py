@@ -40,9 +40,17 @@ def welcome(request):
         return HttpResponseRedirect('/')
 
     if request.method == 'POST':
+        domain_value = request.POST['domain']
+
         domain = Setting.objects.get(name='domain')
-        domain.data = request.POST['domain']
+        domain.data = domain_value
         domain.save()
+
+        vpn_setting = Setting.objects.get(name='vpn')
+        vpn = vpn_setting.data
+        vpn['server']['address']['address'] = domain_value
+        vpn_setting.data = vpn
+        vpn_setting.save()
 
         user_info = dict(
             username=request.POST['admin-username'],
@@ -55,7 +63,7 @@ def welcome(request):
         reconfigure_system()
 
         with WELCOME_STARTED.open('w') as f:
-            f.write(request.POST['domain'])
+            f.write(domain_value)
 
         return HttpResponseRedirect('/welcome/')
 
