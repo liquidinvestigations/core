@@ -358,6 +358,7 @@ def vpn_server_address(request):
     vpn['server']['address'] = request.data
     vpn_setting.data = vpn
     vpn_setting.save()
+    reconfigure_system()
     return Response()
 
 @api_view(['PUT'])
