@@ -8,8 +8,8 @@ def create_service_instances(apps, schema_editor):
     Service = apps.get_model("config", "Service")
     service_list = [
         {'name': 'hoover', 'is_enabled': True},
-        {'name': 'hypothesis', 'is_enabled': False},
-        {'name': 'matrix', 'is_enabled': False},
+        {'name': 'hypothesis', 'is_enabled': True},
+        {'name': 'matrix', 'is_enabled': True},
         {'name': 'dokuwiki', 'is_enabled': True},
         {'name': 'davros', 'is_enabled': True},
     ]
