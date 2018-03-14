@@ -262,11 +262,15 @@ class State:
         self.save(dict(self.load(), **delta))
 
 
-def run_task(command, options):
+def run_task(command, options, repair):
     log(
-        "Calling setup with target configuration",
-        json.dumps(options, indent=2, sort_keys=True)
+        "Calling setup with target configuration %r (repair: %r)",
+        json.dumps(options, indent=2, sort_keys=True),
+        repair,
     )
+
+    if repair:
+        command += ' --repair'
 
     subprocess.run(
         command,
@@ -302,7 +306,7 @@ def do_the_job(job_id, var):
         with job.options_file.open(encoding='utf8') as f:
             task_data = json.load(f)
 
-        repair = task_data.pop('repair')
+        repair = task_data['repair']
 
         state_db = State(var)
         with lock(var / 'agent.lock'):
