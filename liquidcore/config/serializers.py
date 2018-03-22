@@ -93,8 +93,8 @@ class NetworkDomainSerializer(serializers.Serializer):
     domain = serializers.CharField(validators=[valid_domain])
 
 class WifiLoginSerializer(serializers.Serializer):
-    ssid = serializers.CharField(max_length=31, min_length=1)
-    password = serializers.CharField(max_length=63, min_length=8)
+    ssid = serializers.CharField(max_length=31, min_length=0)  # should be 1
+    password = serializers.CharField(max_length=63, min_length=0)  # should be 8
 
 class LanSerializer(serializers.Serializer):
     ip = serializers.IPAddressField(protocol="IPv4")
