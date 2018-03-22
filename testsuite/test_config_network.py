@@ -121,7 +121,7 @@ REGISTRATION_DEFAULT = {
 }
 
 REGISTRATION1 =  {
-    "username": "johnDoe",
+    "username": "johndoe",
     "password": "123b456x",
     "domain": "liquid.example.org",
     "lan": LAN1,
