@@ -243,14 +243,16 @@ def test_username_validation(client, admin_user):
         'phillip.glass',
         'erik_satie',
         'yet_another.badly.named_user',
-        'johnDoe',
+        'johndoe',
     ]
     BAD_USERNAMES = [
+        'Mouse',
+        'theMan',
         'beta!',
         'this-username-is-no-good',
         'sh',  # length 2 < 3
         'x',
-        'long username' * 5,  # length 65 > 64
+        'long.username' * 5,  # length 65 > 64
         'money&power',
     ]
     USER_STUB = {
