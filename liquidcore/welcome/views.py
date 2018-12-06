@@ -12,6 +12,7 @@ USERS_FILE = Path('/var/lib/liquid/core/users.json')
 
 
 def should_welcome():
+    return False
     return not WELCOME_DONE.is_file()
 
 

@@ -6,21 +6,7 @@ from django.utils.dateparse import parse_datetime
 from . import discover
 
 def homepage(request):
-    status = discover.get_status().get("status")
-    nodes = discover.get_node_list() if status else []
-
-    node_list = [
-        {
-            'hostname': node['hostname'],
-            'address': node['data']['address'],
-            'discovered_at_datetime': parse_datetime(node['data']['discovered_at']),
-        }
-        for node in nodes
-    ]
-
     return render(request, 'homepage.html', {
-        'status': status,
-        'node_list': node_list,
         'hypothesis_app_url': settings.HYPOTHESIS_APP_URL,
         'hoover_app_url': settings.HOOVER_APP_URL,
         'dokuwiki_app_url': settings.DOKUWIKI_APP_URL,

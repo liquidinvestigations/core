@@ -4,3 +4,4 @@
 /static
 /.cache
 /initialize.lock
+/var
