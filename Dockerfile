@@ -6,8 +6,8 @@ WORKDIR /app
 ADD requirements.txt ./
 RUN pip install -r requirements.txt
 
+ENV DJANGO_SETTINGS_MODULE liquidcore.site.settings.docker_local
 COPY . .
-COPY liquidcore/site/settings/docker_local.py liquidcore/site/settings/local.py
 
 VOLUME /app/var
 ENV PYTHONUNBUFFERED 1
