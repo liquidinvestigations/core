@@ -1,5 +1,7 @@
 import re
 
+from .common import *
+
 DEBUG = True
 SECRET_KEY = 'foo'
 ALLOWED_HOSTS = ['*']
