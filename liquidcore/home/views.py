@@ -23,6 +23,7 @@ def profile(request):
         return HttpResponse('Unauthorized', status=401)
 
     return JsonResponse({
+        'id': user.get_username(),
         'login': user.get_username(),
         'email': user.email,
     })
