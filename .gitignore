@@ -2,6 +2,4 @@
 /liquidcore/site/settings/local.py
 /db.sqlite3
 /static
-/.cache
-/initialize.lock
 /var

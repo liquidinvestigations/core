@@ -82,12 +82,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-REST_FRAMEWORK = {
-    'DEFAULT_PERMISSION_CLASSES': (
-        'rest_framework.permissions.IsAdminUser',
-    )
-}
-
 LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'UTC'
 USE_I18N = True
@@ -96,9 +90,6 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATIC_ROOT = str(BASE_DIR / 'static')
 
-INVOKE_HOOK = None
-HYPOTHESIS_APP_URL = None
-
 HOOVER_APP_URL = None
 HYPOTHESIS_APP_URL = None
 DOKUWIKI_APP_URL = None
@@ -106,5 +97,3 @@ MATRIX_APP_URL = None
 DAVROS_APP_URL = None
 LIQUID_DOMAIN = None
 DISCOVERY_URL = None
-
-INITIALIZE_LOCK_FILE_PATH = str(BASE_DIR / 'initialize.lock')

@@ -1,9 +1,6 @@
 from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render
 from django.conf import settings
-from django.utils.dateparse import parse_datetime
-
-from . import discover
 
 
 def homepage(request):
