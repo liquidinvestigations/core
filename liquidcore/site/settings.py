@@ -1,8 +1,20 @@
+import os
 from pathlib import Path
 
-BASE_DIR = Path(__file__).parent.parent.parent.parent
 
-ALLOWED_HOSTS = []
+def bool_env(value):
+    return (value or '').lower() in ['on', 'true']
+
+
+base_dir = Path(__file__).parent.parent.parent.parent
+
+DEBUG = bool_env(os.environ.get('DEBUG'))
+SECRET_KEY = os.environ.get('SECRET_KEY')
+liquid_proto = os.environ.get('LIQUID_PROTO', 'http')
+liquid_domain = os.environ['LIQUID_DOMAIN']
+
+LIQUID_URL = f'{liquid_proto}://{liquid_domain}'
+ALLOWED_HOSTS = [liquid_domain]
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -13,11 +25,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'oauth2_provider',
     'corsheaders',
-    'rest_framework',
-    'liquidcore.home.apps.HomeConfig',
-    'liquidcore.config',
-    'liquidcore.welcome',
+    'liquidcore.home',
 ]
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -29,8 +39,8 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'corsheaders.middleware.CorsMiddleware',
-    'liquidcore.welcome.middleware.welcome_middleware',
 ]
+
 
 AUTHENTICATION_BACKENDS = [
     'oauth2_provider.backends.OAuth2Backend',
@@ -62,25 +72,12 @@ WSGI_APPLICATION = 'liquidcore.site.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': str(BASE_DIR / 'var' / 'db.sqlite3'),
+        'NAME': str(base_dir / 'var' / 'db.sqlite3'),
     }
 }
 
 
-AUTH_PASSWORD_VALIDATORS = [
-    {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
-    },
-]
+AUTH_PASSWORD_VALIDATORS = []
 
 LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'UTC'
@@ -88,7 +85,7 @@ USE_I18N = True
 USE_L10N = True
 USE_TZ = True
 STATIC_URL = '/static/'
-STATIC_ROOT = str(BASE_DIR / 'static')
+STATIC_ROOT = str(base_dir / 'static')
 
 HOOVER_APP_URL = None
 HYPOTHESIS_APP_URL = None
