@@ -92,8 +92,8 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATIC_ROOT = str(base_dir / 'static')
 
-HOOVER_APP_URL = None
-HYPOTHESIS_APP_URL = None
-DOKUWIKI_APP_URL = None
-MATRIX_APP_URL = None
-DAVROS_APP_URL = None
+HOOVER_APP_URL = os.environ.get('HOOVER_APP_URL')
+DOKUWIKI_APP_URL = os.environ.get('DOKUWIKI_APP_URL')
+ROCKETCHAT_APP_URL = os.environ.get('ROCKETCHAT_APP_URL')
+NEXTCLOUD_APP_URL = os.environ.get('NEXTCLOUD_APP_URL')
+HYPOTHESIS_APP_URL = os.environ.get('HYPOTHESIS_APP_URL')

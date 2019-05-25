@@ -9,7 +9,8 @@ def homepage(request):
         'hoover_app_url': settings.HOOVER_APP_URL,
         'dokuwiki_app_url': settings.DOKUWIKI_APP_URL,
         'matrix_app_url': settings.MATRIX_APP_URL,
-        'davros_app_url': settings.DAVROS_APP_URL,
+        'rocketchat_app_url': settings.ROCKETCHAT_APP_URL,
+        'nextcloud_app_url': settings.NEXTCLOUD_APP_URL,
     })
 
 
