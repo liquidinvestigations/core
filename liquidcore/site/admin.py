@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.contrib.auth.admin import User, UserAdmin
+from django.contrib.admin import site
 
 if settings.LIQUID_2FA:
     from django_otp.admin import OTPAdminSite as AdminSite
@@ -8,7 +9,7 @@ else:
 
 
 class HooverAdminSite(AdminSite):
-    pass
+    site_header = "Liquid Core administration"
 
 
 class HooverUserAdmin(UserAdmin):
@@ -28,5 +29,15 @@ class HooverUserAdmin(UserAdmin):
         actions.append(create_invitations)
 
 
-admin_site = HooverAdminSite(name='hoover-admin')
-admin_site.register(User, HooverUserAdmin)
+liquid_admin = HooverAdminSite(name='liquidadmin')
+
+for model, model_admin in site._registry.items():
+    model_admin_cls = type(model_admin)
+
+    if model is User:
+        model_admin_cls = HooverUserAdmin
+
+    if model._meta.app_label == 'otp_totp':
+        continue
+
+    liquid_admin.register(model, model_admin_cls)

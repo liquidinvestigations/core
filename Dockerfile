@@ -12,9 +12,10 @@ RUN set -e \
  && pipenv install --system --deploy --ignore-pipfile
 
 ADD liquidcore ./liquidcore
-ADD manage.py ./
+ADD manage.py dockercmd ./
 
 ENV PYTHONUNBUFFERED 1
 VOLUME /app/var
 
 CMD ./manage.py initialize && waitress-serve --port 8000 liquidcore.site.wsgi:application
+CMD ./dockercmd
