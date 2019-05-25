@@ -14,4 +14,4 @@ ADD manage.py ./
 ENV PYTHONUNBUFFERED 1
 VOLUME /app/var
 
-CMD ./manage.py initialize && ./manage.py runserver 0.0.0.0:8000
+CMD ./manage.py initialize && waitress-serve --port 8000 liquidcore.site.wsgi:application
