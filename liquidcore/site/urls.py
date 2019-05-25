@@ -1,9 +1,10 @@
-from django.contrib import admin
+from django.conf import settings
 from django.urls import path, include
+from .admin import admin_site
 from ..home import views
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    path('admin/', include(admin_site.get_urls())),
     path('accounts/', include('django.contrib.auth.urls')),
     path('accounts/profile', views.profile),
     path('o/', include('oauth2_provider.urls', namespace='oauth2_provider')),

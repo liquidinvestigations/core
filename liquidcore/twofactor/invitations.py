@@ -4,6 +4,7 @@ from django.conf import settings
 from django.http import Http404
 from django.contrib.auth import authenticate, login, get_user_model
 from django.utils.timezone import now
+from django.shortcuts import render
 from django_otp import login as otp_login
 from . import models
 from . import devices
@@ -65,3 +66,18 @@ def accept(request, invitation, device, password):
     assert user2
     login(request, user2)
     otp_login(request, device)
+
+
+def create_invitations(modeladmin, request, queryset):
+    username_list = [u.username for u in queryset]
+    duration = settings.LIQUID_2FA_INVITATION_VALID
+    invitations = [
+        (username, invite(username, duration, request.user))
+        for username in username_list
+    ]
+    return render(request, 'admin-create-invitations.html', {
+        'invitations': invitations,
+    })
+
+
+create_invitations.short_description = "Create invitations"
