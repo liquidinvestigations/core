@@ -8,7 +8,8 @@ RUN set -e \
  && pip install pipenv \
  && pipenv install --system --deploy --ignore-pipfile
 
-COPY liquidcore manage.py ./
+ADD liquidcore ./liquidcore
+ADD manage.py ./
 
 ENV PYTHONUNBUFFERED 1
 VOLUME /app/var

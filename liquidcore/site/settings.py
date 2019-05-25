@@ -10,11 +10,15 @@ base_dir = Path(__file__).parent.parent.parent
 
 DEBUG = bool_env(os.environ.get('DEBUG'))
 SECRET_KEY = os.environ.get('SECRET_KEY')
-liquid_proto = os.environ.get('LIQUID_PROTO', 'http')
+liquid_http_protocol = os.environ.get('LIQUID_HTTP_PROTOCOL', 'http')
 liquid_domain = os.environ['LIQUID_DOMAIN']
+service_address = os.environ.get('SERVICE_ADDRESS')
 
-LIQUID_URL = f'{liquid_proto}://{liquid_domain}'
+LIQUID_URL = f'{liquid_http_protocol}://{liquid_domain}'
+
 ALLOWED_HOSTS = [liquid_domain]
+if service_address:
+    ALLOWED_HOSTS.append(service_address)
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -93,5 +97,3 @@ HYPOTHESIS_APP_URL = None
 DOKUWIKI_APP_URL = None
 MATRIX_APP_URL = None
 DAVROS_APP_URL = None
-LIQUID_DOMAIN = None
-DISCOVERY_URL = None

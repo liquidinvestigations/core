@@ -16,7 +16,7 @@ def homepage(request):
 def profile(request):
     user = request.user
 
-    if not user.is_authenticated():
+    if not user.is_authenticated:
         return HttpResponse('Unauthorized', status=401)
 
     return JsonResponse({

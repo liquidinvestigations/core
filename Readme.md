@@ -14,3 +14,5 @@ The app is configured by setting environment variables.
 * `SECRET_KEY`: a random secret string.
 * `LIQUID_PROTO`: `http` (default) or `https`.
 * `LIQUID_DOMAIN`: the domain name, e.g. `liquid.example.com`.
+* `SERVICE_ADDRESS`: name or address of the internal service, as it's
+  registered in the cluster
