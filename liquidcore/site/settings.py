@@ -1,8 +1,24 @@
+import os
 from pathlib import Path
 
-BASE_DIR = Path(__file__).parent.parent.parent.parent
 
-ALLOWED_HOSTS = []
+def bool_env(value):
+    return (value or '').lower() in ['on', 'true']
+
+
+base_dir = Path(__file__).parent.parent.parent
+
+DEBUG = bool_env(os.environ.get('DEBUG'))
+SECRET_KEY = os.environ.get('SECRET_KEY')
+liquid_http_protocol = os.environ.get('LIQUID_HTTP_PROTOCOL', 'http')
+liquid_domain = os.environ['LIQUID_DOMAIN']
+service_address = os.environ.get('SERVICE_ADDRESS')
+
+LIQUID_URL = f'{liquid_http_protocol}://{liquid_domain}'
+
+ALLOWED_HOSTS = [liquid_domain]
+if service_address:
+    ALLOWED_HOSTS.append(service_address)
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -13,11 +29,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'oauth2_provider',
     'corsheaders',
-    'rest_framework',
-    'liquidcore.home.apps.HomeConfig',
-    'liquidcore.config',
-    'liquidcore.welcome',
+    'liquidcore.home',
 ]
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -29,8 +43,9 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'corsheaders.middleware.CorsMiddleware',
-    'liquidcore.welcome.middleware.welcome_middleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
 ]
+
 
 AUTHENTICATION_BACKENDS = [
     'oauth2_provider.backends.OAuth2Backend',
@@ -62,31 +77,12 @@ WSGI_APPLICATION = 'liquidcore.site.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': str(BASE_DIR / 'var' / 'db.sqlite3'),
+        'NAME': str(base_dir / 'var' / 'db.sqlite3'),
     }
 }
 
 
-AUTH_PASSWORD_VALIDATORS = [
-    {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
-    },
-]
-
-REST_FRAMEWORK = {
-    'DEFAULT_PERMISSION_CLASSES': (
-        'rest_framework.permissions.IsAdminUser',
-    )
-}
+AUTH_PASSWORD_VALIDATORS = []
 
 LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'UTC'
@@ -94,17 +90,10 @@ USE_I18N = True
 USE_L10N = True
 USE_TZ = True
 STATIC_URL = '/static/'
-STATIC_ROOT = str(BASE_DIR / 'static')
+STATIC_ROOT = str(base_dir / 'static')
 
-INVOKE_HOOK = None
-HYPOTHESIS_APP_URL = None
-
-HOOVER_APP_URL = None
-HYPOTHESIS_APP_URL = None
-DOKUWIKI_APP_URL = None
-MATRIX_APP_URL = None
-DAVROS_APP_URL = None
-LIQUID_DOMAIN = None
-DISCOVERY_URL = None
-
-INITIALIZE_LOCK_FILE_PATH = str(BASE_DIR / 'initialize.lock')
+HOOVER_APP_URL = os.environ.get('HOOVER_APP_URL')
+DOKUWIKI_APP_URL = os.environ.get('DOKUWIKI_APP_URL')
+ROCKETCHAT_APP_URL = os.environ.get('ROCKETCHAT_APP_URL')
+NEXTCLOUD_APP_URL = os.environ.get('NEXTCLOUD_APP_URL')
+HYPOTHESIS_APP_URL = os.environ.get('HYPOTHESIS_APP_URL')

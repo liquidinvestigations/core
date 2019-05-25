@@ -1,9 +1,6 @@
 from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render
 from django.conf import settings
-from django.utils.dateparse import parse_datetime
-
-from . import discover
 
 
 def homepage(request):
@@ -20,7 +17,7 @@ def homepage(request):
 def profile(request):
     user = request.user
 
-    if not user.is_authenticated():
+    if not user.is_authenticated:
         return HttpResponse('Unauthorized', status=401)
 
     return JsonResponse({

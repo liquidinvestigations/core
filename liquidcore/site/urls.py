@@ -1,14 +1,11 @@
-from django.conf.urls import include, url
-from .admin import admin_site
+from django.contrib import admin
+from django.urls import path, include
 from ..home import views
 
 urlpatterns = [
-    url(r'^admin/', admin_site.urls),
-    url(r'^accounts/', include('django.contrib.auth.urls')),
-    url(r'^accounts/profile$', views.profile),
-    url(r'^o/', include('oauth2_provider.urls', namespace='oauth2_provider')),
-    url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
-    url(r'^api/', include('liquidcore.config.urls')),
-    url(r'^welcome/', include('liquidcore.welcome.urls')),
-    url(r'^', include('liquidcore.home.urls')),
+    path('admin/', admin.site.urls),
+    path('accounts/', include('django.contrib.auth.urls')),
+    path('accounts/profile', views.profile),
+    path('o/', include('oauth2_provider.urls', namespace='oauth2_provider')),
+    path('', views.homepage),
 ]

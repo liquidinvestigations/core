@@ -8,9 +8,7 @@
     {{ request.user }}
     <a href="/accounts/logout/?next=/">[logout]</a>
     {% if request.user.is_staff %}
-      <a href="/admin-ui/">[admin]</a>
-      <a href="/admin/">[django admin]</a>
-      <a href="/admin/reconfigure/">[reconfigure]</a>
+      <a href="/admin/">[admin]</a>
     {% endif %}
   {% else %}
     <a href="/accounts/login/">[login]</a>
