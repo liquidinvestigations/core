@@ -11,6 +11,7 @@ django-cors-middleware = "*"
 waitress = "*"
 whitenoise = "*"
 Django = "*"
+django-otp = "*"
 
 [requires]
 python_version = "3.7"

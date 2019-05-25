@@ -13,6 +13,7 @@ SECRET_KEY = os.environ.get('SECRET_KEY')
 liquid_http_protocol = os.environ.get('LIQUID_HTTP_PROTOCOL', 'http')
 liquid_domain = os.environ['LIQUID_DOMAIN']
 service_address = os.environ.get('SERVICE_ADDRESS')
+LIQUID_2FA = bool_env(os.environ.get('LIQUID_2FA'))
 
 LIQUID_URL = f'{liquid_http_protocol}://{liquid_domain}'
 
@@ -45,6 +46,22 @@ MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
 ]
+
+if LIQUID_2FA:
+    INSTALLED_APPS += [
+        'liquidcore.twofactor',
+        'django_otp',
+        'django_otp.plugins.otp_totp',
+    ]
+
+    MIDDLEWARE += [
+        'django_otp.middleware.OTPMiddleware',
+    ]
+
+    LIQUID_2FA_APP_NAME = liquid_domain
+
+    _valid = os.environ.get('LIQUID_2FA_INVITATION_VALID')
+    LIQUID_2FA_INVITATION_VALID = int(_valid or 30) # minutes
 
 
 AUTHENTICATION_BACKENDS = [
