@@ -2,3 +2,4 @@
 /liquidcore/site/settings/local.py
 /static
 /var
+/.env

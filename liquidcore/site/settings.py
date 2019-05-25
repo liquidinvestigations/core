@@ -6,7 +6,7 @@ def bool_env(value):
     return (value or '').lower() in ['on', 'true']
 
 
-base_dir = Path(__file__).parent.parent.parent.parent
+base_dir = Path(__file__).parent.parent.parent
 
 DEBUG = bool_env(os.environ.get('DEBUG'))
 SECRET_KEY = os.environ.get('SECRET_KEY')
@@ -39,6 +39,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'corsheaders.middleware.CorsMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
 ]
 
 

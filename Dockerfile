@@ -11,8 +11,6 @@ RUN set -e \
 COPY liquidcore manage.py ./
 
 ENV PYTHONUNBUFFERED 1
-ENV DJANGO_SETTINGS_MODULE liquidcore.site.settings
-
 VOLUME /app/var
 
 CMD ./manage.py initialize && ./manage.py runserver 0.0.0.0:8000
