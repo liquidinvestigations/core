@@ -8,7 +8,7 @@ RUN set -e \
  && pip install pipenv \
  && pipenv install --system --deploy --ignore-pipfile
 
-COPY . .
+COPY liquidcore manage.py ./
 
 ENV PYTHONUNBUFFERED 1
 ENV DJANGO_SETTINGS_MODULE liquidcore.site.settings.docker_local
