@@ -17,5 +17,7 @@ ADD manage.py dockercmd ./
 ENV PYTHONUNBUFFERED 1
 VOLUME /app/var
 
+RUN LIQUID_DOMAIN=x SECRET_KEY=x ./manage.py collectstatic
+
 CMD ./manage.py initialize && waitress-serve --port 8000 liquidcore.site.wsgi:application
 CMD ./dockercmd
