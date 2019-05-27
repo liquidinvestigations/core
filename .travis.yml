@@ -1,0 +1,13 @@
+dist: xenial
+language: python
+python:
+  - "3.7"
+install:
+  - sudo apt-get update
+  - sudo apt-get install -y --no-install-recommends qrencode
+  - pip install pipenv
+  - pipenv install --system --deploy --ignore-pipfile
+script:
+  - pipenv run pytest
+notifications:
+  email: false
