@@ -107,7 +107,7 @@ USE_I18N = True
 USE_L10N = True
 USE_TZ = True
 STATIC_URL = '/static/'
-STATIC_ROOT = str(base_dir / 'static')
+STATIC_ROOT = str(base_dir / 'liquidcore' / 'home' / 'static')
 
 HOOVER_APP_URL = os.environ.get('HOOVER_APP_URL')
 DOKUWIKI_APP_URL = os.environ.get('DOKUWIKI_APP_URL')
