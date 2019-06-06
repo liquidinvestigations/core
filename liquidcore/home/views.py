@@ -23,4 +23,5 @@ def profile(request):
         'id': user.get_username(),
         'login': user.get_username(),
         'email': user.email,
+        'is_admin': user.is_staff,
     })
