@@ -8,7 +8,7 @@ def homepage(request):
         'hypothesis_app_url': settings.HYPOTHESIS_APP_URL,
         'hoover_app_url': settings.HOOVER_APP_URL,
         'dokuwiki_app_url': settings.DOKUWIKI_APP_URL,
-        'rocketchat_app_url': settings.ROCKETCHAT_APP_URL,
+        'rocketchat_app_url': settings.ROCKETCHAT_APP_URL + '/home',
         'nextcloud_app_url': settings.NEXTCLOUD_APP_URL,
     })
 
@@ -22,6 +22,8 @@ def profile(request):
     return JsonResponse({
         'id': user.get_username(),
         'login': user.get_username(),
-        'email': user.email,
+        'email': user.email or user.get_username() + '@' + settings.LIQUID_DOMAIN,
         'is_admin': user.is_staff,
+        'name': user.get_full_name() or user.get_username(),
+        'roles': ['admin', 'user'] if user.is_staff else ['user'],
     })

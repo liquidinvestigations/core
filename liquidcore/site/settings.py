@@ -11,13 +11,13 @@ base_dir = Path(__file__).parent.parent.parent
 DEBUG = bool_env(os.environ.get('DEBUG'))
 SECRET_KEY = os.environ.get('SECRET_KEY')
 liquid_http_protocol = os.environ.get('LIQUID_HTTP_PROTOCOL', 'http')
-liquid_domain = os.environ['LIQUID_DOMAIN']
+LIQUID_DOMAIN = os.environ['LIQUID_DOMAIN']
 service_address = os.environ.get('SERVICE_ADDRESS')
 LIQUID_2FA = bool_env(os.environ.get('LIQUID_2FA'))
 
-LIQUID_URL = f'{liquid_http_protocol}://{liquid_domain}'
+LIQUID_URL = f'{liquid_http_protocol}://{LIQUID_DOMAIN}'
 
-ALLOWED_HOSTS = [liquid_domain]
+ALLOWED_HOSTS = [LIQUID_DOMAIN]
 if service_address:
     ALLOWED_HOSTS.append(service_address)
 
@@ -58,7 +58,7 @@ if LIQUID_2FA:
         'django_otp.middleware.OTPMiddleware',
     ]
 
-    LIQUID_2FA_APP_NAME = liquid_domain
+    LIQUID_2FA_APP_NAME = LIQUID_DOMAIN
 
     _valid = os.environ.get('LIQUID_2FA_INVITATION_VALID')
     LIQUID_2FA_INVITATION_VALID = int(_valid or 30) # minutes
