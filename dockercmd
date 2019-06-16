@@ -1,4 +1,5 @@
 #!/bin/bash -ex
 
 ./manage.py initialize
+# exec ./manage.py runserver 0.0.0.0:8000
 exec waitress-serve --port 8000 liquidcore.site.wsgi:application
