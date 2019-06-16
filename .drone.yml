@@ -43,14 +43,14 @@ when:
 
 ---
 kind: secret
-name: username
+name: docker_username
 get:
   path: liquid/ci/drone.docker
   name: username
 
 ---
 kind: secret
-name: password
+name: docker_password
 get:
   path: liquid/ci/drone.docker
   name: password
