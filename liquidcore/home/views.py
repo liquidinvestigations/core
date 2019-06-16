@@ -1,8 +1,10 @@
 from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render
 from django.conf import settings
+from django.contrib.auth.decorators import login_required
 
 
+@login_required
 def homepage(request):
     return render(request, 'homepage.html', {
         'liquid_title': settings.LIQUID_TITLE,
