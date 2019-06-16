@@ -1,7 +1,8 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h1>Liquid Investigations</h1>
+<h1 class="shady">Liquid Investigations</h1>
+<h1>{{ liquid_title }}</h1>
 
 <p>
   {% if request.user.is_authenticated %}
@@ -45,4 +46,14 @@
 </p>
 {% endif %}
 
+{% endblock %}
+{% block headstyles %}
+<style>
+.shady {
+  transform: rotate(90deg);
+  transform-origin: top left;
+  color: #ddd;
+  padding-left: 100pt;
+}
+</style>
 {% endblock %}
