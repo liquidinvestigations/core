@@ -1,0 +1,69 @@
+kind: pipeline
+name: test
+
+steps:
+- name: flake8
+  image: python:3.7-stretch
+  commands:
+  - pip install flake8 > /dev/null
+  - flake8 || true  # not now
+
+- name: test
+  image: python:3.7-stretch
+  commands:
+  - apt-get update -yqq
+  - apt-get install -yqq --no-install-recommends qrencode
+  - pip install flake8 pipenv > /dev/null
+  - pipenv install --system --deploy --ignore-pipfile
+  - pipenv run pytest
+
+---
+kind: pipeline
+name: publish
+
+trigger:
+  status:
+  - success
+  event:
+  - push
+
+depends_on:
+- test
+
+steps:
+- name: docker push branch ${DRONE_COMMIT_BRANCH}
+  image: plugins/docker
+  settings:
+    repo: liquidinvestigations/core
+    tags: ${DRONE_COMMIT_BRANCH}
+    username:
+      from_secret: docker_username
+    password:
+      from_secret: docker_password
+
+- name: docker push autotag + latest
+  image: plugins/docker
+  settings:
+    repo: liquidinvestigations/core
+    auto_tag: true
+    username:
+      from_secret: docker_username
+    password:
+      from_secret: docker_password
+  when:
+    branch:
+    - master
+
+---
+kind: secret
+name: docker_username
+get:
+  path: liquid/ci/drone.docker
+  name: username
+
+---
+kind: secret
+name: docker_password
+get:
+  path: liquid/ci/drone.docker
+  name: password
