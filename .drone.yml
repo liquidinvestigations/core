@@ -17,17 +17,17 @@ steps:
   - pipenv install --system --deploy --ignore-pipfile
   - pipenv run pytest
 
-- name: docker push branch-${DRONE_COMMIT_BRANCH}
+- name: docker push branch ${DRONE_COMMIT_BRANCH}
   image: plugins/docker
   settings:
     repo: liquidinvestigations/core
-    tags: branch-${DRONE_COMMIT_BRANCH}
+    tags: ${DRONE_COMMIT_BRANCH}
     username:
       from_secret: docker_username
     password:
       from_secret: docker_password
 
-- name: docker push autotag
+- name: docker push autotag + latest
   image: plugins/docker
   settings:
     repo: liquidinvestigations/core
@@ -39,7 +39,6 @@ steps:
 when:
   branch:
   - master
-
 
 ---
 kind: secret
