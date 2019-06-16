@@ -12,6 +12,7 @@ DEBUG = bool_env(os.environ.get('DEBUG'))
 SECRET_KEY = os.environ.get('SECRET_KEY')
 liquid_http_protocol = os.environ.get('LIQUID_HTTP_PROTOCOL', 'http')
 LIQUID_DOMAIN = os.environ['LIQUID_DOMAIN']
+LIQUID_TITLE = os.environ['LIQUID_TITLE']
 service_address = os.environ.get('SERVICE_ADDRESS')
 LIQUID_2FA = bool_env(os.environ.get('LIQUID_2FA'))
 
