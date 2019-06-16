@@ -24,6 +24,8 @@ name: publish
 trigger:
   status:
   - success
+  event:
+  - push
 
 depends_on:
 - test
@@ -38,9 +40,6 @@ steps:
       from_secret: docker_username
     password:
       from_secret: docker_password
-  when:
-    event:
-    - push
 
 - name: docker push autotag + latest
   image: plugins/docker
@@ -54,8 +53,6 @@ steps:
   when:
     branch:
     - master
-    event:
-    - push
 
 ---
 kind: secret
