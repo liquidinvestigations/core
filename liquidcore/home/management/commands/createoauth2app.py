@@ -15,6 +15,7 @@ class Command(BaseCommand):
         app.redirect_uris = redirect_uri
         app.client_type = 'confidential'
         app.authorization_grant_type = 'authorization-code'
+        app.skip_authorization = True
         app.user_id = None
         app.save()
 
