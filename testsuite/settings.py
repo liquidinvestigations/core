@@ -1,4 +1,4 @@
-from liquidcore.site.settings import *
+from liquidcore.site.settings import *  # noqa: F401, F403
 import os
 os.environ['LIQUID_DOMAIN'] = 'liquid.example.org'
 os.environ['LIQUID_TITLE'] = 'Liquid Example Org'
