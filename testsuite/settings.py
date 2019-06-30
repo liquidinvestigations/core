@@ -1,3 +1,4 @@
+from liquidcore.site.settings import *
 import os
 os.environ['LIQUID_DOMAIN'] = 'liquid.example.org'
 os.environ['LIQUID_TITLE'] = 'Liquid Example Org'
