@@ -62,7 +62,7 @@ if LIQUID_2FA:
     LIQUID_2FA_APP_NAME = LIQUID_DOMAIN
 
     _valid = os.environ.get('LIQUID_2FA_INVITATION_VALID')
-    LIQUID_2FA_INVITATION_VALID = int(_valid or 30) # minutes
+    LIQUID_2FA_INVITATION_VALID = int(_valid or 30)  # minutes
 
 
 AUTHENTICATION_BACKENDS = [

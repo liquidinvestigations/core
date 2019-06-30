@@ -25,7 +25,8 @@ def profile(request):
     return JsonResponse({
         'id': user.get_username(),
         'login': user.get_username(),
-        'email': user.email or user.get_username() + '@' + settings.LIQUID_DOMAIN,
+        'email': user.email or
+        user.get_username() + '@' + settings.LIQUID_DOMAIN,
         'is_admin': user.is_staff,
         'name': user.get_full_name() or user.get_username(),
         'roles': ['admin', 'user'] if user.is_staff else ['user'],
