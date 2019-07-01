@@ -18,10 +18,15 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Invitation',
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('code', models.CharField(default=liquidcore.twofactor.models.random_code, max_length=200)),
+                ('id', models.AutoField(auto_created=True, primary_key=True,
+                                        serialize=False, verbose_name='ID')),
+                ('code', models.CharField(
+                            default=liquidcore.twofactor.models.random_code,
+                            max_length=200)),
                 ('expires', models.DateTimeField()),
-                ('user', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
+                ('user', models.OneToOneField(
+                            on_delete=django.db.models.deletion.CASCADE,
+                            to=settings.AUTH_USER_MODEL)),
             ],
         ),
     ]

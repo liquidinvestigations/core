@@ -5,4 +5,4 @@ class HomeConfig(AppConfig):
     name = 'liquidcore.home'
 
     def ready(self):
-        from . import signals
+        from . import signals  # noqa: F401

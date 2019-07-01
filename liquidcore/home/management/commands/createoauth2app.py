@@ -2,6 +2,7 @@ import json
 from django.core.management.base import BaseCommand
 from oauth2_provider.models import Application
 
+
 class Command(BaseCommand):
 
     help = "Create an OAuth2 app and print client_id and client_secret as json"

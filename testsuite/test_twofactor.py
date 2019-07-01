@@ -31,6 +31,7 @@ def _totp(device, now):
     counter = int(now.timestamp() - device.t0) // device.step
     return hotp(device.bin_key, counter)
 
+
 def is_logged_in(client):
     resp = client.get('/', follow=False)
     return resp.status_code == 200
@@ -48,7 +49,7 @@ def is_logged_in(client):
 def test_flow(
         client, mock_time, minutes, username_ok, password_ok, code_ok,
         invitation, success,
-    ):
+        ):
 
     t0 = datetime(2016, 6, 13, 12, 0, 0, tzinfo=utc)
     t1 = t0 + timedelta(minutes=minutes)

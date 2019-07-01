@@ -1,6 +1,7 @@
 import subprocess
 from django.core.management.base import BaseCommand
 
+
 class Command(BaseCommand):
 
     help = "Initialize app data"
