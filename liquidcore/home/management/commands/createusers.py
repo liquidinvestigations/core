@@ -1,5 +1,4 @@
 import json
-from pathlib import Path  # noqa: F401
 from django.core.management.base import BaseCommand
 from django.contrib.auth.models import User
 
