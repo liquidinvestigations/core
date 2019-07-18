@@ -42,8 +42,13 @@
 
 {% if nextcloud_app_url %}
 <p>
-  <a href="{{ nextcloud_app_url }}">Nextcloud</a>
+  <a href="{{ nextcloud_app_url }}/login?autologin=uploads">Nextcloud</a>
 </p>
+  {% if user.is_superuser %}
+  <p>
+    <a href="{{ nextcloud_app_url }}/login?autologin=admin">Nextcloud -- Admin</a>
+  </p>
+  {% endif %}
 {% endif %}
 
 {% endblock %}
