@@ -48,6 +48,8 @@ MIDDLEWARE = [
     'whitenoise.middleware.WhiteNoiseMiddleware',
 ]
 
+AUTH_STAFF_ONLY = bool_env(os.environ.get('AUTH_STAFF_ONLY'))
+
 if LIQUID_2FA:
     INSTALLED_APPS += [
         'liquidcore.twofactor',
@@ -67,7 +69,7 @@ if LIQUID_2FA:
 
 AUTHENTICATION_BACKENDS = [
     'oauth2_provider.backends.OAuth2Backend',
-    'django.contrib.auth.backends.ModelBackend'
+    'liquidcore.home.auth.AuthBackend',
 ]
 
 ROOT_URLCONF = 'liquidcore.site.urls'
