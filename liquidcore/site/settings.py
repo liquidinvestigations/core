@@ -46,9 +46,12 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
+    'liquidcore.home.autologout.AutoLogoutMiddleware',
 ]
 
 AUTH_STAFF_ONLY = bool_env(os.environ.get('AUTH_STAFF_ONLY'))
+
+AUTH_AUTO_LOGOUT = os.environ.get('AUTH_AUTO_LOGOUT')
 
 if LIQUID_2FA:
     INSTALLED_APPS += [
