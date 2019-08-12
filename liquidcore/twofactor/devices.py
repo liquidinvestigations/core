@@ -1,4 +1,4 @@
-import subprocess
+import qrcode
 from base64 import b32encode
 from django_otp.plugins.otp_totp.models import TOTPDevice
 from django.conf import settings
@@ -23,10 +23,6 @@ def delete_all(user, keep=None):
         old_device.delete()
 
 
-def qrencode(data):
-    return subprocess.check_output(['qrencode', data, '-s', '5', '-o', '-'])
-
-
 def qr_png(device, username):
     tpl = 'otpauth://totp/{app}:{username}?secret={secret}&issuer={app}'
     url = tpl.format(
@@ -34,4 +30,4 @@ def qr_png(device, username):
         username=username,
         secret=b32encode(device.bin_key).decode('utf8'),
     )
-    return qrencode(url)
+    return qrcode.make(url).tobytes()
