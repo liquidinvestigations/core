@@ -40,6 +40,12 @@
 </p>
 {% endif %}
 
+{% if etherpad_app_url %}
+<p>
+  <a href="{{ etherpad_app_url }}">Etherpad</a>
+</p>
+{% endif %}
+
 {% if nextcloud_app_url %}
 <p>
   <a href="{{ nextcloud_app_url }}/login?autologin=uploads">Nextcloud</a>
