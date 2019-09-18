@@ -13,7 +13,7 @@ def homepage(request):
         'dokuwiki_app_url': settings.DOKUWIKI_APP_URL,
         'rocketchat_app_url': settings.ROCKETCHAT_APP_URL,
         'nextcloud_app_url': settings.NEXTCLOUD_APP_URL,
-        'etherpad_app_url': settings.ETHERPAD_APP_URL,
+        'codimd_app_url': settings.CODIMD_APP_URL,
     })
 
 
