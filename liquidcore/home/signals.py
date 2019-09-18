@@ -17,4 +17,5 @@ def kill_user_sessions(user, **kwargs):
 
 @receiver(pre_save, sender=User)
 def check_user_username(sender, instance, **kwargs):
-    assert all(x in USERNAME_CHARS for x in instance.username), 'Bad Username'
+    assert all(x in USERNAME_CHARS for x in instance.username), \
+        f'Bad username: "{instance.username}"'
