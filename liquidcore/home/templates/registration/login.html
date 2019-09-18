@@ -18,6 +18,8 @@
   {% endif %}
 {% endif %}
 
+
+
 <form method="post" action="{% url 'login' %}">
   {% csrf_token %}
 
@@ -57,8 +59,14 @@
   <input type="hidden" name="next" value="{{ next }}" />
 </form>
 
-{% if not form.otp_token %}
-<p><a href="{% url 'password_reset' %}">Lost password?</a></p>
-{% endif %}
+<footer class="page-footer font-small blue pt-4">
+
+  {% if not form.otp_token %}
+  <p><a href="{% url 'password_reset' %}">Lost password?</a></p>
+  {% endif %}
+
+  <i>Note</i> All hyphens (<pre>-</pre>) in usernames have been replaced with dots (<pre>.</pre>).
+
+</footer>
 
 {% endblock %}
