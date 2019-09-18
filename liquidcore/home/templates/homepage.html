@@ -62,3 +62,11 @@
 }
 </style>
 {% endblock %}
+
+{% block scripts %}
+
+{% if hypothesis_app_url %}
+  <script src="{{ hypothesis_app_url }}/embed.js" async></script>
+{% endif %}
+
+{% endblock %}
