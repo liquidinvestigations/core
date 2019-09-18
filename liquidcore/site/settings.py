@@ -52,7 +52,6 @@ MIDDLEWARE = [
 AUTH_STAFF_ONLY = bool_env(os.environ.get('AUTH_STAFF_ONLY'))
 
 AUTH_AUTO_LOGOUT = os.environ.get('AUTH_AUTO_LOGOUT')
-AUTH_USER_MODEL = 'home.User'
 
 if LIQUID_2FA:
     INSTALLED_APPS += [
