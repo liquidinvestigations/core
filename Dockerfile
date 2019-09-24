@@ -5,8 +5,6 @@ WORKDIR /app
 
 ADD Pipfile Pipfile.lock ./
 RUN set -e \
- && apt-get update \
- && apt-get clean && rm -rf /var/lib/apt/lists/* \
  && pip install pipenv \
  && pipenv install --system --deploy --ignore-pipfile
 
