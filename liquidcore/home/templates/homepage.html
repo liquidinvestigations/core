@@ -40,6 +40,12 @@
 </p>
 {% endif %}
 
+{% if codimd_app_url %}
+<p>
+  <a href="{{ codimd_app_url }}">CodiMD</a>
+</p>
+{% endif %}
+
 {% if nextcloud_app_url %}
 <p>
   <a href="{{ nextcloud_app_url }}/login?autologin=uploads">Nextcloud</a>
@@ -61,4 +67,12 @@
   padding-left: 100pt;
 }
 </style>
+{% endblock %}
+
+{% block scripts %}
+
+{% if hypothesis_app_url %}
+  <script src="{{ hypothesis_app_url }}/embed.js" async></script>
+{% endif %}
+
 {% endblock %}
