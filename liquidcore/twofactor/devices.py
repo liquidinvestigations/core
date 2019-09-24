@@ -1,4 +1,5 @@
 import qrcode
+import tempfile
 from base64 import b32encode
 from django_otp.plugins.otp_totp.models import TOTPDevice
 from django.conf import settings
