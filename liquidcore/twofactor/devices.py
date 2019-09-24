@@ -30,4 +30,10 @@ def qr_png(device, username):
         username=username,
         secret=b32encode(device.bin_key).decode('utf8'),
     )
-    return qrcode.make(url).tobytes()
+    img = qrcode.make(url)
+    qr_file = tempfile.NamedTemporaryFile()
+    img.save(qr_file.name, 'PNG')
+    qr_img = qr_file.read()
+    qr_file.close()
+
+    return qr_img
