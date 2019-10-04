@@ -1,8 +1,10 @@
 {% extends "base.html" %}
 
+{% load staticfiles %}
+
 {% block content %}
 <h1 class="shady">Liquid Investigations</h1>
-<h1>{{ liquid_title }}</h1>
+<img src="{% static "logo_favicon/Liquid_logo_RGB.png" %}" height="250" alt="Liquid Investigations">
 
 <p>
   {% if request.user.is_authenticated %}
