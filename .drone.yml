@@ -8,13 +8,13 @@ steps:
   - flake8
 
 - name: test
-  image: python:3.7-stretch
+  image: python:3.8-buster
   commands:
   - apt-get update -yqq
   - apt-get install -yqq --no-install-recommends qrencode
   - pip install flake8 pipenv > /dev/null
   - pipenv install --system --deploy --ignore-pipfile
-  - pipenv run pytest
+  - pytest
 
 ---
 kind: pipeline
