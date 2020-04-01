@@ -54,12 +54,12 @@
 
 {% if nextcloud_app_url %}
 <p>
-  <a href="{{ nextcloud_app_url }}/login?autologin=uploads">Nextcloud</a> has a
+  <a href="{{ nextcloud_app_url }}/index.php/login?autologin=uploads">Nextcloud</a> has a
   file share system and a contact list of users.
 </p>
   {% if user.is_superuser %}
   <p>
-    <a href="{{ nextcloud_app_url }}/login?autologin=admin">Nextcloud -- Admin</a>
+    <a href="{{ nextcloud_app_url }}/index.php/login?autologin=admin">Nextcloud -- Admin</a>
   </p>
   {% endif %}
 {% endif %}
