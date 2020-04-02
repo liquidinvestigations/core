@@ -1,5 +1,10 @@
 FROM python:3.8-buster
 
+RUN set -e \
+ && apt-get update \
+ && apt-get install -y --no-install-recommends sqlite3 \
+ && apt-get clean && rm -rf /var/lib/apt/lists/*
+
 RUN mkdir -p /app
 WORKDIR /app
 
