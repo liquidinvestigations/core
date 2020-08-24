@@ -21,54 +21,17 @@
 
 <p>Welcome to Liquid Investigations.</p>
 
-{% if hoover_app_url %}
-<p>
-  <a href="{{ hoover_app_url }}">Hoover</a> is a search app.
-</p>
-{% endif %}
 
-{% if hypothesis_app_url %}
+{% for app in liquid_apps%}
 <p>
-  <a href="{{ hypothesis_app_url }}">Hypothesis</a> is an annotation system.
-</p>
-{% endif %}
-
-{% if dokuwiki_app_url %}
-<p>
-  <a href="{{ dokuwiki_app_url }}">DokuWiki</a> is a wiki system used as a
-  knowledge base for processed information.
-</p>
-{% endif %}
-
-{% if rocketchat_app_url %}
-<p>
-  <a href="{{ rocketchat_app_url }}">Rocket.Chat</a> is the chat app.
-</p>
-{% endif %}
-
-{% if codimd_app_url %}
-<p>
-  <a href="{{ codimd_app_url }}">CodiMD</a> is a real-time collaboration pad.
-</p>
-{% endif %}
-
-{% if nextcloud_app_url %}
-<p>
-  <a href="{{ nextcloud_app_url }}/index.php/login?autologin=uploads">Nextcloud</a> has a
-  file share system and a contact list of users.
-</p>
-  {% if user.is_superuser %}
-  <p>
-    <a href="{{ nextcloud_app_url }}/index.php/login?autologin=admin">Nextcloud -- Admin</a>
-  </p>
+  {% if app.enabled %}
+  {% if app.adminOnly and user.is_superuser or not app.adminOnly %}
+  <a href="{{app.url}}">{{app.title}}</a> {{app.description}}
   {% endif %}
-{% endif %}
-
-<p>
-  For a detailed description of how best to use each application, go to the <a
-  href="https://github.com/liquidinvestigations/docs/wiki/User-Guide">User
-  Guide</a>.
+  {% endif %}
 </p>
+{% endfor %}
+
 
 {% endblock %}
 {% block headstyles %}

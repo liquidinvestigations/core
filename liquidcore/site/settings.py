@@ -1,4 +1,5 @@
 import os
+import json
 from pathlib import Path
 
 
@@ -11,12 +12,12 @@ base_dir = Path(__file__).parent.parent.parent
 DEBUG = bool_env(os.environ.get('DEBUG'))
 SECRET_KEY = os.environ.get('SECRET_KEY')
 liquid_http_protocol = os.environ.get('LIQUID_HTTP_PROTOCOL', 'http')
-LIQUID_DOMAIN = os.environ['LIQUID_DOMAIN']
-LIQUID_TITLE = os.environ['LIQUID_TITLE']
+LIQUID_DOMAIN = os.getenv("LIQUID_DOMAIN")
+LIQUID_TITLE = os.getenv('LIQUID_TITLE')
 service_address = os.environ.get('SERVICE_ADDRESS')
 LIQUID_2FA = bool_env(os.environ.get('LIQUID_2FA'))
-
 LIQUID_URL = f'{liquid_http_protocol}://{LIQUID_DOMAIN}'
+LIQUID_APPS = json.loads(os.environ.get('LIQUID_APPS', "null"))
 
 ALLOWED_HOSTS = [LIQUID_DOMAIN]
 if service_address:
@@ -114,10 +115,3 @@ USE_L10N = True
 USE_TZ = True
 STATIC_URL = '/static/'
 STATIC_ROOT = str(base_dir / 'static')
-
-HOOVER_APP_URL = os.environ.get('HOOVER_APP_URL')
-DOKUWIKI_APP_URL = os.environ.get('DOKUWIKI_APP_URL')
-ROCKETCHAT_APP_URL = os.environ.get('ROCKETCHAT_APP_URL')
-NEXTCLOUD_APP_URL = os.environ.get('NEXTCLOUD_APP_URL')
-CODIMD_APP_URL = os.environ.get('CODIMD_APP_URL')
-HYPOTHESIS_APP_URL = os.environ.get('HYPOTHESIS_APP_URL')
