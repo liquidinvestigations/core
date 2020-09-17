@@ -8,12 +8,7 @@ from django.contrib.auth.decorators import login_required
 def homepage(request):
     return render(request, 'homepage.html', {
         'liquid_title': settings.LIQUID_TITLE,
-        'hypothesis_app_url': settings.HYPOTHESIS_APP_URL,
-        'hoover_app_url': settings.HOOVER_APP_URL,
-        'dokuwiki_app_url': settings.DOKUWIKI_APP_URL,
-        'rocketchat_app_url': settings.ROCKETCHAT_APP_URL,
-        'nextcloud_app_url': settings.NEXTCLOUD_APP_URL,
-        'codimd_app_url': settings.CODIMD_APP_URL,
+        'liquid_apps': settings.LIQUID_APPS,
     })
 
 

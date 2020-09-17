@@ -19,6 +19,6 @@ ADD manage.py dockercmd ./
 ENV PYTHONUNBUFFERED 1
 VOLUME /app/var
 
-RUN LIQUID_TITLE=x LIQUID_DOMAIN=x SECRET_KEY=x ./manage.py collectstatic
+RUN SECRET_KEY=x ./manage.py collectstatic
 
 CMD ./dockercmd
