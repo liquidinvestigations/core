@@ -9,6 +9,8 @@ def homepage(request):
     return render(request, 'homepage.html', {
         'liquid_title': settings.LIQUID_TITLE,
         'liquid_apps': settings.LIQUID_APPS,
+        'liquid_version': settings.LIQUID_VERSION,
+        'liquid_core_version': settings.LIQUID_CORE_VERSION,
     })
 
 

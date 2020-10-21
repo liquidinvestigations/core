@@ -18,6 +18,8 @@ service_address = os.environ.get('SERVICE_ADDRESS')
 LIQUID_2FA = bool_env(os.environ.get('LIQUID_2FA'))
 LIQUID_URL = f'{liquid_http_protocol}://{LIQUID_DOMAIN}'
 LIQUID_APPS = json.loads(os.environ.get('LIQUID_APPS', "null"))
+LIQUID_VERSION = os.getenv("LIQUID_VERSION")
+LIQUID_CORE_VERSION = os.getenv("LIQUID_CORE_VERSION")
 
 ALLOWED_HOSTS = [LIQUID_DOMAIN]
 if service_address:

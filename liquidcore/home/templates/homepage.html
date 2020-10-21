@@ -3,7 +3,7 @@
 {% load static %}
 
 {% block content %}
-<h1 class="shady">Liquid Investigations</h1>
+<h1 class="shady">Liquid Investigations <br/> {{liquid_version}}</h1>
 <img src="{% static "icons/logo.png" %}" height="125" alt="Liquid Investigations">
 <h1>{{ liquid_title }}</h1>
 
@@ -19,15 +19,17 @@
   {% endif %}
 </p>
 
-<p>Welcome to Liquid Investigations.</p>
+<p> Welcome to the Liquid Investigations Home Page. <small style="float: right;">{{liquid_core_version}} </small></p>
 
 
 {% for app in liquid_apps%}
 <p>
   {% if app.enabled %}
-  {% if app.adminOnly and user.is_superuser or not app.adminOnly %}
-  <a href="{{app.url}}">{{app.title}}</a> {{app.description}}
-  {% endif %}
+    {% if app.adminOnly and user.is_superuser or not app.adminOnly %}
+      <a href="{{app.url}}">{{app.title}}</a>
+      {{app.description}}
+      <small style="float: right;">{{app.version}}</small>
+    {% endif %}
   {% endif %}
 </p>
 {% endfor %}
