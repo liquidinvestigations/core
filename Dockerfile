@@ -3,7 +3,7 @@ FROM python:3.8-buster
 RUN set -e \
  && apt-get update \
  && apt-get install -y --no-install-recommends sqlite3 \
- && apt-get update && apt-get install -y gosu \
+ && apt-get install -y gosu \
  && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 ARG USER_NAME=liquid
