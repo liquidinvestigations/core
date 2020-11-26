@@ -6,7 +6,7 @@ RUN set -e \
  && apt-get update && apt-get install -y gosu \
  && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-ARG UNAME=liquid
+ARG USER_NAME=liquid
 ARG UID=666
 ARG GID=666
 RUN groupadd -g $GID -o $UNAME
@@ -27,7 +27,7 @@ ADD docker-entrypoint.sh ./
 ENV PYTHONUNBUFFERED 1
 
 ENV DATA_DIR "/app/var"
-ENV USER_NAME $UNAME
+ENV USER_NAME $USER_NAME
 ENV UID $UID
 ENV GID $GID
 
