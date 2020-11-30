@@ -1,5 +1,3 @@
-import json
-import base64
 from django.conf import settings
 from django.contrib.auth.backends import ModelBackend
 from django.contrib.sessions.models import Session
@@ -39,9 +37,8 @@ def kill_sessions(user=None):
     if user:
         # for the user
         for session in Session.objects.all().iterator():
-            session_data = base64.b64decode(session.session_data)
-            session_json = session_data.split(b':', 1)[1]
-            user_id = json.loads(session_json).get('_auth_user_id')
+            session_data = session.get_decoded()
+            user_id = session_data.get('_auth_user_id')
             if user_id and int(user_id) == user.id:
                 session.delete()
     else:

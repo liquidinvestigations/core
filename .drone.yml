@@ -8,7 +8,7 @@ steps:
   - flake8
 
 - name: test
-  image: python:3.8-buster
+  image: python:3.9-buster
   commands:
   - apt-get update -yqq
   - apt-get install -yqq --no-install-recommends qrencode
