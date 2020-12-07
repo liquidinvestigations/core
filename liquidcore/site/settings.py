@@ -117,3 +117,7 @@ USE_L10N = True
 USE_TZ = True
 STATIC_URL = '/static/'
 STATIC_ROOT = str(base_dir / 'static')
+
+CSRF_COOKIE_NAME = 'liquidcore-csrftoken'
+CSRF_HEADER_NAME = 'HTTP_X_LIQUIDCORE_CSRFTOKEN'
+X_FRAME_OPTIONS = 'SAMEORIGIN'

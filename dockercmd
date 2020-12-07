@@ -2,4 +2,10 @@
 
 ./manage.py initialize
 # exec ./manage.py runserver 0.0.0.0:8000
-exec waitress-serve --port 8000 liquidcore.site.wsgi:application
+exec waitress-serve \
+  --threads 5 \
+  --backlog 2048 \
+  --connection-limit 200 \
+  --channel-timeout 70 \
+  --port 8000 \
+  liquidcore.site.wsgi:application
