@@ -6,18 +6,16 @@
 # poor man's cron
 (
   while true; do
-    set -x
     ./manage.py clearsessions
     ./manage.py cleartokens
-    set +x
-    sleep 600
+    sleep 444
   done
 ) &
 
 exec waitress-serve \
   --threads 5 \
   --backlog 2048 \
-  --connection-limit 200 \
-  --channel-timeout 70 \
+  --connection-limit 300 \
+  --channel-timeout 60 \
   --port 8000 \
   liquidcore.site.wsgi:application
