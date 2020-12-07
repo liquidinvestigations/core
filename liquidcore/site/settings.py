@@ -1,10 +1,30 @@
 import os
 import json
 from pathlib import Path
+from datetime import timedelta
 
 
 def bool_env(value):
     return (value or '').lower() in ['on', 'true']
+
+
+def get_interval(spec):
+    if not spec:
+        return None
+
+    if spec.endswith('d'):
+        return timedelta(days=int(spec[:-1]))
+
+    if spec.endswith('h'):
+        return timedelta(hours=int(spec[:-1]))
+
+    if spec.endswith('m'):
+        return timedelta(minutes=int(spec[:-1]))
+
+    if spec.endswith('s'):
+        return timedelta(seconds=int(spec[:-1]))
+
+    raise RuntimeError(f"Can't parse interval {spec!r}")
 
 
 base_dir = Path(__file__).parent.parent.parent
@@ -54,7 +74,10 @@ MIDDLEWARE = [
 
 AUTH_STAFF_ONLY = bool_env(os.environ.get('AUTH_STAFF_ONLY'))
 
-AUTH_AUTO_LOGOUT = os.environ.get('AUTH_AUTO_LOGOUT')
+AUTH_AUTO_LOGOUT = get_interval(os.environ.get('AUTH_AUTO_LOGOUT', '100d'))
+AUTH_AUTO_LOGOUT_SECONDS = int(AUTH_AUTO_LOGOUT.total_seconds())
+SESSION_COOKIE_AGE = AUTH_AUTO_LOGOUT_SECONDS
+SESSION_COOKIE_NAME = 'liquidcore-sessionid'
 
 if LIQUID_2FA:
     INSTALLED_APPS += [
@@ -121,3 +144,10 @@ STATIC_ROOT = str(base_dir / 'static')
 CSRF_COOKIE_NAME = 'liquidcore-csrftoken'
 CSRF_HEADER_NAME = 'HTTP_X_LIQUIDCORE_CSRFTOKEN'
 X_FRAME_OPTIONS = 'SAMEORIGIN'
+
+OAUTH2_PROVIDER = {
+    'ACCESS_TOKEN_EXPIRE_SECONDS': 200,  # we refresh every 1m
+    'REFRESH_TOKEN_EXPIRE_SECONDS': AUTH_AUTO_LOGOUT_SECONDS,
+    'AUTHORIZATION_CODE_EXPIRE_SECONDS': 600,  # recommended from docs
+    'REFRESH_TOKEN_GRACE_PERIOD_SECONDS': 120,  # recommended from docs
+}

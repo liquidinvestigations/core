@@ -2,6 +2,18 @@
 
 ./manage.py initialize
 # exec ./manage.py runserver 0.0.0.0:8000
+
+# poor man's cron
+(
+  while true; do
+    set -x
+    ./manage.py clearsessions
+    ./manage.py cleartokens
+    set +x
+    sleep 600
+  done
+) &
+
 exec waitress-serve \
   --threads 5 \
   --backlog 2048 \

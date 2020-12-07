@@ -1,5 +1,6 @@
 *.pyc
 /liquidcore/site/settings/local.py
-/static
+!/static/.gitignore
+/static/*
 /var
 /.env
