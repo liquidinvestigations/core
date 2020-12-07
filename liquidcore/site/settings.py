@@ -60,16 +60,16 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'liquidcore.home.autologout.AutoLogoutMiddleware',
     'oauth2_provider.middleware.OAuth2TokenMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',
-    'liquidcore.home.autologout.AutoLogoutMiddleware',
 ]
 
 AUTH_STAFF_ONLY = bool_env(os.environ.get('AUTH_STAFF_ONLY'))
@@ -146,7 +146,7 @@ CSRF_HEADER_NAME = 'HTTP_X_LIQUIDCORE_CSRFTOKEN'
 X_FRAME_OPTIONS = 'SAMEORIGIN'
 
 OAUTH2_PROVIDER = {
-    'ACCESS_TOKEN_EXPIRE_SECONDS': 200,  # we refresh every 1m
+    'ACCESS_TOKEN_EXPIRE_SECONDS': 200,
     'REFRESH_TOKEN_EXPIRE_SECONDS': AUTH_AUTO_LOGOUT_SECONDS,
     'AUTHORIZATION_CODE_EXPIRE_SECONDS': 600,  # recommended from docs
     'REFRESH_TOKEN_GRACE_PERIOD_SECONDS': 120,  # recommended from docs
