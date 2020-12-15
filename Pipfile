@@ -16,6 +16,12 @@ pytest = "*"
 pytest-django = "*"
 qrcode = "*"
 Pillow = "*"
+djangorestframework = "*"
+markdown = "*"
+django-filter = "*"
+pyyaml = "*"
+drf-yasg = {extras = ["validation"], version = "*"}
+uritemplate = "*"
 
 [requires]
 python_version = "3.9"

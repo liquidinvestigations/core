@@ -54,6 +54,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'oauth2_provider',
     'corsheaders',
+    'rest_framework',
+    'drf_yasg',
     'liquidcore.home',
 ]
 
@@ -151,3 +153,9 @@ OAUTH2_PROVIDER = {
     'AUTHORIZATION_CODE_EXPIRE_SECONDS': 600,  # recommended from docs
     'REFRESH_TOKEN_GRACE_PERIOD_SECONDS': 120,  # recommended from docs
 }
+
+if not DEBUG:
+    # don't connect to the internet to verify my schema pls
+    SWAGGER_SETTINGS = {
+        'VALIDATOR_URL': None,
+    }

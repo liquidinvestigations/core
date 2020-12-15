@@ -1,3 +1,4 @@
 [flake8]
 per-file-ignores =
     liquidcore/home/migrations/*: E501
+max-line-length = 109
