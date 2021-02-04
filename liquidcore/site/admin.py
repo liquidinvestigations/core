@@ -7,6 +7,8 @@ if settings.LIQUID_2FA:
 else:
     from django.contrib.admin import AdminSite
 
+from liquidcore.home.admin import ProfileInline
+
 
 class HooverAdminSite(AdminSite):
     site_header = "Liquid Core administration"
@@ -15,18 +17,43 @@ class HooverAdminSite(AdminSite):
 class HooverUserAdmin(UserAdmin):
     actions = []
 
+    if settings.LIQUID_2FA:
+        from ..twofactor.invitations import create_invitations
+        actions.append(create_invitations)
+
     fieldsets = (
         (None, {'fields': ('username', 'password')}),
-        ('Personal info', {'fields': ('first_name', 'last_name', 'email')}),
         ('Permissions', {
             'fields': ('is_active', 'is_staff', 'is_superuser', 'groups'),
         }),
         ('Important dates', {'fields': ('last_login', 'date_joined')}),
+        ('Personal info', {'fields': ('first_name', 'last_name', 'email')}),
     )
 
-    if settings.LIQUID_2FA:
-        from ..twofactor.invitations import create_invitations
-        actions.append(create_invitations)
+    inlines = (ProfileInline,)
+
+    list_display = ('username', 'email', 'first_name', 'last_name',
+                    'organization', 'contact_info', 'about',
+                    'is_staff', 'is_superuser', 'is_active')
+    list_filter = ('is_staff', 'is_superuser', 'is_active')
+    search_fields = ('username', 'first_name', 'last_name',
+                     'profile__organization', 'profile__contact_info',
+                     'profile__about')
+
+    list_select_related = ('profile', )
+
+    def organization(self, instance):
+        return instance.profile.organization
+
+    def contact_info(self, instance):
+        return instance.profile.contact_info
+
+    def about(self, instance):
+        return instance.profile.about
+
+    organization.short_description = 'Organization'
+    contact_info.short_description = 'Contact Info'
+    about.short_description = 'About'
 
 
 liquid_admin = HooverAdminSite(name='liquidadmin')

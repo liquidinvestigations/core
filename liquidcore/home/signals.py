@@ -24,11 +24,5 @@ def check_user_username(sender, instance, **kwargs):
 
 @receiver(post_save, sender=User)
 def create_user_profile(sender, instance, created, **kwargs):
-    if created:
-        Profile.objects.create(user=instance)
-        return
-    try:
-        instance.profile.save()
-    except User.profile.RelatedObjectDoesNotExist:
-        Profile.objects.create(user=instance)
-        return
+    p, _ = Profile.objects.get_or_create(user=instance)
+    p.save()
