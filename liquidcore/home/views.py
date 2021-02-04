@@ -28,5 +28,11 @@ def profile(request):
         'email': user.email or user_email,
         'is_admin': user.is_staff,
         'name': user.get_full_name() or user.get_username(),
+        'full_name': user.get_full_name() or user.get_username(),
+        'first_name': user.first_name,
+        'last_name': user.last_name,
+        'organization': user.profile.organization,
+        'contact_info': user.profile.contact_info,
+        'about': user.profile.about,
         'roles': ['admin', 'user'] if user.is_staff else ['user'],
     })
