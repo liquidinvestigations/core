@@ -12,10 +12,14 @@
   done
 ) &
 
-exec waitress-serve \
-  --threads 5 \
-  --backlog 2048 \
-  --connection-limit 300 \
-  --channel-timeout 60 \
-  --port 8000 \
-  liquidcore.site.wsgi:application
+if [[ "$DEBUG" == "true" ]]; then
+	exec ./manage.py runserver 0.0.0.0:8000
+else
+	exec waitress-serve \
+ 	 --threads 5 \
+ 	 --backlog 2048 \
+ 	 --connection-limit 300 \
+ 	 --channel-timeout 60 \
+ 	 --port 8000 \
+ 	 liquidcore.site.wsgi:application
+fi
