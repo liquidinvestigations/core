@@ -11,6 +11,7 @@
   {% if request.user.is_authenticated %}
     <span class="username">{{ request.user }}</span>
     <a href="/accounts/logout/?next=/">[logout]</a>
+    <a href="/accounts/password_change/">[password]</a>
     {% if request.user.is_staff %}
       <a href="/admin/">[admin]</a>
     {% endif %}
