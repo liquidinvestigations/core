@@ -13,6 +13,14 @@ def create(user):
     )
 
 
+def add(user):
+    return TOTPDevice.objects.create(
+        user=user,
+        name=user.get_username() + '2',
+        confirmed=False,
+    )
+
+
 def get(user, id):
     return TOTPDevice.objects.devices_for_user(user).get(id=id)
 
