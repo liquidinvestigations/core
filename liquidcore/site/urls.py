@@ -22,5 +22,6 @@ if settings.LIQUID_2FA:
         path('accounts/login/', login_view),
         path('invitation/<code>', twofactor_views.invitation),
         path('accounts/change_totp/', twofactor_views.change_totp),
-        path('accounts/change_totp/confirm', twofactor_views.confirm_totp_change),
+        path('accounts/change_totp/confirm',
+             twofactor_views.confirm_totp_change),
     ] + urlpatterns
