@@ -1,6 +1,6 @@
 from base64 import b64encode
 from django.db import transaction
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from . import devices
 from . import invitations
 import django_otp
@@ -48,32 +48,64 @@ def invitation(request, code):
 def change_totp(request):
     bad_token = None
     bad_password = False
-    device = None
-    new_device = None
     user = request.user
-    otp_png = None
 
-    if request.method == 'POST':
+    if request.method == 'POST' and 'token' in request.POST:
         device = django_otp.match_token(user, request.POST['token'])
         if not device:
             bad_token = True
         password = request.POST['password']
+
         if not authenticate(username=user.username, password=password):
             bad_password = True
 
         if not (bad_password or bad_token):
             new_device = devices.add(user)
             new_device.save()
+            request.session['new_device'] = new_device.id
+
             png_data = b64encode(devices.qr_png(new_device,
                                                 user.username)).decode('utf8')
+
             otp_png = 'data:image/png;base64,' + png_data
+
+            if 'add_device' in request.POST:
+                request.session['add_device'] = True
+            else:
+                request.session['add_device'] = False
+
+            request.session['otp_png'] = otp_png
+
+            return redirect(confirm_totp_change)
 
     return render(request, 'totp-change-form.html', {
         'username': user.username,
         'bad_token': bad_token,
-        'device': device,
-        'new_device': new_device,
         'bad_password': bad_password,
+    })
+
+
+@transaction.atomic
+def confirm_totp_change(request):
+    bad_token = None
+    user = request.user
+    new_device = devices.get(user, request.session['new_device'])
+    otp_png = request.session['otp_png']
+    add_device = request.session['add_device']
+    success = False
+
+    if request.method == 'POST':
+        new_token = request.POST['new_token']
+        if new_device.verify_token(new_token):
+            success = True
+            if not add_device:
+                devices.delete_all(user, keep=new_device)
+        else:
+            bad_token = True
+
+    return render(request, 'totp-change-confirmation.html', {
+        'success': success,
+        'bad_token': bad_token,
         'otp_png': otp_png,
-        'devices': django_otp.devices_for_user(user)
+        'add_device': add_device
     })

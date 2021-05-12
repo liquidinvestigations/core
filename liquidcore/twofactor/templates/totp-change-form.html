@@ -3,22 +3,13 @@
 
 {% block content %}
 
-<h1>Change two-factor authentication</h1>
+<h1>Change 2FA device</h1>
 
 <form method="post">
   {% csrf_token %}
-  <!--
-  <p class="text-muted">Step 1: Enter your username &ndash; it's
-  <code>{{ username }}</code></p>
-
-  <fieldset class="form-group row">
-    <label>Username</label>
-    <div class="col-sm-4">
-      <input name="username">
-    </div>
-  </fieldset>
--->
-  <p class="text-muted">Enter your password and a valid Otp token to register a new otp device. </p>
+  {% if not otp_png %}
+  <p>Enter your password and a valid OTP token to change your device. This will deactivate your old devices. </p>
+  <p>Hit the checkbox below to add a new device while keeping your old devices.</p>
 
   <fieldset class="form-group row">
     <label>Confirm password</label>
@@ -29,34 +20,23 @@
 
 
   <fieldset class="form-group row">
-    <label>Otp token</label>
+    <label>OTP token</label>
     <div class="col-sm-4">
       <input name="token">
     </div>
   </fieldset>
 
-  <p><img src="{{ otp_png }}"></p>
-
-  <p>{{ username }}</p>
-  {% for device in devices %}
-  <p>{{ device }}</p>
-  {% endfor %}
-
-  {% if device %}
-  <p>{{ device }}</p>
+  <fieldset class="form-group row">
+    <label>Add new device (keep old device)</label>
+    <div class="col-sm-4">
+      <input name="add_device" type="checkbox">
+    </div>
+  </fieldset>
   {% endif %}
 
-  {% if new_device %}
-  <p>{{ new_device }}</p>
-  {% endif %}
-
-  {% if bad_username %}
-    <p>Username is wrong.</p>
-  {% endif %}
-
-  {% if bad_password %}
-    <p>Passwords don't match.</p>
-  {% endif %}
+  <button type="submit" class="btn btn-primary">Change</button>
+  <a href="/" class="btn btn-secondary">Cancel</a>
+</form>
 
   {% if bad_token %}
     <p>Invalid token, please try again.</p>
@@ -65,11 +45,5 @@
   {% if bad_password %}
     <p>Invalid password.</p>
   {% endif %}
-
-  {% if not bad_password and not bad_token %}
-    <p>Valid credentials.</p>
-    {% endif %}
-  <button type="submit" class="btn btn-primary">Change</button>
-</form>
 
 {% endblock %}

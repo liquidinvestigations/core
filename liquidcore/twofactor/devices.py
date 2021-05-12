@@ -16,8 +16,9 @@ def create(user):
 def add(user):
     return TOTPDevice.objects.create(
         user=user,
-        name=user.get_username() + '2',
-        confirmed=False,
+        name=user.get_username() +
+        str(sum(1 for device in TOTPDevice.objects.devices_for_user(user))),
+        confirmed=True,
     )
 
 
