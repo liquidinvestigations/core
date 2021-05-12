@@ -24,7 +24,7 @@ def invitation(request, code):
         if request.POST['username'] != username:
             bad_username = True
 
-        password = request.POST['password'].get('password')
+        password = request.POST['password']
         if password != request.POST['password-confirm']:
             bad_password = True
 
