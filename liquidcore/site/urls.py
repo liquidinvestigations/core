@@ -6,9 +6,14 @@ from django.contrib.auth import views as auth_views
 
 urlpatterns = [
     path('admin/', liquid_admin.urls),
-    # path('accounts/', include('django.contrib.auth.urls')),
-    path('accounts/password_change/', auth_views.PasswordChangeView.as_view(), name='password_change'),
-    path('accounts/password_change/done/', auth_views.PasswordChangeDoneView.as_view(), name='password_change_done'),
+    path('accounts/password_change/',
+         auth_views.PasswordChangeView.as_view(),
+         name='password_change'
+         ),
+    path('accounts/password_change/done/',
+         auth_views.PasswordChangeDoneView.as_view(),
+         name='password_change_done'
+         ),
     path('accounts/login/', auth_views.LoginView.as_view(), name='login'),
     path('accounts/logout/', auth_views.LogoutView.as_view(), name='logout'),
     path('accounts/profile', views.profile),
@@ -26,7 +31,11 @@ if settings.LIQUID_2FA:
 
     urlpatterns = [
         path('accounts/login/', login_view),
-        path('accounts/password_change/', auth_views.PasswordChangeView.as_view(form_class=OtpPasswordChangeForm), name='password_change'),
+        path('accounts/password_change/',
+             auth_views.PasswordChangeView
+             .as_view(form_class=OtpPasswordChangeForm,
+                      template_name='password_change_form_otp.html'),
+             name='password_change'),
         path('invitation/<code>', twofactor_views.invitation),
         path('accounts/change_totp/', twofactor_views.change_totp),
         path('accounts/change_totp/confirm',

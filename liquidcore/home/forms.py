@@ -9,7 +9,7 @@ class OtpPasswordChangeForm(PasswordChangeForm):
 
     error_messages = {
         **PasswordChangeForm.error_messages,
-        'token_incorrect': _("Your token was entered incorrectly. Please enter it again."),
+        'token_incorrect': _("Invalid Token. Please try again."),
     }
 
     otp_token = forms.CharField(
