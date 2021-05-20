@@ -72,7 +72,7 @@ def change_totp(request, add=False):
                             password=request.POST['password']):
             bad_password = True
 
-        if not bad_password and bad_token:
+        if not (bad_password or bad_token):
             new_device = add_device(request.user, request.POST['new_name'])
             request.session['new_device'] = new_device.id
 
