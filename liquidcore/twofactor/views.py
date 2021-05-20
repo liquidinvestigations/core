@@ -44,6 +44,13 @@ def invitation(request, code):
     })
 
 
+def add_device(user, name):
+    device = devices.create(user, name)
+    device.confirmed = True
+    device.save()
+    return device
+
+
 @transaction.atomic
 def change_totp(request, add=False):
     bad_token = None
@@ -65,10 +72,7 @@ def change_totp(request, add=False):
             bad_device_name = True
 
         if not (bad_password or bad_token or bad_device_name):
-            new_device = devices.create(request.user,
-                                        request.POST['new_name'])
-            new_device.confirmed = True
-            new_device.save()
+            new_device = add_device(request.user, request.POST['new_name'])
             request.session['new_device'] = new_device.id
 
             png_data = b64encode(devices
@@ -85,6 +89,7 @@ def change_totp(request, add=False):
         'bad_device_name': bad_device_name,
         'add_device': request.session['add_device'],
     })
+
 
 
 @transaction.atomic
