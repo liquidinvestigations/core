@@ -7,8 +7,9 @@ import django_otp
 from django.contrib.auth import authenticate
 
 
-def get_png(device, user):
-    png_data = b64encode(devices.qr_png(device, user)).decode('utf8')
+def get_png(user, device):
+    png_data = b64encode(devices.qr_png(device,
+                         user.get_username())).decode('utf8')
     return 'data:image/png;base64,' + png_data
 
 
