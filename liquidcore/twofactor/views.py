@@ -7,6 +7,11 @@ import django_otp
 from django.contrib.auth import authenticate
 
 
+def get_png(device, user):
+    png_data = b64encode(devices.qr_png(device, user)).decode('utf8')
+    return 'data:image/png;base64,' + png_data
+
+
 @transaction.atomic
 def invitation(request, code):
     invitation = invitations.get_or_404(code)
@@ -75,11 +80,7 @@ def change_totp(request, add=False):
             new_device = add_device(request.user, request.POST['new_name'])
             request.session['new_device'] = new_device.id
 
-            png_data = b64encode(devices
-                                 .qr_png(new_device,
-                                         request.user.username)).decode('utf8')
-
-            request.session['otp_png'] = 'data:image/png;base64,' + png_data
+            request.session['otp_png'] = get_png(request.user, new_device)
 
             return redirect(confirm_totp_change)
 
@@ -89,7 +90,6 @@ def change_totp(request, add=False):
         'bad_device_name': bad_device_name,
         'add_device': request.session['add_device'],
     })
-
 
 
 @transaction.atomic
