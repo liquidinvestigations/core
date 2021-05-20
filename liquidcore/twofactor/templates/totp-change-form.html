@@ -47,7 +47,7 @@
   <a href="/" class="btn btn-secondary">Cancel</a>
 </form>
 
-  {% if bad_token %}
+  {% if not valid_device %}
     <p>Invalid token, please try again.</p>
   {% endif %}
 
