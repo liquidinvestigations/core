@@ -49,19 +49,15 @@ def change_totp(request, add=False):
     bad_token = None
     bad_password = False
     bad_device_name = False
-    user = request.user
 
-    if add:
-        request.session['add_device'] = True
-    else:
-        request.session['add_device'] = False
+    request.session['add_device'] = add
 
     if request.method == 'POST' and 'token' in request.POST:
-        device = django_otp.match_token(user, request.POST['token'])
-        if not device:
+
+        if not django_otp.match_token(request.user, request.POST['token']):
             bad_token = True
 
-        if not authenticate(username=user.username,
+        if not authenticate(username=request.user.username,
                             password=request.POST['password']):
             bad_password = True
 
@@ -69,14 +65,15 @@ def change_totp(request, add=False):
             bad_device_name = True
 
         if not (bad_password or bad_token or bad_device_name):
-            new_device = devices.create(user,
+            new_device = devices.create(request.user,
                                         request.POST['new_name'])
             new_device.confirmed = True
             new_device.save()
             request.session['new_device'] = new_device.id
 
-            png_data = b64encode(devices.qr_png(new_device,
-                                                user.username)).decode('utf8')
+            png_data = b64encode(devices
+                                 .qr_png(new_device,
+                                         request.user.username)).decode('utf8')
 
             request.session['otp_png'] = 'data:image/png;base64,' + png_data
 
@@ -134,9 +131,9 @@ def totp_remove(request):
     if request.method == 'POST' and 'token' in request.POST:
         if not django_otp.match_token(request.user, request.POST['token']):
             bad_token = True
-        password = request.POST['password']
 
-        if not authenticate(username=request.user.username, password=password):
+        if not authenticate(username=request.user.username,
+                            password=request.POST['password']):
             bad_password = True
 
         if not bad_password and not bad_token:
