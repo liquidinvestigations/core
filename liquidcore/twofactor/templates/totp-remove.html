@@ -1,18 +1,14 @@
-
 {% extends "auth_base.html" %}
 
 {% block content %}
 
-<h1>{% if add_device %}Add{% else %}Change{% endif %} 2FA device</h1>
+<h1>Remove 2FA devices</h1>
 
 <form method="post">
   {% csrf_token %}
-  {% if not otp_png %}
-  {% if add_device %}
-  <p>Enter your password and a valid OTP token to add a new device. </p>
-  {% else %}
-  <p>Enter your password and a valid OTP token to change your device. This will deactivate your old devices. </p>
-  {% endif %}
+  <p>Enter your password and a valid OTP token to remove all devices but one. Choose the device you want to keep from the dropdown menu.</p>
+  <p><b>Note:</b> The device named like your username is the device you registered when setting up the two factor authentication</p>
+
   <fieldset class="form-group row">
     <label>Confirm password</label>
     <div class="col-sm-4">
@@ -28,21 +24,20 @@
     </div>
   </fieldset>
 
+
   <fieldset class="form-group row">
-    <label>New device name</label>
+  <label for="device">Select the device you want to keep:</label>
     <div class="col-sm-4">
-      <input name="new_name">
-    </div>
+      <select id=device" class="form-control" name="device">
+          {% for device in devices %}
+            <option value={{ device.id }}>{{ device.name }}</option>
+          {% endfor %}
+      </select>
+  </div>
   </fieldset>
 
-  {% endif %}
-
   <button type="submit" class="btn btn-primary"> 
-  {% if add_device %}
-    Add 
-  {% else %}
-    Change
-  {% endif %}
+    Remove
   </button>
   <a href="/" class="btn btn-secondary">Cancel</a>
 </form>
@@ -55,8 +50,8 @@
     <p>Invalid password.</p>
   {% endif %}
 
-  {% if bad_device_name %}
-    <p>Empty device name.</p>
+  {% if success %}
+    <p>Successfully removed devices.</p>
   {% endif %}
 
 {% endblock %}

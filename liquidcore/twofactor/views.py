@@ -45,10 +45,16 @@ def invitation(request, code):
 
 
 @transaction.atomic
-def change_totp(request):
+def change_totp(request, add=False):
     bad_token = None
     bad_password = False
+    bad_device_name = False
     user = request.user
+
+    if add:
+        request.session['add_device'] = True
+    else:
+        request.session['add_device'] = False
 
     if request.method == 'POST' and 'token' in request.POST:
         device = django_otp.match_token(user, request.POST['token'])
@@ -59,8 +65,14 @@ def change_totp(request):
         if not authenticate(username=user.username, password=password):
             bad_password = True
 
-        if not (bad_password or bad_token):
-            new_device = devices.add(user)
+        if not request.POST['new_name']:
+            bad_device_name = True
+        else:
+            new_name = request.POST['new_name']
+
+        if not (bad_password or bad_token or bad_device_name):
+            new_device = devices.create(user, new_name)
+            new_device.confirmed = True
             new_device.save()
             request.session['new_device'] = new_device.id
 
@@ -69,19 +81,15 @@ def change_totp(request):
 
             otp_png = 'data:image/png;base64,' + png_data
 
-            if 'add_device' in request.POST:
-                request.session['add_device'] = True
-            else:
-                request.session['add_device'] = False
-
             request.session['otp_png'] = otp_png
 
             return redirect(confirm_totp_change)
 
     return render(request, 'totp-change-form.html', {
-        'username': user.username,
         'bad_token': bad_token,
         'bad_password': bad_password,
+        'bad_device_name': bad_device_name,
+        'add_device': request.session['add_device'],
     })
 
 
@@ -107,5 +115,43 @@ def confirm_totp_change(request):
         'success': success,
         'bad_token': bad_token,
         'otp_png': otp_png,
-        'add_device': add_device
+    })
+
+
+def totp_settings(request):
+    return render(request, 'totp-settings.html', {
+        'devices': django_otp.devices_for_user(request.user),
+    })
+
+
+def totp_add(request):
+    return change_totp(request, True)
+
+
+@transaction.atomic
+def totp_remove(request):
+    bad_token = False
+    bad_password = False
+    user = request.user
+    success = False
+
+    if request.method == 'POST' and 'token' in request.POST:
+        device = django_otp.match_token(user, request.POST['token'])
+        if not device:
+            bad_token = True
+        password = request.POST['password']
+
+        if not authenticate(username=user.username, password=password):
+            bad_password = True
+
+        if not bad_password and not bad_token:
+            keep_device = devices.get(user, request.POST['device'])
+            devices.delete_all(user, keep_device)
+            success = True
+
+    return render(request, 'totp-remove.html', {
+        'devices': django_otp.devices_for_user(request.user),
+        'bad_token': bad_token,
+        'bad_password': bad_password,
+        'success': success,
     })
