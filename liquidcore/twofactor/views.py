@@ -60,7 +60,6 @@ def add_device(user, name):
 def change_totp(request, add=False):
     bad_token = None
     bad_password = False
-    bad_device_name = False
 
     request.session['add_device'] = add
 
@@ -73,10 +72,7 @@ def change_totp(request, add=False):
                             password=request.POST['password']):
             bad_password = True
 
-        if not request.POST['new_name']:
-            bad_device_name = True
-
-        if not (bad_password or bad_token or bad_device_name):
+        if not (bad_password or bad_token) and request.POST['new_name']:
             new_device = add_device(request.user, request.POST['new_name'])
             request.session['new_device'] = new_device.id
 
@@ -87,7 +83,7 @@ def change_totp(request, add=False):
     return render(request, 'totp-change-form.html', {
         'bad_token': bad_token,
         'bad_password': bad_password,
-        'bad_device_name': bad_device_name,
+        'new_device_name': request.POST['new_name'],
         'add_device': request.session['add_device'],
     })
 
