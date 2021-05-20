@@ -31,7 +31,7 @@
   <fieldset class="form-group row">
     <label>New device name</label>
     <div class="col-sm-4">
-      <input name="new_name">
+      <input name="new_name" required>
     </div>
   </fieldset>
 
@@ -47,16 +47,12 @@
   <a href="/" class="btn btn-secondary">Cancel</a>
 </form>
 
-  {% if not valid_device %}
+  {% if bad_token %}
     <p>Invalid token, please try again.</p>
   {% endif %}
 
   {% if bad_password %}
     <p>Invalid password.</p>
-  {% endif %}
-
-  {% if not new_device_name %}
-    <p>Empty device name.</p>
   {% endif %}
 
 {% endblock %}

@@ -59,19 +59,20 @@ def add_device(user, name):
 @transaction.atomic
 def change_totp(request, add=False):
     bad_password = False
+    bad_token = None
 
     request.session['add_device'] = add
 
     if request.method == 'POST' and 'token' in request.POST:
 
-        valid_device = django_otp.match_token(request.user,
-                                              request.POST['token'])
+        if not django_otp.match_token(request.user, request.POST['token']):
+            bad_token = True
 
         if not authenticate(username=request.user.username,
                             password=request.POST['password']):
             bad_password = True
 
-        if not bad_password and valid_device and request.POST['new_name']:
+        if not bad_password and bad_token:
             new_device = add_device(request.user, request.POST['new_name'])
             request.session['new_device'] = new_device.id
 
@@ -80,9 +81,8 @@ def change_totp(request, add=False):
             return redirect(confirm_totp_change)
 
     return render(request, 'totp-change-form.html', {
-        'bad_token': valid_device,
+        'bad_token': bad_token,
         'bad_password': bad_password,
-        'new_device_name': request.POST['new_name'],
         'add_device': request.session['add_device'],
     })
 
