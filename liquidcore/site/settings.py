@@ -107,7 +107,7 @@ LOGIN_REDIRECT_URL = '/'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(base_dir, 'liquidcore', 'home', 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [

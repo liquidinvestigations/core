@@ -5,10 +5,13 @@ from django_otp.plugins.otp_totp.models import TOTPDevice
 from django.conf import settings
 
 
-def create(user):
+def create(user, name=None):
+    if not name:
+        name = user.get_username()
+
     return TOTPDevice.objects.create(
         user=user,
-        name=user.get_username(),
+        name=name,
         confirmed=False,
     )
 
