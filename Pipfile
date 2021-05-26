@@ -16,6 +16,7 @@ pytest = "*"
 pytest-django = "*"
 qrcode = "*"
 Pillow = "*"
+pytest-forked = "*"
 
 [requires]
 python_version = "3.9"

@@ -5,6 +5,7 @@ from . import devices
 from . import invitations
 import django_otp
 from django.contrib.auth import authenticate
+from django.contrib.auth.decorators import login_required
 
 
 def get_png(user, device):
@@ -57,6 +58,7 @@ def add_device(user, name):
     return device
 
 
+@login_required
 @transaction.atomic
 def change_totp(request, add=False):
     bad_password = False
@@ -88,6 +90,7 @@ def change_totp(request, add=False):
     })
 
 
+@login_required
 @transaction.atomic
 def confirm_totp_change(request):
     bad_token = None
@@ -113,16 +116,19 @@ def confirm_totp_change(request):
     })
 
 
+@login_required
 def totp_settings(request):
     return render(request, 'totp-settings.html', {
         'devices': django_otp.devices_for_user(request.user),
     })
 
 
+@login_required
 def totp_add(request):
     return change_totp(request, True)
 
 
+@login_required
 @transaction.atomic
 def totp_remove(request):
     bad_token = False
