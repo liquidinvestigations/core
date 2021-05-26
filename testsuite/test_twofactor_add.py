@@ -4,22 +4,20 @@ from django_otp.plugins.otp_totp.models import TOTPDevice
 import django_otp
 
 
-def test_totp_add(client, test_user, test_user_name,
-                  test_user_pw, test_device):
+def test_totp_add(client, test_user, test_device):
     user = test_user()
-    client.login(username=test_user_name, password=test_user_pw)
-    device = test_device(user=user)
+    client.login(username=user['username'], password=user['password'])
+    device = test_device(user=user['user'])
     _reset_last_use(device)
     response = client.post('/accounts/totp/add/', {
-        'password': test_user_pw,
+        'password': user['password'],
         'token': _totp(device, now()),
         'new_name': 'new_device_name',
     })
     assert response.url == '/accounts/totp/confirm/'
-    totp_devices = django_otp.devices_for_user(user)
-    assert len(list(totp_devices)) == 2
+    assert sum(1 for device in django_otp.devices_for_user(user['user'])) == 2
     new_device = (TOTPDevice.objects
-                  .devices_for_user(user).get(name='new_device_name'))
+                  .devices_for_user(user['user']).get(name='new_device_name'))
     _reset_last_use(device)
     confirm_response = client.post('/accounts/totp/confirm/', {
         'new_token': _totp(new_device, now()),

@@ -1,7 +1,7 @@
-def test_profile(client, test_user, test_user_name, test_user_pw):
+def test_profile(client, test_user):
     resp = client.get('/accounts/profile')
     assert resp.status_code == 401
-    test_user()
-    client.login(username=test_user_name, password=test_user_pw)
+    user = test_user()
+    client.login(username=user['username'], password=user['password'])
     resp = client.get('/accounts/profile')
     assert resp.status_code == 200

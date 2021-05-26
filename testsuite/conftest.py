@@ -5,8 +5,13 @@ from liquidcore.twofactor import devices
 @pytest.fixture
 def test_user(django_user_model, test_user_name, test_user_pw):
     def make_user():
-        return django_user_model.objects.create_user(username=test_user_name,
-                                                     password=test_user_pw)
+        return {
+                'user': (django_user_model.objects
+                         .create_user(username=test_user_name,
+                                      password=test_user_pw)),
+                'password': test_user_pw,
+                'username': test_user_name,
+        }
     return make_user
 
 
