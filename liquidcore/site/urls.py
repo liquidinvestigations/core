@@ -30,20 +30,21 @@ if settings.LIQUID_2FA:
     login_view = LoginView.as_view(authentication_form=OTPAuthenticationForm)
 
     urlpatterns = [
-        path('accounts/login/', login_view),
+        path('accounts/login/', login_view, name='login'),
         path('accounts/password_change/',
              auth_views.PasswordChangeView
              .as_view(form_class=OtpPasswordChangeForm,
                       template_name='password_change_form_otp.html'),
              name='password_change'),
         path('invitation/<code>', twofactor_views.invitation),
-        path('accounts/totp/change/', twofactor_views.change_totp),
+        path('accounts/totp/change/', twofactor_views.change_totp,
+             name='totp_change'),
         path('accounts/totp/confirm/',
-             twofactor_views.confirm_totp_change),
+             twofactor_views.confirm_totp_change, name='totp_confirm'),
         path('accounts/totp/settings/',
-             twofactor_views.totp_settings),
+             twofactor_views.totp_settings, name='totp_settings'),
         path('accounts/totp/add/',
-             twofactor_views.totp_add),
+             twofactor_views.totp_add, name='totp_add'),
         path('accounts/totp/remove/',
-             twofactor_views.totp_remove),
+             twofactor_views.totp_remove, name='totp_remove'),
     ] + urlpatterns
