@@ -64,7 +64,8 @@ def test_totp_change(client, create_user, create_device):
     assert response.url == CONFIRM_URL
     assert user_device_count(create_user['user']) == 2
     new_device = (TOTPDevice.objects
-                  .devices_for_user(create_user['user']).get(name='new_device_name'))
+                  .devices_for_user(create_user['user'])
+                  .get(name='new_device_name'))
     confirm_response = client.post(CONFIRM_URL, {
         'new_token': _totp(new_device, now()),
     })

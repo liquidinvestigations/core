@@ -39,11 +39,11 @@ def create_user(django_user_model):
 def create_admin(django_user_model):
     return {
         'admin': (django_user_model.objects
-            .create_superuser(
-                username='testadmin',
-                email='test@mail.com',
-                password='admin-pw'
-                )),
+                  .create_superuser(
+                      username='testadmin',
+                      email='test@mail.com',
+                      password='admin-pw'
+                      )),
         'password': ADMIN_PW,
     }
 
@@ -57,5 +57,3 @@ def create_device():
         _reset_last_use(device)
         return device
     return create_device
-
-
