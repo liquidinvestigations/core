@@ -1,9 +1,9 @@
 from datetime import datetime, timedelta
 import pytest
 from django.utils.timezone import utc, now
-from django_otp.oath import hotp
 from django_otp.plugins.otp_totp.models import TOTPDevice
 from liquidcore.twofactor import invitations, models
+from conftest import _totp, is_logged_in, _reset_last_use
 
 pytestmark = pytest.mark.django_db
 
@@ -25,16 +25,6 @@ def mock_time(monkeypatch):
         t = value
 
     yield set_time
-
-
-def _totp(device, now):
-    counter = int(now.timestamp() - device.t0) // device.step
-    return hotp(device.bin_key, counter)
-
-
-def is_logged_in(client):
-    resp = client.get('/', follow=False)
-    return resp.status_code == 200
 
 
 @pytest.mark.parametrize(
@@ -96,12 +86,6 @@ def _accept(client, invitation, password, mock_now=None):
 
     device.refresh_from_db()
     return device
-
-
-def _reset_last_use(device):
-    device.refresh_from_db()
-    device.last_t = -1
-    device.save()
 
 
 @pytest.mark.parametrize('username,password,interval,success', [

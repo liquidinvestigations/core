@@ -16,9 +16,9 @@ urlpatterns = [
          ),
     path('accounts/login/', auth_views.LoginView.as_view(), name='login'),
     path('accounts/logout/', auth_views.LogoutView.as_view(), name='logout'),
-    path('accounts/profile', views.profile),
+    path('accounts/profile', views.profile, name='profile'),
     path('o/', include('oauth2_provider.urls', namespace='oauth2_provider')),
-    path('', views.homepage),
+    path('', views.homepage, name='home'),
 ]
 
 if settings.LIQUID_2FA:

@@ -1,7 +1,11 @@
-def test_profile(client, test_user):
-    resp = client.get('/accounts/profile')
+from django.urls import reverse
+
+
+def test_profile(client, create_user):
+    url = reverse('profile')
+    resp = client.get(url)
     assert resp.status_code == 401
-    user = test_user()
-    client.login(username=user['username'], password=user['password'])
-    resp = client.get('/accounts/profile')
+    client.login(username=create_user['user'].get_username(),
+                 password=create_user['password'])
+    resp = client.get(url)
     assert resp.status_code == 200
