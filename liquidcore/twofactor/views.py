@@ -53,7 +53,6 @@ def invitation(request, code):
 
 def add_device(user, name):
     device = devices.create(user, name)
-    device.confirmed = True
     device.save()
     return device
 
@@ -63,7 +62,6 @@ def add_device(user, name):
 def change_totp(request, add=False):
     bad_password = False
     bad_token = None
-    success = False
     otp_png = None
     confirmed = False
 
@@ -87,6 +85,8 @@ def change_totp(request, add=False):
         new_device = devices.get(request.user, request.session['new_device'])
         otp_png = get_png(request.user, new_device)
         if new_device.verify_token(request.POST['new_token']):
+            new_device.confirmed = True
+            new_device.save()
             confirmed = True
             if not request.session['add_device']:
                 devices.delete_all(request.user, keep=new_device)
@@ -98,7 +98,6 @@ def change_totp(request, add=False):
         'bad_password': bad_password,
         'add_device': request.session['add_device'],
         'otp_png': otp_png,
-        'success': success,
         'confirmed': confirmed,
     })
 
