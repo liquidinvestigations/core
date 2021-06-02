@@ -136,7 +136,8 @@ def totp_remove(request):
     success = False
 
     if request.method == 'POST' and 'token' in request.POST:
-        if not django_otp.match_token(request.user, request.POST['token']):
+        device = django_otp.match_token(request.user, request.POST['token'])
+        if not device:
             bad_token = True
 
         if not authenticate(username=request.user.username,
@@ -144,13 +145,10 @@ def totp_remove(request):
             bad_password = True
 
         if not bad_password and not bad_token:
-            devices.delete_all(request.user,
-                               devices.get(request.user,
-                                           request.POST['device']))
+            devices.delete_all(request.user, keep=device)
             success = True
 
     return render(request, 'totp-remove.html', {
-        'devices': django_otp.devices_for_user(request.user),
         'bad_token': bad_token,
         'bad_password': bad_password,
         'success': success,

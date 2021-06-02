@@ -6,8 +6,7 @@
 
 <form method="post">
   {% csrf_token %}
-  <p>Enter your password and a valid OTP token to remove all devices but one. Choose the device you want to keep from the dropdown menu.</p>
-  <p><b>Note:</b> The device named like your username is the device you registered when setting up the two factor authentication</p>
+  <p>Enter your password and a valid OTP token to remove all devices but the one you used for entering the token.  </p>
 
   <fieldset class="form-group row">
     <label>Confirm password</label>
@@ -24,18 +23,6 @@
     </div>
   </fieldset>
 
-
-  <fieldset class="form-group row">
-  <label for="device">Select the device you want to keep:</label>
-    <div class="col-sm-4">
-      <select id=device" class="form-control" name="device">
-          {% for device in devices %}
-            <option value={{ device.id }}>{{ device.name }}</option>
-          {% endfor %}
-      </select>
-  </div>
-  </fieldset>
-
   <button type="submit" class="btn btn-primary"> 
     Remove
   </button>
@@ -43,15 +30,15 @@
 </form>
 
   {% if bad_token %}
-    <p>Invalid token, please try again.</p>
+    <p class="bg-warning">Invalid token, please try again.</p>
   {% endif %}
 
   {% if bad_password %}
-    <p>Invalid password.</p>
+    <p class="bg-warning">Invalid password.</p>
   {% endif %}
 
   {% if success %}
-    <p>Successfully removed devices.</p>
+    <p class="bg-success">Successfully removed devices.</p>
   {% endif %}
 
 {% endblock %}

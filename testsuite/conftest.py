@@ -1,6 +1,7 @@
 import pytest
 from liquidcore.twofactor import devices
 from django_otp.oath import hotp
+from collections import namedtuple
 
 NORMAL_USER_NAME = 'user'
 NORMAL_USER_PW = 'password'
@@ -27,25 +28,27 @@ def _reset_last_use(device):
 
 @pytest.fixture
 def create_user(django_user_model):
-    return {
-            'user': (django_user_model.objects
-                     .create_user(username=NORMAL_USER_NAME,
-                                  password=NORMAL_USER_PW)),
-            'password': NORMAL_USER_PW,
-    }
+    # The password cannot be retrieved from the user directly so a tuple needs
+    # to be returned
+    User = namedtuple('User', ['user', 'password'])
+    return User(user=(django_user_model.objects
+                      .create_user(username=NORMAL_USER_NAME,
+                                   password=NORMAL_USER_PW)),
+                password=NORMAL_USER_PW)
 
 
 @pytest.fixture
 def create_admin(django_user_model):
-    return {
-        'admin': (django_user_model.objects
-                  .create_superuser(
-                      username='testadmin',
-                      email='test@mail.com',
-                      password='admin-pw'
-                      )),
-        'password': ADMIN_PW,
-    }
+    # The password cannot be retrieved from the user directly so a tuple needs
+    # to be returned
+    Admin = namedtuple('Admin', ['admin', 'password'])
+    return Admin(admin=(django_user_model.objects
+                        .create_superuser(
+                            username='testadmin',
+                            email='test@mail.com',
+                            password='admin-pw'
+                            )),
+                 password=ADMIN_PW)
 
 
 @pytest.fixture
