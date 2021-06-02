@@ -1,6 +1,6 @@
 from django.utils.timezone import now
 from time import sleep
-from conftest import _totp, _reset_last_use, payload, is_logged_in
+from conftest import _totp, _reset_last_use, payload
 from django.urls import reverse
 
 
