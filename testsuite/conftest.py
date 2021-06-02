@@ -26,6 +26,16 @@ def _reset_last_use(device):
     device.save()
 
 
+def payload(username, password, otp_token=None):
+    if otp_token:
+        return {'username': username,
+                'password': password,
+                'otp_token': otp_token}
+
+    else:
+        return {'username': username, 'password': password}
+
+
 @pytest.fixture
 def create_user(django_user_model):
     # The password cannot be retrieved from the user directly so a tuple needs
@@ -44,9 +54,9 @@ def create_admin(django_user_model):
     Admin = namedtuple('Admin', ['admin', 'password'])
     return Admin(admin=(django_user_model.objects
                         .create_superuser(
-                            username='testadmin',
-                            email='test@mail.com',
-                            password='admin-pw'
+                            username=ADMIN_NAME,
+                            email=ADMIN_EMAIL,
+                            password=ADMIN_PW
                             )),
                  password=ADMIN_PW)
 

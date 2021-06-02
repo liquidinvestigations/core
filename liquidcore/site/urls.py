@@ -39,8 +39,6 @@ if settings.LIQUID_2FA:
         path('invitation/<code>', twofactor_views.invitation),
         path('accounts/totp/change/', twofactor_views.change_totp,
              name='totp_change'),
-        path('accounts/totp/confirm/',
-             twofactor_views.confirm_totp_change, name='totp_confirm'),
         path('accounts/totp/settings/',
              twofactor_views.totp_settings, name='totp_settings'),
         path('accounts/totp/add/',

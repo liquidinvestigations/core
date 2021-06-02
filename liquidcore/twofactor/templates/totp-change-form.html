@@ -7,7 +7,7 @@
 
 <form method="post">
   {% csrf_token %}
-  {% if not otp_png %}
+  {% if not otp_png and not confirmed %}
   {% if add_device %}
   <p>Enter your password and a valid OTP token to add a new device. </p>
   {% else %}
@@ -35,8 +35,6 @@
     </div>
   </fieldset>
 
-  {% endif %}
-
   <button type="submit" class="btn btn-primary"> 
   {% if add_device %}
     Add 
@@ -46,6 +44,33 @@
   </button>
   <a href="/" class="btn btn-secondary">Cancel</a>
 </form>
+  {% else %}
+
+
+<form method="post">
+  {% csrf_token %}
+  {% if otp_png %}
+<p>Confirm your new device with a token.</p>
+<p><img src="{{ otp_png }}"></p>
+{% if not confirmed %}
+<fieldset class="form-group row">
+  <label>Confirm with new token</label>
+  <div class="col-sm-4">
+    <input name="new_token">
+  </div>
+</fieldset>
+<button type="submit" class="btn btn-primary">Confirm</button>
+ {% endif %}
+{% endif %}
+
+{% if confirmed %}
+  <p>New device confirmed.</p>
+  <p><a class="btn btn-primary" href="/">Home</a></p>
+{% endif %}
+
+  {% endif %}
+
+
 
   {% if bad_token %}
     <p>Invalid token, please try again.</p>

@@ -63,6 +63,9 @@ def add_device(user, name):
 def change_totp(request, add=False):
     bad_password = False
     bad_token = None
+    success = False
+    otp_png = None
+    confirmed = False
 
     request.session['add_device'] = add
 
@@ -78,41 +81,25 @@ def change_totp(request, add=False):
         if not (bad_password or bad_token):
             new_device = add_device(request.user, request.POST['new_name'])
             request.session['new_device'] = new_device.id
+            otp_png = get_png(request.user, new_device)
 
-            request.session['otp_png'] = get_png(request.user, new_device)
-
-            return redirect(confirm_totp_change)
+    if request.method == 'POST' and 'new_token' in request.POST:
+        new_device = devices.get(request.user, request.session['new_device'])
+        otp_png = get_png(request.user, new_device)
+        if new_device.verify_token(request.POST['new_token']):
+            confirmed = True
+            if not request.session['add_device']:
+                devices.delete_all(request.user, keep=new_device)
+        else:
+            bad_token = True
 
     return render(request, 'totp-change-form.html', {
         'bad_token': bad_token,
         'bad_password': bad_password,
         'add_device': request.session['add_device'],
-    })
-
-
-@login_required
-@transaction.atomic
-def confirm_totp_change(request):
-    bad_token = None
-    new_device = devices.get(request.user, request.session['new_device'])
-    otp_png = request.session['otp_png']
-    add_device = request.session['add_device']
-    success = False
-
-    if request.method == 'POST':
-        new_token = request.POST['new_token']
-        if new_device.verify_token(new_token):
-            success = True
-        else:
-            bad_token = True
-
-        if success and not add_device:
-            devices.delete_all(request.user, keep=new_device)
-
-    return render(request, 'totp-change-confirmation.html', {
-        'success': success,
-        'bad_token': bad_token,
         'otp_png': otp_png,
+        'success': success,
+        'confirmed': confirmed,
     })
 
 

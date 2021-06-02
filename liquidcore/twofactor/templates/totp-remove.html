@@ -7,7 +7,7 @@
 <form method="post">
   {% csrf_token %}
   <p>Enter your password and a valid OTP token to remove all devices but the one you used for entering the token.  </p>
-
+{% if not success %}
   <fieldset class="form-group row">
     <label>Confirm password</label>
     <div class="col-sm-4">
@@ -30,15 +30,16 @@
 </form>
 
   {% if bad_token %}
-    <p class="bg-warning">Invalid token, please try again.</p>
+    <p class="bg-warning" style="margin-top: 10px; width: 50rem">Invalid token, please try again.</p>
   {% endif %}
 
   {% if bad_password %}
-    <p class="bg-warning">Invalid password.</p>
+    <p class="bg-warning", style="margin-top: 10px; width: 50rem">Invalid password.</p>
   {% endif %}
 
-  {% if success %}
-    <p class="bg-success">Successfully removed devices.</p>
+  {% elif success %}
+    <a href="/" class="btn btn-primary">Home</a>
+    <p class="bg-success" style="margin-top: 10px; width: 50rem">Successfully removed devices.</p>
   {% endif %}
 
 {% endblock %}

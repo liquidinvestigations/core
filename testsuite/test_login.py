@@ -54,7 +54,7 @@ def test_login_totp(client, create_user, create_device):
         'otp_token': _totp(device, now())
     })
     assert not is_logged_in(client)
-    sleep(60)
+    sleep(30)
 
     _reset_last_use(device)
     client.post(get_url(), {
@@ -64,7 +64,7 @@ def test_login_totp(client, create_user, create_device):
     })
     assert not is_logged_in(client)
 
-    sleep(60)
+    sleep(30)
     _reset_last_use(device)
     client.post(get_url(), {
         'username': create_user.user.get_username(),
@@ -73,7 +73,7 @@ def test_login_totp(client, create_user, create_device):
     })
     assert not is_logged_in(client)
 
-    sleep(60)
+    sleep(30)
     _reset_last_use(device)
     client.post(get_url(), {
         'username': create_user.user.get_username(),
