@@ -1,6 +1,4 @@
-from django.conf import settings
 from django.core.management.base import BaseCommand
-from ... import invitations
 from django_otp.plugins.otp_totp.models import TOTPDevice
 
 
