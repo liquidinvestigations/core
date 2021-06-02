@@ -1,6 +1,6 @@
 from base64 import b64encode
 from django.db import transaction
-from django.shortcuts import render, redirect
+from django.shortcuts import render
 from . import devices
 from . import invitations
 import django_otp
