@@ -8,7 +8,7 @@ def remove_unconfirmed_devices():
     TOTPDeviceTimed.objects.all() \
                    .filter(confirmed=False,
                            created__lte=timezone.now()
-                           - timedelta(minutes=1)) \
+                           - timedelta(days=1)) \
                    .select_related('totpdevice_ptr') \
                    .delete()
 
