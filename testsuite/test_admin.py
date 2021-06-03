@@ -20,7 +20,7 @@ def test_admin_login_totp(client, create_admin, create_device):
     assert response.status_code == 302
     assert response.url == '/admin/login/?next=/admin/'
 
-    sleep(30)
+    sleep(5)
     _reset_last_use(device)
     client.post(get_login_url(), payload(create_admin.admin.get_username(),
                                          'baddpassword',
@@ -29,7 +29,7 @@ def test_admin_login_totp(client, create_admin, create_device):
     assert response.status_code == 302
     assert response.url == '/admin/login/?next=/admin/'
 
-    sleep(30)
+    sleep(5)
     _reset_last_use(device)
     client.post(get_login_url(), payload(create_admin.admin.get_username(),
                                          create_admin.password,
@@ -38,7 +38,7 @@ def test_admin_login_totp(client, create_admin, create_device):
     assert response.status_code == 302
     assert response.url == '/admin/login/?next=/admin/'
 
-    sleep(30)
+    sleep(5)
     _reset_last_use(device)
     client.post(get_login_url(), payload(create_admin.admin.get_username(),
                                          create_admin.password,

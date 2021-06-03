@@ -46,7 +46,7 @@ def test_login_totp(client, create_user, create_device):
                                    create_user.password,
                                    _totp(device, now())))
     assert not is_logged_in(client)
-    sleep(30)
+    sleep(5)
 
     _reset_last_use(device)
     client.post(get_url(), payload(create_user.user.get_username(),
@@ -54,7 +54,7 @@ def test_login_totp(client, create_user, create_device):
                                    _totp(device, now())))
     assert not is_logged_in(client)
 
-    sleep(30)
+    sleep(5)
     _reset_last_use(device)
     client.post(get_url(), payload(create_user.user.get_username(),
                                    create_user.password,
@@ -62,7 +62,7 @@ def test_login_totp(client, create_user, create_device):
                                          timedelta(minutes=5))))
     assert not is_logged_in(client)
 
-    sleep(30)
+    sleep(5)
     _reset_last_use(device)
     client.post(get_url(), payload(create_user.user.get_username(),
                                    create_user.password,

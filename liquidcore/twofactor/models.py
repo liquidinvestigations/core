@@ -2,6 +2,7 @@ import random
 import math
 from django.conf import settings
 from django.db import models
+from django_otp.plugins.otp_totp.models import TOTPDevice
 
 VOCABULARY = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
 REQUIRED_ENTROPY = 256
@@ -21,3 +22,7 @@ class Invitation(models.Model):
     )
     code = models.CharField(max_length=200, default=random_code)
     expires = models.DateTimeField()
+
+
+class TOTPDeviceTimed(TOTPDevice):
+    created = models.DateTimeField(auto_now_add=True)

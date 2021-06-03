@@ -4,8 +4,11 @@ from django.shortcuts import render
 from . import devices
 from . import invitations
 import django_otp
+from django_otp.plugins.otp_totp.models import TOTPDevice
 from django.contrib.auth import authenticate
 from django.contrib.auth.decorators import login_required
+from django.core.exceptions import ObjectDoesNotExist
+from collections import namedtuple
 
 
 def get_png(user, device):
@@ -102,10 +105,21 @@ def change_totp(request, add=False):
     })
 
 
+def get_devices(user):
+    qs = TOTPDevice.objects.devices_for_user(user) \
+         .select_related('totpdevicetimed')
+    DeviceTimed = namedtuple('DeviceTimed', ['device', 'time'])
+    for d in qs:
+        try:
+            yield DeviceTimed(d, d.totpdevicetimed.created)
+        except ObjectDoesNotExist:
+            yield DeviceTimed(d, None)
+
+
 @login_required
 def totp_settings(request):
     return render(request, 'totp-settings.html', {
-        'devices': django_otp.devices_for_user(request.user),
+        'devices': get_devices(request.user),
     })
 
 

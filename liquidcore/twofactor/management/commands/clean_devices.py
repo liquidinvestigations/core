@@ -1,9 +1,16 @@
 from django.core.management.base import BaseCommand
-from django_otp.plugins.otp_totp.models import TOTPDevice
+from liquidcore.twofactor.models import TOTPDeviceTimed
+from datetime import timedelta
+from django.utils import timezone
 
 
 def remove_unconfirmed_devices():
-    TOTPDevice.objects.all().filter(confirmed=False).delete()
+    TOTPDeviceTimed.objects.all() \
+                   .filter(confirmed=False,
+                           created__lte=timezone.now()
+                           - timedelta(minutes=1)) \
+                   .select_related('totpdevice_ptr') \
+                   .delete()
 
 
 class Command(BaseCommand):

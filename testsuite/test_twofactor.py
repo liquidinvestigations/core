@@ -1,7 +1,7 @@
 from django.utils.timezone import now
 from conftest import _totp
 import django_otp
-from django_otp.plugins.otp_totp.models import TOTPDevice
+from liquidcore.twofactor.models import TOTPDeviceTimed
 from django.urls import reverse
 
 
@@ -18,7 +18,7 @@ def get_change_url():
 
 
 def user_device_count(user):
-    return len(list(django_otp.devices_for_user(user)))
+    return len(list(TOTPDeviceTimed.objects.devices_for_user(user)))
 
 
 def test_totp_remove(client, create_user, create_device):
@@ -48,7 +48,7 @@ def test_totp_add(client, create_user, create_device):
         'new_name': 'new_device_name',
     })
     assert response.context['otp_png']
-    new_device = (TOTPDevice.objects
+    new_device = (TOTPDeviceTimed.objects
                   .devices_for_user(create_user.user)
                   .get(name='new_device_name'))
     confirm_response = client.post(get_add_url(), {
@@ -68,7 +68,7 @@ def test_totp_change(client, create_user, create_device):
         'new_name': 'new_device_name',
     })
     assert response.context['otp_png']
-    new_device = (TOTPDevice.objects
+    new_device = (TOTPDeviceTimed.objects
                   .devices_for_user(create_user.user)
                   .get(name='new_device_name'))
     confirm_response = client.post(get_change_url(), {
