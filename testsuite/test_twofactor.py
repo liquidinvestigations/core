@@ -1,128 +1,78 @@
-from datetime import datetime, timedelta
-import pytest
-from django.utils.timezone import utc, now
-from django_otp.oath import hotp
-from django_otp.plugins.otp_totp.models import TOTPDevice
-from liquidcore.twofactor import invitations, models
-
-pytestmark = pytest.mark.django_db
-
-INVITATION_DURATION = 30  # minutes
+from django.utils.timezone import now
+from conftest import _totp
+import django_otp
+from liquidcore.twofactor.models import TOTPDeviceTimed
+from django.urls import reverse
 
 
-@pytest.yield_fixture
-def mock_time(monkeypatch):
-    class mock_time:
-        time = staticmethod(lambda: t.timestamp())
-    t = now()
-    patch = monkeypatch.setattr
-    patch('liquidcore.twofactor.invitations.now', lambda: t)
-    patch('django_otp.plugins.otp_totp.models.time', mock_time)
-
-    def set_time(value):
-        nonlocal t
-        assert t.tzinfo is utc
-        t = value
-
-    yield set_time
+def get_rm_url():
+    return reverse('totp_remove')
 
 
-def _totp(device, now):
-    counter = int(now.timestamp() - device.t0) // device.step
-    return hotp(device.bin_key, counter)
+def get_add_url():
+    return reverse('totp_add')
 
 
-def is_logged_in(client):
-    resp = client.get('/', follow=False)
-    return resp.status_code == 200
+def get_change_url():
+    return reverse('totp_change')
 
 
-@pytest.mark.parametrize(
-    'minutes,username_ok,password_ok,code_ok,invitation,success',
-    [
-        (10, True, True, True, True, True),
-        (40, True, True, True, False, False),
-        (10, False, True, True, True, False),
-        (10, True, False, True, True, False),
-        (10, True, True, False, True, False),
-    ])
-def test_flow(
-        client, mock_time, minutes, username_ok, password_ok, code_ok,
-        invitation, success,
-        ):
+def user_device_count(user):
+    return len(list(TOTPDeviceTimed.objects.devices_for_user(user)))
 
-    t0 = datetime(2016, 6, 13, 12, 0, 0, tzinfo=utc)
-    t1 = t0 + timedelta(minutes=minutes)
 
-    mock_time(t0)
-    url = invitations.invite('john', INVITATION_DURATION, create=True)
-    assert not is_logged_in(client)
-
-    mock_time(t1)
-    client.get(url)
-
-    if not invitation:
-        assert TOTPDevice.objects.count() == 0
-        return
-
-    [device] = TOTPDevice.objects.all()
-    hour = timedelta(hours=1)
-    resp = client.post(url, {
-        'username': 'john' if username_ok else 'ramirez',
-        'password': 'secretz',
-        'password-confirm': 'secretz' if password_ok else 'foobar',
-        'code': _totp(device, t1) if code_ok else _totp(device, t1 + hour),
+def test_totp_remove(client, create_user, create_device):
+    client.login(username=create_user.user.get_username(),
+                 password=create_user.password)
+    create_device(user=create_user.user)
+    device2 = create_device(user=create_user.user, name='device2')
+    response = client.post(get_rm_url(), {
+        'password': create_user.password,
+        'token': _totp(device2, now()),
     })
+    assert response.context['success']
+    totp_names = [device.name
+                  for device
+                  in django_otp.devices_for_user(create_user.user)]
+    assert 'device2' in totp_names
+    assert 'device' not in totp_names
 
-    if success:
-        assert "Verification successful." in resp.content.decode('utf-8')
-        assert is_logged_in(client)
 
-    else:
-        assert not is_logged_in(client)
-
-
-def _accept(client, invitation, password, mock_now=None):
-    client.get(f'/invitation/{invitation.code}')
-    [device] = invitation.user.totpdevice_set.all()
-
-    resp = client.post(f'/invitation/{invitation.code}', {
-        'username': invitation.user.username,
-        'password': password,
-        'password-confirm': password,
-        'code': _totp(device, mock_now or now()),
+def test_totp_add(client, create_user, create_device):
+    client.login(username=create_user.user.get_username(),
+                 password=create_user.password)
+    device = create_device(user=create_user.user)
+    response = client.post(get_add_url(), {
+        'password': create_user.password,
+        'token': _totp(device, now()),
+        'new_name': 'new_device_name',
     })
-    assert "Verification successful." in resp.content.decode('utf8')
-
-    device.refresh_from_db()
-    return device
-
-
-def _reset_last_use(device):
-    device.refresh_from_db()
-    device.last_t = -1
-    device.save()
-
-
-@pytest.mark.parametrize('username,password,interval,success', [
-    ('john', 'pw', timedelta(0), True),
-    ('john', 'pw', timedelta(minutes=2), False),
-    ('johnny', 'pw', timedelta(0), False),
-    ('john', 'pwz', timedelta(0), False),
-])
-def test_login(client, username, password, interval, success):
-    invitations.invite('john', INVITATION_DURATION, create=True)
-    device = _accept(client, models.Invitation.objects.get(), 'pw')
-    assert is_logged_in(client)
-    client.logout()
-    _reset_last_use(device)
-    assert not is_logged_in(client)
-    client.post('/accounts/login/', {
-        'username': username,
-        'password': password,
-        'otp_token': _totp(device, now() + interval),
+    assert response.context['otp_png']
+    new_device = (TOTPDeviceTimed.objects
+                  .devices_for_user(create_user.user)
+                  .get(name='new_device_name'))
+    confirm_response = client.post(get_add_url(), {
+        'new_token': _totp(new_device, now()),
     })
-    if success:
-        assert is_logged_in(client)
-    else:
-        assert not is_logged_in(client)
+    assert confirm_response.context['confirmed']
+    assert user_device_count(create_user.user) == 2
+
+
+def test_totp_change(client, create_user, create_device):
+    client.login(username=create_user.user.get_username(),
+                 password=create_user.password)
+    device = create_device(user=create_user.user)
+    response = client.post(get_change_url(), {
+        'password': create_user.password,
+        'token': _totp(device, now()),
+        'new_name': 'new_device_name',
+    })
+    assert response.context['otp_png']
+    new_device = (TOTPDeviceTimed.objects
+                  .devices_for_user(create_user.user)
+                  .get(name='new_device_name'))
+    confirm_response = client.post(get_change_url(), {
+        'new_token': _totp(new_device, now()),
+    })
+    assert confirm_response.context['confirmed']
+    assert user_device_count(create_user.user) == 1

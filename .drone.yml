@@ -14,7 +14,7 @@ steps:
   - apt-get install -yqq --no-install-recommends qrencode
   - pip install flake8 pipenv > /dev/null
   - pipenv install --system --deploy --ignore-pipfile
-  - pytest
+  - pytest --forked
 
 ---
 kind: pipeline

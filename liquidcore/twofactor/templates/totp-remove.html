@@ -1,0 +1,45 @@
+{% extends "auth_base.html" %}
+
+{% block content %}
+
+<h1>Remove 2FA devices</h1>
+
+<form method="post">
+  {% csrf_token %}
+  <p>Enter your password and a valid OTP token to remove all devices but the one you used for entering the token.  </p>
+{% if not success %}
+  <fieldset class="form-group row">
+    <label>Confirm password</label>
+    <div class="col-sm-4">
+      <input type="password" name="password">
+    </div>
+  </fieldset>
+
+
+  <fieldset class="form-group row">
+    <label>OTP token</label>
+    <div class="col-sm-4">
+      <input name="token">
+    </div>
+  </fieldset>
+
+  <button type="submit" class="btn btn-primary"> 
+    Remove
+  </button>
+  <a href="/" class="btn btn-secondary">Cancel</a>
+</form>
+
+  {% if bad_token %}
+    <p class="bg-warning" style="margin-top: 10px; width: 50rem">Invalid token, please try again.</p>
+  {% endif %}
+
+  {% if bad_password %}
+    <p class="bg-warning", style="margin-top: 10px; width: 50rem">Invalid password.</p>
+  {% endif %}
+
+  {% elif success %}
+    <a href="/" class="btn btn-primary">Home</a>
+    <p class="bg-success" style="margin-top: 10px; width: 50rem">Successfully removed devices.</p>
+  {% endif %}
+
+{% endblock %}

@@ -57,8 +57,4 @@
   <input type="hidden" name="next" value="{{ next }}" />
 </form>
 
-{% if not form.otp_token %}
-<p><a href="{% url 'password_reset' %}">Lost password?</a></p>
-{% endif %}
-
 {% endblock %}
