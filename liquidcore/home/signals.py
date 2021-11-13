@@ -2,6 +2,7 @@ import logging
 import string
 
 import requests
+import os
 from django.contrib.auth import get_user_model
 from django.contrib.auth.signals import user_logged_out
 from django.db.models.signals import post_save, pre_save
@@ -33,9 +34,13 @@ def create_user_everywhere(sender, instance, created=None, **kwargs):
                 "USERNAME": instance.username
             }
         }
-        res = requests.post('http://10.66.60.1:4646/v1/job/liquid-createuser/dispatch', json=payload)
+        nomad_ip = os.getenv('SERVICE_ADDRESS')
+        res = requests.post(
+            f'http://{nomad_ip}:4646/v1/job/liquid-createuser/dispatch',
+            json=payload
+        )
         if res.status_code != 200:
-            log.warning('Error creating user ' + '"' + instance.username + '".')
-            log.warning('Nomad returned: ' + str(res.status_code) + ', ' + res.text)
+            log.warning(f'Error creating user "{instance.username}".')
+            log.warning(f'Nomad returned: {str(res.status_code)}, {res.text}')
         else:
-            log.warning('Created liquid user ' + '"' + instance.username + '".')
+            log.warning(f'Created liquid user "{instance.username}".')
