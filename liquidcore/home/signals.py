@@ -42,7 +42,9 @@ def create_user_everywhere(sender, instance, created=None, **kwargs):
             )
             if res.status_code != 200:
                 log.warning(f'Error creating user "{instance.username}".')
-                log.warning(f'Nomad returned: {str(res.status_code)}, {res.text}')
+                log.warning(
+                    f'Nomad returned: {str(res.status_code)}, {res.text}'
+                )
             else:
                 log.warning(f'Created liquid user "{instance.username}".')
         else:
