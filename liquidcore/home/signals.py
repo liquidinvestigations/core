@@ -35,12 +35,15 @@ def create_user_everywhere(sender, instance, created=None, **kwargs):
             }
         }
         nomad_ip = os.getenv('SERVICE_ADDRESS')
-        res = requests.post(
-            f'http://{nomad_ip}:4646/v1/job/liquid-createuser/dispatch',
-            json=payload
-        )
-        if res.status_code != 200:
-            log.warning(f'Error creating user "{instance.username}".')
-            log.warning(f'Nomad returned: {str(res.status_code)}, {res.text}')
+        if nomad_ip:
+            res = requests.post(
+                f'http://{nomad_ip}:4646/v1/job/liquid-createuser/dispatch',
+                json=payload
+            )
+            if res.status_code != 200:
+                log.warning(f'Error creating user "{instance.username}".')
+                log.warning(f'Nomad returned: {str(res.status_code)}, {res.text}')
+            else:
+                log.warning(f'Created liquid user "{instance.username}".')
         else:
-            log.warning(f'Created liquid user "{instance.username}".')
+            log.warning('No nomad address found to create liquid users!')
