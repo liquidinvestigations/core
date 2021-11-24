@@ -34,8 +34,8 @@ def create_user_everywhere(sender, instance, created=None, **kwargs):
                 "USERNAME": instance.username
             }
         }
-        nomad_ip = os.getenv('NOMAD_URL')
-        if nomad_ip:
+        nomad_url = os.getenv('NOMAD_URL')
+        if nomad_url:
             res = requests.post(
                 f'{nomad_url}/v1/job/liquid-createuser/dispatch',
                 json=payload
