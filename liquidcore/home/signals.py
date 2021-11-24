@@ -34,10 +34,10 @@ def create_user_everywhere(sender, instance, created=None, **kwargs):
                 "USERNAME": instance.username
             }
         }
-        nomad_ip = os.getenv('SERVICE_ADDRESS')
+        nomad_ip = os.getenv('NOMAD_URL')
         if nomad_ip:
             res = requests.post(
-                f'http://{nomad_ip}:4646/v1/job/liquid-createuser/dispatch',
+                f'{nomad_url}/v1/job/liquid-createuser/dispatch',
                 json=payload
             )
             if res.status_code != 200:
