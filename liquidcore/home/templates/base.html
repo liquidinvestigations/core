@@ -2,13 +2,16 @@
 <meta charset="utf-8">
 <title>{{ liquid_title }} - Liquid Investigations</title>
 {% load static %}
-<link rel="stylesheet" href="{% static "search/bootstrap.css" %}">
+<link rel="stylesheet" href="{% static "core/bootstrap.css" %}">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<script src="{% static "core/bootstrap.js"%}"></script>
 <link rel="shortcut icon" type="image/png" href="{% static "icons/favicon.png" %}">
-{% block headstyles %}{% endblock %}
-<body>
 
-<div class="container">
+{% block headstyles %}{% endblock %}
+<body class="container container-lg">
+<div style="margin-top: 5rem;">
 {% block content %}{% endblock %}
 </div>
 
-{% block scripts %}{% endblock %}
+{% block scripts %}
+{% endblock %}
