@@ -21,9 +21,9 @@
 <form method="post" action="{% url 'login' %}">
   {% csrf_token %}
 
-  <fieldset class="form-group row{% if form.errors.username %} has-danger{% endif %}">
+  <fieldset class="form-group row {% if form.errors.username %} has-danger{% endif %}">
     {{ form.username.label_tag }}
-    <div class="col-sm-4">
+    <div class="col-lg-9">
       {{ form.username }}
     </div>
     {% for message in form.errors.username %}
@@ -31,9 +31,9 @@
     {% endfor %}
   </fieldset>
 
-  <fieldset class="form-group row{% if form.errors.password %} has-danger{% endif %}">
+  <fieldset class="form-group row {% if form.errors.password %} has-danger{% endif %}">
     {{ form.password.label_tag }}
-    <div class="col-sm-4">
+    <div class="col-lg-9">
       {{ form.password }}
     </div>
     {% for message in form.errors.password %}
@@ -42,9 +42,9 @@
   </fieldset>
 
   {% if form.otp_token %}
-  <fieldset class="form-group row{% if form.errors.otp_token %} has-danger{% endif %}">
+  <fieldset class="form-group row {% if form.errors.otp_token %} has-danger{% endif %}">
     {{ form.otp_token.label_tag }}
-    <div class="col-sm-4">
+    <div class="col-lg-9">
       {{ form.otp_token }}
     </div>
     {% for message in form.errors.otp_token %}
@@ -53,7 +53,7 @@
   </fieldset>
   {% endif %}
 
-  <button type="submit" class="btn btn-primary">login</button>
+  <button type="submit" class="btn btn-primary btn-lg">login</button>
   <input type="hidden" name="next" value="{{ next }}" />
 </form>
 
