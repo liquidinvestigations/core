@@ -23,6 +23,8 @@ class HooverUserAdmin(UserAdmin):
         }),
         ('Important dates', {'fields': ('last_login', 'date_joined')}),
     )
+    list_display = ('username', 'email', 'first_name', 'last_name',
+                    'is_staff', 'last_login')
 
     if settings.LIQUID_2FA:
         from ..twofactor.invitations import create_invitations
