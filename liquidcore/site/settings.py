@@ -150,4 +150,9 @@ OAUTH2_PROVIDER = {
     'REFRESH_TOKEN_EXPIRE_SECONDS': AUTH_AUTO_LOGOUT_SECONDS,
     'AUTHORIZATION_CODE_EXPIRE_SECONDS': 600,  # recommended from docs
     'REFRESH_TOKEN_GRACE_PERIOD_SECONDS': 120,  # recommended from docs
+    'SCOPES': {
+        'read': 'Read scope',
+        'write': 'Write scope',
+    },
+    'DEFAULT_SCOPES': ['read', 'write'],
 }

@@ -28,8 +28,8 @@
 
 {% for app in liquid_apps%}
 <p>
-  {% if app.enabled %}
-    {% if app.adminOnly and user.is_superuser or not app.adminOnly %}
+    {% if app.enabled and 'home.use_'|add:app.id in perms %}
+    {% if app.adminOnly and user.is_superuser or not app.adminOnly  %}
       <a href="{{app.url}}">{{app.title}}</a>
       {{app.description}}
       <small style="float: right;">{{app.version}}</small>
