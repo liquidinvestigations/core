@@ -2,6 +2,7 @@ from django.db import models
 
 
 class AppPermissions(models.Model):
+    '''Model to add permissions for using liquid apps.'''
     class Meta:
         permissions = [
             ('use_nextcloud', 'Can use Nextcloud'),

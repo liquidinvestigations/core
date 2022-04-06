@@ -1,11 +1,7 @@
-import json
-from django.http import JsonResponse, HttpResponse, HttpResponseForbidden
+from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
-from oauth2_provider.views.base import TokenView
-from oauth2_provider.models import get_access_token_model
-from oauth2_provider.signals import app_authorized
 
 
 @login_required
@@ -20,7 +16,8 @@ def homepage(request):
 
 
 def app_permissions(user):
-    '''Helper function to create a list with names of the allowed apps for a user. '''
+    '''Helper function to create a list with names
+    of the allowed apps for a user.'''
     app_perms = []
     for liquid_app in settings.LIQUID_APPS:
         id = liquid_app['id']
@@ -45,7 +42,10 @@ def profile(request):
         'email': user.email or user_email,
         'is_admin': user.is_staff,
         'name': user.get_full_name() or user.get_username(),
-        # these roles are used by the ouauth2proxy to restrict app access. The proxy expects the group to
+        # These roles are used by the ouauth2proxy to restrict app access.
+        # The proxy expects the group to
         # match the app id from the configuration.
-        'roles': ['admin', 'user'] + user_app_perms if user.is_staff else ['user'] + user_app_perms,
+        'roles': (['admin', 'user']
+                  + user_app_perms if user.is_staff else ['user']
+                  + user_app_perms),
     })
