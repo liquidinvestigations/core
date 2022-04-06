@@ -4,6 +4,7 @@ import string
 import requests
 import os
 from django.contrib.auth import get_user_model
+from django.contrib.auth.models import Permission
 from django.contrib.auth.signals import user_logged_out
 from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
@@ -49,3 +50,11 @@ def create_user_everywhere(sender, instance, created=None, **kwargs):
                 log.warning(f'Created liquid user "{instance.username}".')
         else:
             log.warning('No nomad address found to create liquid users!')
+
+
+@receiver(post_save, sender=User)
+def add_default_permissions(sender, instance, created, **kwargs):
+    if created:
+        permission = Permission.objects.get(codename='use_rocketchat')
+        instance.user_permissions.add(permission)
+        instance.save()
