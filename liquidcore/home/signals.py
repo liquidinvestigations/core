@@ -54,7 +54,8 @@ def create_user_everywhere(sender, instance, created=None, **kwargs):
 
 @receiver(post_save, sender=User)
 def add_default_permissions(sender, instance, created, **kwargs):
-    '''Signal handler to add default permissions after user has been created.'''
+    '''Signal handler to add default permissions
+    after user has been created.'''
     if created:
         rocketchat_perm = Permission.objects.get(codename='use_rocketchat')
         hypothesis_perm = Permission.objects.get(codename='use_hypothesis')
