@@ -35,6 +35,12 @@ def profile(request):
     user_email = user.get_username() + '@' + settings.LIQUID_DOMAIN
     user_app_perms = app_permissions(user)
 
+    roles = ['user']
+    if user.is_staff:
+        roles.append('admin')
+    if user.is_superuser:
+        roles.append('superuser')
+
     return JsonResponse({
         'id': user.get_username(),
         'login': user.get_username(),
@@ -44,7 +50,5 @@ def profile(request):
         # These roles are used by the ouauth2proxy to restrict app access.
         # The proxy expects the group to
         # match the app id from the configuration.
-        'roles': (['admin', 'user']
-                  + user_app_perms if user.is_staff else ['user']
-                  + user_app_perms),
+        'roles': roles + user_app_perms,
     })
