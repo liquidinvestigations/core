@@ -21,6 +21,8 @@ def app_permissions(user):
     app_perms = []
     for liquid_app in settings.LIQUID_APPS:
         id = liquid_app['id']
+        if id == 'nextcloud-admin':
+            continue
         if user.has_perm((f'home.use_{id}')):
             app_perms.append(id)
     return app_perms
@@ -34,7 +36,6 @@ def profile(request):
 
     user_email = user.get_username() + '@' + settings.LIQUID_DOMAIN
     user_app_perms = app_permissions(user)
-    print(user_app_perms)
 
     return JsonResponse({
         'id': user.get_username(),
