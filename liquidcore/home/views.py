@@ -15,6 +15,17 @@ def homepage(request):
     })
 
 
+def app_permissions(user):
+    '''Helper function to create a list with names
+    of the allowed apps for a user.'''
+    app_perms = []
+    for liquid_app in settings.LIQUID_APPS:
+        id = liquid_app['id']
+        if user.has_perm((f'home.use_{id}')):
+            app_perms.append(id)
+    return app_perms
+
+
 def profile(request):
     user = request.user
 
@@ -22,6 +33,8 @@ def profile(request):
         return HttpResponse('Unauthorized', status=401)
 
     user_email = user.get_username() + '@' + settings.LIQUID_DOMAIN
+    user_app_perms = app_permissions(user)
+    print(user_app_perms)
 
     return JsonResponse({
         'id': user.get_username(),
@@ -29,5 +42,10 @@ def profile(request):
         'email': user.email or user_email,
         'is_admin': user.is_staff,
         'name': user.get_full_name() or user.get_username(),
-        'roles': ['admin', 'user'] if user.is_staff else ['user'],
+        # These roles are used by the ouauth2proxy to restrict app access.
+        # The proxy expects the group to
+        # match the app id from the configuration.
+        'roles': (['admin', 'user']
+                  + user_app_perms if user.is_staff else ['user']
+                  + user_app_perms),
     })

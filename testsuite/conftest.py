@@ -70,3 +70,24 @@ def create_device():
         _reset_last_use(device)
         return device
     return create_device
+
+
+@pytest.fixture
+def use_liquid_apps(settings):
+    settings.LIQUID_APPS = [
+        {
+            'id': 'rocketchat',
+            'enabled': True,
+            'url': 'liquid.test.rocketchat',
+        },
+        {
+            'id': 'hoover',
+            'enabled': True,
+            'url': 'liquid.test.hoover'
+        },
+        {
+            'id': 'dokuwiki',
+            'enabled': True,
+            'url': 'liquid.test.dokuwiki',
+        },
+    ]
