@@ -34,7 +34,6 @@ def profile(request):
 
     user_email = user.get_username() + '@' + settings.LIQUID_DOMAIN
     user_app_perms = app_permissions(user)
-    print(user_app_perms)
 
     return JsonResponse({
         'id': user.get_username(),
