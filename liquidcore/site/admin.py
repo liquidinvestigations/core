@@ -1,5 +1,5 @@
 from django.conf import settings
-from django.contrib.auth.admin import User, UserAdmin
+from django.contrib.auth.admin import User, Group, UserAdmin, GroupAdmin
 from django.contrib.admin import site
 from django.forms import CheckboxSelectMultiple
 
@@ -42,9 +42,13 @@ class HooverUserAdmin(PermissionFilterMixin, UserAdmin):
     actions = []
 
     def get_form(self, request, obj=None, **kwargs):
-        form = super(UserAdmin, self).get_form(request, obj, **kwargs)
-        form.base_fields['user_permissions'].widget = CheckboxSelectMultiple()
+        form = super(HooverUserAdmin, self).get_form(request, obj, **kwargs)
+        if 'user_permissions' in form.base_fields:
+            form.base_fields['user_permissions'].widget = CheckboxSelectMultiple()
         return form
+
+    def user_app_permissions(self, obj):
+        return [perm.codename for perm in obj.user_permissions.all()]
 
     fieldsets = (
         (None, {'fields': ('username', 'password')}),
@@ -59,11 +63,23 @@ class HooverUserAdmin(PermissionFilterMixin, UserAdmin):
         ('Important dates', {'fields': ('last_login', 'date_joined')}),
     )
     list_display = ('username', 'email', 'first_name', 'last_name',
-                    'is_staff', 'last_login')
+                    'is_staff', 'last_login', 'user_app_permissions')
 
     if settings.LIQUID_2FA:
         from ..twofactor.invitations import create_invitations
         actions.append(create_invitations)
+
+
+class HooverGroupAdmin(PermissionFilterMixin, GroupAdmin):
+    def get_form(self, request, obj=None, **kwargs):
+        form = super(HooverGroupAdmin, self).get_form(request, obj, **kwargs)
+        form.base_fields['permissions'].widget = CheckboxSelectMultiple()
+        return form
+
+    def group_app_permissions(self, obj):
+        return [perm.codename for perm in obj.permissions.all()]
+
+    list_display = ('name', 'group_app_permissions',)
 
 
 liquid_admin = HooverAdminSite(name='liquidadmin')
@@ -74,11 +90,10 @@ for model, model_admin in site._registry.items():
     if model is User:
         model_admin_cls = HooverUserAdmin
 
+    if model is Group:
+        model_admin_cls = HooverGroupAdmin
+
     if model._meta.app_label == 'otp_totp':
         continue
 
     liquid_admin.register(model, model_admin_cls)
-
-
-site.unregister(User)
-site.register(User, HooverUserAdmin)
