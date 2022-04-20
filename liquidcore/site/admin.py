@@ -14,7 +14,7 @@ class HooverAdminSite(AdminSite):
 
 
 class PermissionFilterMixin(object):
-    '''Filter the permissions field in the admin panel to show only app permisssions.
+    '''Filter permissions field in the admin panel to show only app permisssions.
 
     Changes the manytomany formfield for the django permissions, by filtering
     all permissions but the ones to allow app usage.
@@ -25,7 +25,8 @@ class PermissionFilterMixin(object):
             qs = _filter_permissions(qs)
             kwargs['queryset'] = qs
 
-        return super(PermissionFilterMixin, self).formfield_for_manytomany(db_field, request, **kwargs)
+        return super(PermissionFilterMixin, self).formfield_for_manytomany(
+            db_field, request, **kwargs)
 
 
 def _filter_permissions(qs):
@@ -34,8 +35,16 @@ def _filter_permissions(qs):
     Gets a queryset as input and filters it based on the LIQUID_APPS setting.
     '''
     return qs.filter(codename__in=(
-        [f'use_{perm}' for perm in [app['id'] for app in settings.LIQUID_APPS if app['enabled']]]
+        [f'use_{perm}' for perm in
+         [app['id']for app in settings.LIQUID_APPS if app['enabled']]]
     ))
+
+
+def all_permissions():
+    '''Helper function that returns a set of all app permissions as strings.'''
+    return {f'home.use_{perm}' for perm in
+            [app['id'] for app in settings.LIQUID_APPS
+             if app['enabled'] and not app['adminOnly']]}
 
 
 class HooverUserAdmin(PermissionFilterMixin, UserAdmin):
@@ -44,11 +53,22 @@ class HooverUserAdmin(PermissionFilterMixin, UserAdmin):
     def get_form(self, request, obj=None, **kwargs):
         form = super(HooverUserAdmin, self).get_form(request, obj, **kwargs)
         if 'user_permissions' in form.base_fields:
-            form.base_fields['user_permissions'].widget = CheckboxSelectMultiple()
+            form.base_fields['user_permissions']\
+                .widget = CheckboxSelectMultiple()
         return form
 
     def user_app_permissions(self, obj):
         return [perm.codename for perm in obj.user_permissions.all()]
+
+    def group_permissions(self, obj):
+        perm_set = obj.get_group_permissions()
+        if all_permissions().issubset(perm_set):
+            return 'All app permissions.'
+        if perm_set:
+            return [perm.split('.')[1] for perm in perm_set
+                    if perm in all_permissions()]
+        else:
+            return '-'
 
     fieldsets = (
         (None, {'fields': ('username', 'password')}),
@@ -58,12 +78,16 @@ class HooverUserAdmin(PermissionFilterMixin, UserAdmin):
                        'is_staff',
                        'is_superuser',
                        'groups',
-                       'user_permissions'),
+                       'group_permissions',
+                       'user_permissions',
+                       ),
         }),
         ('Important dates', {'fields': ('last_login', 'date_joined')}),
     )
     list_display = ('username', 'email', 'first_name', 'last_name',
                     'is_staff', 'last_login', 'user_app_permissions')
+
+    readonly_fields = ('group_permissions',)
 
     if settings.LIQUID_2FA:
         from ..twofactor.invitations import create_invitations
