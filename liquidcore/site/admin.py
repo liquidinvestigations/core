@@ -53,8 +53,8 @@ class HooverUserAdmin(PermissionFilterMixin, UserAdmin):
     def get_form(self, request, obj=None, **kwargs):
         form = super(HooverUserAdmin, self).get_form(request, obj, **kwargs)
         if 'user_permissions' in form.base_fields:
-            form.base_fields['user_permissions']\
-                .widget = CheckboxSelectMultiple()
+            form.base_fields['user_permissions'].widget = (
+                CheckboxSelectMultiple())
         return form
 
     def user_app_permissions(self, obj):
