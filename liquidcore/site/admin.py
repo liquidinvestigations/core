@@ -60,7 +60,7 @@ class HooverUserAdmin(PermissionFilterMixin, UserAdmin):
     def user_app_permissions(self, obj):
         return [perm.codename for perm in obj.user_permissions.all()]
 
-    def group_permissions(self, obj):
+    def app_permissions_from_groups(self, obj):
         perm_set = obj.get_group_permissions()
         if all_permissions().issubset(perm_set):
             return 'All app permissions.'
@@ -78,16 +78,18 @@ class HooverUserAdmin(PermissionFilterMixin, UserAdmin):
                        'is_staff',
                        'is_superuser',
                        'groups',
-                       'group_permissions',
+                       'app_permissions_from_groups',
                        'user_permissions',
                        ),
         }),
         ('Important dates', {'fields': ('last_login', 'date_joined')}),
     )
     list_display = ('username', 'email', 'first_name', 'last_name',
-                    'is_staff', 'last_login', 'user_app_permissions')
+                    'is_staff', 'is_superuser',
+                    'last_login', 'user_app_permissions',
+                    'app_permissions_from_groups')
 
-    readonly_fields = ('group_permissions',)
+    readonly_fields = ('app_permissions_from_groups',)
 
     if settings.LIQUID_2FA:
         from ..twofactor.invitations import create_invitations
