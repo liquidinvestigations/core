@@ -109,6 +109,7 @@ class HooverGroupAdmin(PermissionFilterMixin, GroupAdmin):
 liquid_admin = HooverAdminSite(name='liquidadmin')
 
 for model, model_admin in site._registry.items():
+    print(model, model_admin)
     model_admin_cls = type(model_admin)
 
     if model is User:
@@ -118,6 +119,9 @@ for model, model_admin in site._registry.items():
         model_admin_cls = HooverGroupAdmin
 
     if model._meta.app_label == 'otp_totp':
+        continue
+
+    if model._meta.app_label == 'oauth2_provider':
         continue
 
     liquid_admin.register(model, model_admin_cls)
