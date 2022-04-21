@@ -109,7 +109,6 @@ class HooverGroupAdmin(PermissionFilterMixin, GroupAdmin):
 liquid_admin = HooverAdminSite(name='liquidadmin')
 
 for model, model_admin in site._registry.items():
-    print(model, model_admin)
     model_admin_cls = type(model_admin)
 
     if model is User:
