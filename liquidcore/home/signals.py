@@ -10,6 +10,7 @@ from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
 
 from .auth import kill_sessions
+from . import sessions
 
 log = logging.getLogger(__name__)
 USERNAME_CHARS = string.ascii_letters + string.digits + '.'
@@ -62,3 +63,10 @@ def add_default_permissions(sender, instance, created, **kwargs):
         instance.user_permissions.add(rocketchat_perm)
         instance.user_permissions.add(hypothesis_perm)
         instance.save()
+
+
+@receiver(user_logged_out)
+def delete_authproxy_sessions(user, **kwargs):
+    print(user)
+    print(kwargs)
+    sessions.clear_authproxy_session(user.username)

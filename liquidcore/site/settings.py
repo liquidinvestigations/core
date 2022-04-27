@@ -156,3 +156,5 @@ OAUTH2_PROVIDER = {
     },
     'DEFAULT_SCOPES': ['read', 'write'],
 }
+
+AUTHPROXY_REDIS_URL = os.getenv('AUTHPROXY_REDIS_URL')
