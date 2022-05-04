@@ -14,8 +14,7 @@ def clear_authproxy_session(username):
 
     for app_id in APP_REDIS_IDS.values():
         if settings.AUTHPROXY_REDIS_URL:
-            r = redis.from_url('redis://'
-                               + settings.AUTHPROXY_REDIS_URL + app_id)
+            r = redis.from_url(settings.AUTHPROXY_REDIS_URL + str(app_id))
             for key in r.scan_iter():
                 if r.get(key).startswith(username.encode()):
                     r.delete(key)
