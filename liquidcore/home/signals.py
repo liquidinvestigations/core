@@ -6,10 +6,14 @@ import os
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Permission
 from django.contrib.auth.signals import user_logged_out
-from django.db.models.signals import post_save, pre_save
+from django.db.models.signals import (post_save,
+                                      pre_save,
+                                      pre_delete,
+                                      m2m_changed)
 from django.dispatch import receiver
 
 from .auth import kill_sessions
+from . import sessions
 
 log = logging.getLogger(__name__)
 USERNAME_CHARS = string.ascii_letters + string.digits + '.'
@@ -62,3 +66,37 @@ def add_default_permissions(sender, instance, created, **kwargs):
         instance.user_permissions.add(rocketchat_perm)
         instance.user_permissions.add(hypothesis_perm)
         instance.save()
+
+
+@receiver(user_logged_out)
+def delete_authproxy_sessions_logout(user, **kwargs):
+    sessions.clear_authproxy_session(user.username)
+    log.warning((f'Removed app sessions for user: "{user.username}" '
+                 'after logout.'))
+
+
+@receiver(pre_save, sender=User)
+def delete_authproxy_sessions_inactive(sender, instance, **kwargs):
+    if instance.id is None:
+        return
+    else:
+        previous = sender.objects.get(id=instance.id)
+        if previous.is_active and not instance.is_active:
+            sessions.clear_authproxy_session(instance.username)
+            log.warning((f'User "{instance.username}" disabled. '
+                         'Removed all app sessions.'))
+
+
+@receiver(pre_delete, sender=User)
+def delete_authproxy_sessions_delete(sender, instance, **kwargs):
+    sessions.clear_authproxy_session(instance.username)
+    log.warning((f'User "{instance.username}" deleted. '
+                 'Removed all app sessions.'))
+
+
+@receiver(m2m_changed, sender=User.user_permissions.through)
+def delete_authproxy_sessions_permissions(sender, instance, action, **kwargs):
+    if action == 'pre_remove':
+        sessions.clear_authproxy_session(instance.username)
+        log.warning((f'App permission removed from "{instance.username}". '
+                     'Removed all app sessions.'))
