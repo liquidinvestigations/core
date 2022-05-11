@@ -1,6 +1,7 @@
 from django.contrib.auth.models import Permission
 from django.urls import reverse
 import json
+import re
 
 APPS = ['hoover', 'nexctloud', 'rocketchat', 'codimd', 'dokuwiki']
 
@@ -46,9 +47,9 @@ def test_html(client, create_user, use_liquid_apps):
     client.login(username=user.username,
                  password=create_user.password)
     html = client.get(reverse('home')).content
-    assert 'liquid.test.rocketchat' in str(html)
-    assert 'liquid.test.hoover' not in str(html)
-    assert 'liquid.test.dokuwiki' not in str(html)
+    assert find_enabled_link(str(html), 'liquid.test.rocketchat')
+    assert not find_enabled_link(str(html), 'liquid.test.hoover')
+    assert not find_enabled_link(str(html), 'liquid.test.dokuwiki')
 
     permission = Permission.objects.get(codename='use_hoover')
     user.user_permissions.add(permission)
@@ -57,6 +58,11 @@ def test_html(client, create_user, use_liquid_apps):
     client.login(username=user.username,
                  password=create_user.password)
     new_html = client.get(reverse('home')).content
-    assert 'liquid.test.rocketchat' in str(new_html)
-    assert 'liquid.test.hoover' in str(new_html)
-    assert 'liquid.test.dokuwiki' not in str(new_html)
+    assert find_enabled_link(str(new_html), 'liquid.test.rocketchat')
+    assert find_enabled_link(str(new_html), 'liquid.test.hoover')
+    assert not find_enabled_link(str(new_html), 'liquid.test.dokuwiki')
+
+
+def find_enabled_link(html, app):
+    match = re.search(f'^.*{app}.*$')
+    return 'inactiveLink' not in match.group(0)
