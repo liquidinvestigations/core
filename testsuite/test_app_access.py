@@ -64,5 +64,5 @@ def test_html(client, create_user, use_liquid_apps):
 
 
 def find_enabled_link(html, app):
-    link_match = re.search(f'{app}" .*>', html)
+    link_match = re.search(f'{app}".*?>', html)
     return 'inactiveLink' not in link_match.group(0)
