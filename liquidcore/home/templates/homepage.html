@@ -25,16 +25,30 @@
 
 <p> Welcome to the Liquid Investigations Home Page. <small style="float: right;">{{liquid_core_version}} </small></p>
 
+<style>
+ .inactiveLink {
+     cursor: help;
+     color: #808080;
+ }
+ .inactiveLink:hover {
+     cursor: help;
+     color: #808080;
+ }
+</style>
 
 {% for app in liquid_apps%}
 <p>
     {% if app.enabled and 'home.use_'|add:app.id in perms %}
-    {% if app.adminOnly and user.is_superuser or not app.adminOnly  %}
+      {% if app.adminOnly and user.is_superuser or not app.adminOnly  %}
       <a href="{{app.url}}">{{app.title}}</a>
-      {{app.description}}
-      <small style="float: right;">{{app.version}}</small>
+        {{app.description}}
+        <small style="float: right;">{{app.version}}</small>
+      {% endif %}
+    {% elif not app.adminOnly %}
+        <a href="{{app.url}}" class="inactiveLink" onClick="return false" title={% if not app.enabled %}"Not enabled"{% else %}"No permission"{% endif %}>{{app.title}}</a>
+        {{app.description}}
+        <small style="float: right;">{{app.version}}</small>
     {% endif %}
-  {% endif %}
 </p>
 {% endfor %}
 
