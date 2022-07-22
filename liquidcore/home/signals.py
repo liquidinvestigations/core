@@ -9,7 +9,8 @@ from django.contrib.auth.signals import user_logged_out
 from django.db.models.signals import (post_save,
                                       pre_save,
                                       pre_delete,
-                                      m2m_changed)
+                                      m2m_changed,
+                                      post_delete)
 from django.dispatch import receiver
 
 from .auth import kill_sessions
@@ -54,6 +55,30 @@ def create_user_everywhere(sender, instance, created=None, **kwargs):
                 log.warning(f'Created liquid user "{instance.username}".')
         else:
             log.warning('No nomad address found to create liquid users!')
+
+
+@receiver(post_delete, sender=User)
+def delete_user_everywhere(sender, instance, **kwargs):
+    payload = {
+        "Meta": {
+            "USERNAME": instance.username
+        }
+    }
+    nomad_url = os.getenv('NOMAD_URL')
+    if nomad_url:
+        res = requests.post(
+            f'{nomad_url}/v1/job/liquid-deleteuser/dispatch',
+            json=payload
+        )
+        if res.status_code != 200:
+            log.warning(f'Error deleting user "{instance.username}".')
+            log.warning(
+                f'Nomad returned: {str(res.status_code)}, {res.text}'
+            )
+        else:
+            log.warning(f'Deleted liquid user "{instance.username}".')
+    else:
+        log.warning('No nomad address found to delete liquid users!')
 
 
 @receiver(post_save, sender=User)
