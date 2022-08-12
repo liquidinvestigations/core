@@ -6,10 +6,7 @@ import os
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Permission
 from django.contrib.auth.signals import user_logged_out
-from django.db.models.signals import (post_save,
-                                      pre_save,
-                                      pre_delete,
-                                      m2m_changed)
+from django.db.models import signals
 from django.dispatch import receiver
 
 from .auth import kill_sessions
@@ -25,13 +22,13 @@ def kill_user_sessions(user, **kwargs):
     kill_sessions(user=user)
 
 
-@receiver(pre_save, sender=User)
+@receiver(signals.pre_save, sender=User)
 def check_user_username(sender, instance, **kwargs):
     assert all(x in USERNAME_CHARS for x in instance.username), \
         f'Bad username: "{instance.username}"'
 
 
-@receiver(post_save, sender=User)
+@receiver(signals.post_save, sender=User)
 def create_user_everywhere(sender, instance, created=None, **kwargs):
     if created:
         payload = {
@@ -56,7 +53,31 @@ def create_user_everywhere(sender, instance, created=None, **kwargs):
             log.warning('No nomad address found to create liquid users!')
 
 
-@receiver(post_save, sender=User)
+@receiver(signals.post_delete, sender=User)
+def delete_user_everywhere(sender, instance, **kwargs):
+    payload = {
+        "Meta": {
+            "USERNAME": instance.username
+        }
+    }
+    nomad_url = os.getenv('NOMAD_URL')
+    if nomad_url:
+        res = requests.post(
+            f'{nomad_url}/v1/job/liquid-deleteuser/dispatch',
+            json=payload
+        )
+        if res.status_code != 200:
+            log.warning(f'Error deleting user "{instance.username}".')
+            log.warning(
+                f'Nomad returned: {str(res.status_code)}, {res.text}'
+            )
+        else:
+            log.warning(f'Deleted liquid user "{instance.username}".')
+    else:
+        log.warning('No nomad address found to delete liquid users!')
+
+
+@receiver(signals.post_save, sender=User)
 def add_default_permissions(sender, instance, created, **kwargs):
     '''Signal handler to add default permissions
     after user has been created.'''
@@ -75,7 +96,7 @@ def delete_authproxy_sessions_logout(user, **kwargs):
                  'after logout.'))
 
 
-@receiver(pre_save, sender=User)
+@receiver(signals.pre_save, sender=User)
 def delete_authproxy_sessions_inactive(sender, instance, **kwargs):
     if instance.id is None:
         return
@@ -87,14 +108,14 @@ def delete_authproxy_sessions_inactive(sender, instance, **kwargs):
                          'Removed all app sessions.'))
 
 
-@receiver(pre_delete, sender=User)
+@receiver(signals.pre_delete, sender=User)
 def delete_authproxy_sessions_delete(sender, instance, **kwargs):
     sessions.clear_authproxy_session(instance.username)
     log.warning((f'User "{instance.username}" deleted. '
                  'Removed all app sessions.'))
 
 
-@receiver(m2m_changed, sender=User.user_permissions.through)
+@receiver(signals.m2m_changed, sender=User.user_permissions.through)
 def delete_authproxy_sessions_permissions(sender, instance, action, **kwargs):
     if action == 'pre_remove':
         sessions.clear_authproxy_session(instance.username)
