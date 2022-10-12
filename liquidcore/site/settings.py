@@ -34,16 +34,18 @@ SECRET_KEY = os.environ.get('SECRET_KEY')
 liquid_http_protocol = os.environ.get('LIQUID_HTTP_PROTOCOL', 'http')
 LIQUID_DOMAIN = os.getenv("LIQUID_DOMAIN")
 LIQUID_TITLE = os.getenv('LIQUID_TITLE')
-service_address = os.environ.get('SERVICE_ADDRESS')
 LIQUID_2FA = bool_env(os.environ.get('LIQUID_2FA'))
 LIQUID_URL = f'{liquid_http_protocol}://{LIQUID_DOMAIN}'
 LIQUID_APPS = json.loads(os.environ.get('LIQUID_APPS', "null"))
 LIQUID_VERSION = os.getenv("LIQUID_VERSION")
 LIQUID_CORE_VERSION = os.getenv("LIQUID_CORE_VERSION")
 
-ALLOWED_HOSTS = [LIQUID_DOMAIN]
-if service_address:
-    ALLOWED_HOSTS.append(service_address)
+# Required as in multi-host setups, the oauth2 callbacks will use their
+# local IP address, which is not easy to set here.
+
+# This is OK because our service is only exposed behind Traefik,
+# and that takes care of restricting hosts from the outside.
+ALLOWED_HOSTS = ['*']
 
 INSTALLED_APPS = [
     'django.contrib.admin',
