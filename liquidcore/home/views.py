@@ -1,7 +1,14 @@
-from django.http import JsonResponse, HttpResponse
+import logging
+
+from django.http import JsonResponse, HttpResponse, StreamingHttpResponse
 from django.shortcuts import render
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.csrf import csrf_exempt
+
+import requests
+
+log = logging.getLogger(__name__)
 
 
 @login_required
@@ -52,3 +59,49 @@ def profile(request):
         # match the app id from the configuration.
         'roles': roles + user_app_perms,
     })
+
+
+@csrf_exempt
+@login_required
+def proxy_dashboards(request):
+    assert settings.LIQUID_ENABLE_DASHBOARDS
+    assert request.user.is_superuser and request.user.is_staff
+
+    url = None
+    headers = dict(request.headers)
+    for prefix in ['/snoop', '/grafana', '/_search_rabbit', '/_snoop_rabbit']:
+        if request.path.startswith(prefix):
+            url = settings.LIQUID_DASHBOARDS_PROXY_BASE_URL \
+                + request.get_full_path()
+            break
+    if not url:
+        for nomad_prefix in ['/ui', '/v1']:
+            if request.path.startswith(nomad_prefix):
+                url = settings.LIQUID_DASHBOARDS_PROXY_NOMAD_URL \
+                    + request.get_full_path()
+                break
+    # Consul does not work; maybe if we check referer headers.
+    if not url:
+        if request.path.startswith('/consul_ui'):
+            url = settings.LIQUID_DASHBOARDS_PROXY_CONSUL_URL \
+                + request.get_full_path()
+    assert url is not None
+
+    try:
+        response = requests.Session().send(
+                requests.Request(request.method, url,
+                                 headers=headers,
+                                 data=request.body).prepare(),
+                stream=True,
+                timeout=600,
+        )
+
+        streaming_resp = StreamingHttpResponse(
+            response.iter_content(chunk_size=1),
+            content_type=response.headers.get('content-type'),
+            status=response.status_code,
+            reason=response.reason)
+        return streaming_resp
+    except Exception as e:
+        log.exception(e)
+        raise

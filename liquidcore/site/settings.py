@@ -39,6 +39,13 @@ LIQUID_URL = f'{liquid_http_protocol}://{LIQUID_DOMAIN}'
 LIQUID_APPS = json.loads(os.environ.get('LIQUID_APPS', "null"))
 LIQUID_VERSION = os.getenv("LIQUID_VERSION")
 LIQUID_CORE_VERSION = os.getenv("LIQUID_CORE_VERSION")
+LIQUID_ENABLE_DASHBOARDS = os.getenv("LIQUID_ENABLE_DASHBOARDS")
+LIQUID_DASHBOARDS_PROXY_BASE_URL = \
+    os.getenv('LIQUID_DASHBOARDS_PROXY_BASE_URL')
+LIQUID_DASHBOARDS_PROXY_NOMAD_URL = \
+    os.getenv('LIQUID_DASHBOARDS_PROXY_NOMAD_URL')
+LIQUID_DASHBOARDS_PROXY_CONSUL_URL = \
+    os.getenv('LIQUID_DASHBOARDS_PROXY_CONSUL_URL')
 
 # Required as in multi-host setups, the oauth2 callbacks will use their
 # local IP address, which is not easy to set here.

@@ -1,5 +1,5 @@
 from django.conf import settings
-from django.urls import path, include
+from django.urls import path, include, re_path
 from .admin import liquid_admin
 from ..home import views
 from django.contrib.auth import views as auth_views
@@ -45,4 +45,25 @@ if settings.LIQUID_2FA:
              twofactor_views.totp_add, name='totp_add'),
         path('accounts/totp/remove/',
              twofactor_views.totp_remove, name='totp_remove'),
+    ] + urlpatterns
+
+if settings.LIQUID_ENABLE_DASHBOARDS:
+    urlpatterns = [
+        re_path(r'^grafana.*$', views.proxy_dashboards,
+                name='proxy-dashboard-grafana'),
+        re_path(r'^nomad.*$', views.proxy_dashboards,
+                name='proxy-dashboard-nomad'),
+        re_path(r'^_snoop_rabbit.*$', views.proxy_dashboards,
+                name='proxy-dashboard-snoop-rabbitmq'),
+        re_path(r'^_search_rabbit.*$', views.proxy_dashboards,
+                name='proxy-dashboard-search-rabbitmq'),
+        re_path(r'^snoop.*$', views.proxy_dashboards,
+                name='proxy-dashboard-snoop'),
+
+        re_path(r'^ui/.*$', views.proxy_dashboards,
+                name='proxy-dashboard-nomad-ui'),
+        re_path(r'^v1.*$', views.proxy_dashboards,
+                name='proxy-dashboard-nomad-v1'),
+        re_path(r'^consul_ui.*$', views.proxy_dashboards,
+                name='proxy-dashboard-consul-ui'),
     ] + urlpatterns
