@@ -53,6 +53,21 @@
 {% endfor %}
 
 
+{% if request.user.is_staff and request.user.is_superuser %}
+<p>
+  <a href="/grafana/dashboards">[superuser dashboard: Grafana]</a>
+</p>
+<p>
+  <a href="/_search_rabbit/">[superuser dashboard: search queue (hoover-search)]</a>
+</p>
+<p>
+  <a href="/_snoop_rabbit/">[superuser dashboard: processing queue (hoover-snoop2)]</a>
+</p>
+<p>
+  <a href="/snoop/">[superuser dashboard: processing (hoover-snoop) admin]</a>
+</p>
+{% endif %}
+
 {% endblock %}
 {% block headstyles %}
 <style>

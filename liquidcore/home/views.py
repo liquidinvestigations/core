@@ -1,7 +1,10 @@
-from django.http import JsonResponse, HttpResponse
+from django.http import JsonResponse, HttpResponse, StreamingHttpResponse
 from django.shortcuts import render
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.csrf import csrf_exempt
+
+import requests
 
 
 @login_required
@@ -52,3 +55,37 @@ def profile(request):
         # match the app id from the configuration.
         'roles': roles + user_app_perms,
     })
+
+
+@csrf_exempt
+@login_required
+def proxy_dashboards(request):
+    assert settings.LIQUID_ENABLE_DASHBOARDS
+    user = request.user
+    assert user.is_superuser and user.is_staff
+
+    url = None
+    headers = dict(request.headers)
+    for prefix in ['/snoop', '/grafana', '/_search_rabbit', '/_snoop_rabbit']:
+        if request.path.startswith(prefix):
+            url = settings.LIQUID_DASHBOARDS_PROXY_BASE_URL \
+                + request.get_full_path()
+            break
+    if not url:
+        for nomad_prefix in ['/ui', '/v1']:
+            if request.path.startswith(nomad_prefix):
+                url = settings.LIQUID_DASHBOARDS_PROXY_NOMAD_URL \
+                    + request.get_full_path()
+                # headers['Transfer-Encoding'] = 'chunked'
+                break
+    assert url is not None
+
+    response = requests.get(url, stream=True, headers=headers)
+    streaming_resp = StreamingHttpResponse(
+        response.raw,
+        content_type=response.headers.get('content-type'),
+        status=response.status_code,
+        reason=response.reason)
+    for key, value in response.headers.items():
+        streaming_resp[key] = value
+    return streaming_resp
