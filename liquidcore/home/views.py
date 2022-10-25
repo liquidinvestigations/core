@@ -18,6 +18,7 @@ def homepage(request):
         'liquid_apps': settings.LIQUID_APPS,
         'liquid_version': settings.LIQUID_VERSION,
         'liquid_core_version': settings.LIQUID_CORE_VERSION,
+        'liquid_enable_dashboards': settings.LIQUID_ENABLE_DASHBOARDS,
         '2fa_enabled': settings.LIQUID_2FA,
     })
 

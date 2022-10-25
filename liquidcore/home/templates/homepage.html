@@ -34,6 +34,9 @@
      cursor: help;
      color: #808080;
  }
+ .inactiveP {
+     color: #808080;
+ }
 </style>
 
 {% for app in liquid_apps%}
@@ -53,7 +56,7 @@
 {% endfor %}
 
 
-{% if request.user.is_staff and request.user.is_superuser %}
+{% if request.user.is_staff and request.user.is_superuser and liquid_enable_dashboards %}
 <p>
   superuser / admin dashboards:
   <a href="/grafana/dashboards">[Grafana]</a> &nbsp;
@@ -62,6 +65,10 @@
   <a href="/_search_rabbit/">[Search Queue]</a> &nbsp;
   <a href="/_snoop_rabbit/">[Processing Queue]</a> &nbsp;
   <a href="/snoop/">[Processing Admin]</a> &nbsp;
+</p>
+{% else %}
+<p class=inactiveP>
+  superuser / admin dashboards: not enabled.
 </p>
 {% endif %}
 
