@@ -6,6 +6,7 @@ import os
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Permission
 from django.contrib.auth.signals import user_logged_out
+from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import signals
 from django.dispatch import receiver
 
@@ -101,7 +102,10 @@ def delete_authproxy_sessions_inactive(sender, instance, **kwargs):
     if instance.id is None:
         return
     else:
-        previous = sender.objects.get(id=instance.id)
+        try:
+            previous = sender.objects.get(id=instance.id)
+        except User.DoesNotExist:
+            return
         if previous.is_active and not instance.is_active:
             sessions.clear_authproxy_session(instance.username)
             log.warning((f'User "{instance.username}" disabled. '
