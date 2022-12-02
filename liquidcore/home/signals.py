@@ -101,7 +101,10 @@ def delete_authproxy_sessions_inactive(sender, instance, **kwargs):
     if instance.id is None:
         return
     else:
-        previous = sender.objects.get(id=instance.id)
+        try:
+            previous = sender.objects.get(id=instance.id)
+        except User.DoesNotExist:
+            return
         if previous.is_active and not instance.is_active:
             sessions.clear_authproxy_session(instance.username)
             log.warning((f'User "{instance.username}" disabled. '
