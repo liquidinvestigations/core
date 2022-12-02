@@ -6,7 +6,6 @@ import os
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Permission
 from django.contrib.auth.signals import user_logged_out
-from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import signals
 from django.dispatch import receiver
 
