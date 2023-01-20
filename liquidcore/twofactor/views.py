@@ -5,6 +5,7 @@ from . import devices
 from . import invitations
 import django_otp
 from django.conf import settings
+from django.utils.timezone import now
 from django_otp.plugins.otp_totp.models import TOTPDevice
 from django.contrib.auth import authenticate
 from django.contrib.auth.decorators import login_required
@@ -34,6 +35,10 @@ def invitation(request, code):
         return render(request, 'totp-invitation-loggedin.html',
                       {'timeout': settings.LIQUID_2FA_INVITATION_VALID})
 
+    if invitation.state == 'opened' and request.method == 'GET':
+        return render(request, 'totp-invitation-opened.html',
+                      {'timestamp': invitation.opened_at})
+
     bad_token = None
     bad_username = False
     bad_password = False
@@ -59,6 +64,9 @@ def invitation(request, code):
     png_data = b64encode(devices.qr_png(device, username)).decode('utf8')
     otp_png = 'data:image/png;base64,' + png_data
 
+    invitation.opened = True
+    invitation.opened_at = now()
+    invitation.save()
     return render(request, 'totp-invitation-form.html', {
         'username': username,
         'otp_png': otp_png,

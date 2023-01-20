@@ -2,6 +2,7 @@ import random
 import math
 from django.conf import settings
 from django.db import models
+from django.utils.timezone import now
 from django_otp.plugins.otp_totp.models import TOTPDevice
 
 VOCABULARY = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
@@ -22,14 +23,19 @@ class Invitation(models.Model):
     )
     code = models.CharField(max_length=200, default=random_code)
     expires = models.DateTimeField()
-    STATE_CHOICES = [
-        ('valid', 'valid'),
-        ('used', 'used'),
-        ('expired', 'expired'),
-    ]
-    state = models.CharField(max_length=200,
-                             choices=STATE_CHOICES,
-                             default='valid')
+    opened = models.BooleanField(default=False)
+    opened_at = models.DateTimeField(null=True)
+    used = models.BooleanField(default=False)
+
+    @property
+    def state(self):
+        if self.used:
+            return 'used'
+        if self.opened:
+            return 'opened'
+        if now() > self.expires:
+            return 'expired'
+        return 'valid'
 
 
 class TOTPDeviceTimed(TOTPDevice):

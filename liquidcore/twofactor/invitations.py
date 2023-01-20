@@ -27,7 +27,6 @@ def invite(username, duration, operator=None, create=False):
 
 def get(code):
     '''Checks if an invitation is expired and returns the invitation.'''
-    now_time = now()
     invitation = (
         models.Invitation.objects
         .select_for_update()
@@ -36,10 +35,6 @@ def get(code):
 
     if invitation is None:
         return None
-
-    if now_time > invitation.expires:
-        invitation.state = 'expired'
-        invitation.save()
 
     return invitation
 
@@ -63,7 +58,7 @@ def accept(request, invitation, device, password):
     device.confirmed = True
     device.save()
     devices.delete_all(user, keep=device)
-    invitation.state = 'used'
+    invitation.used = True
     invitation.save()
     user2 = authenticate(username=user.get_username(), password=password)
     assert user2
