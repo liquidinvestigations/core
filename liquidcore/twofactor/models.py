@@ -22,6 +22,12 @@ class Invitation(models.Model):
     )
     code = models.CharField(max_length=200, default=random_code)
     expires = models.DateTimeField()
+    STATE_CHOICES = [
+        ('valid', 'valid'),
+        ('used', 'used'),
+        ('expired', 'expired'),
+    ]
+    state = models.CharField(max_length=200, choices=STATE_CHOICES, default='valid')
 
 
 class TOTPDeviceTimed(TOTPDevice):

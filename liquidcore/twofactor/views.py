@@ -4,6 +4,7 @@ from django.shortcuts import render
 from . import devices
 from . import invitations
 import django_otp
+from django.conf import settings
 from django_otp.plugins.otp_totp.models import TOTPDevice
 from django.contrib.auth import authenticate
 from django.contrib.auth.decorators import login_required
@@ -19,7 +20,20 @@ def get_png(user, device):
 
 @transaction.atomic
 def invitation(request, code):
-    invitation = invitations.get_or_404(code)
+    invitation = invitations.get(code)
+
+    if not invitation:
+        return render(request, 'totp-invitation-nonexistent.html')
+
+    if invitation.state == 'expired':
+        return render(request, 'totp-invitation-expired.html',
+                      {'timeout': settings.LIQUID_2FA_INVITATION_VALID})
+    if invitation.state == 'used':
+        return render(request, 'totp-invitation-used.html')
+    if invitation.state == 'valid' and request.user.is_authenticated:
+        return render(request, 'totp-invitation-loggedin.html',
+                      {'timeout': settings.LIQUID_2FA_INVITATION_VALID})
+
     bad_token = None
     bad_username = False
     bad_password = False
@@ -107,7 +121,7 @@ def change_totp(request, add=False):
 
 def get_devices(user):
     qs = TOTPDevice.objects.devices_for_user(user) \
-         .select_related('totpdevicetimed')
+                           .select_related('totpdevicetimed')
     DeviceTimed = namedtuple('DeviceTimed', ['device', 'time'])
     for d in qs:
         try:

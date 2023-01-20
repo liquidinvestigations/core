@@ -1,7 +1,6 @@
 from django.db import transaction
 from datetime import timedelta
 from django.conf import settings
-from django.http import Http404
 from django.contrib.auth import authenticate, login, get_user_model
 from django.utils.timezone import now
 from django.shortcuts import render
@@ -26,20 +25,23 @@ def invite(username, duration, operator=None, create=False):
     return f'{settings.LIQUID_URL}/invitation/{invitation.code}'
 
 
-def get_or_404(code):
+def get(code):
+    '''Checks if an invitation is expired and returns the invitation.'''
     now_time = now()
-    invitations = (
+    invitation = (
         models.Invitation.objects
         .select_for_update()
         .filter(code=code)
-    )
+    ).first()
 
-    invitation = None
-    for invitation in invitations:
-        if invitation.expires > now_time:
-            return invitation
+    if invitation is None:
+        return None
 
-    raise Http404()
+    if now_time > invitation.expires:
+        invitation.state = 'expired'
+        invitation.save()
+
+    return invitation
 
 
 def device_for_session(request, invitation):
@@ -61,7 +63,8 @@ def accept(request, invitation, device, password):
     device.confirmed = True
     device.save()
     devices.delete_all(user, keep=device)
-    invitation.delete()
+    invitation.state = 'used'
+    invitation.save()
     user2 = authenticate(username=user.get_username(), password=password)
     assert user2
     login(request, user2)

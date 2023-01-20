@@ -2,11 +2,13 @@ from django import forms
 from django.conf import settings
 from django.contrib.auth.admin import User, Group, UserAdmin, GroupAdmin
 from django.contrib.admin.widgets import FilteredSelectMultiple
-from django.contrib.admin import site
 from django.forms import CheckboxSelectMultiple, ModelForm
+from django.contrib.admin import site, ModelAdmin
+from django.utils.timezone import now
 
 if settings.LIQUID_2FA:
     from django_otp.admin import OTPAdminSite as AdminSite
+    from ..twofactor.models import Invitation
 else:
     from django.contrib.admin import AdminSite
 
@@ -145,6 +147,27 @@ class HooverGroupAdmin(PermissionFilterMixin, GroupAdmin):
     list_display = ('name', 'group_app_permissions',)
 
 
+class InvitationAdmin(ModelAdmin):
+    list_display = ('user', 'get_url', 'expires', 'time_left', 'state')
+
+    def get_url(self, invitation):
+        return f'{settings.LIQUID_URL}/invitation/{invitation.code}'
+
+    def time_left(self, invitation):
+        if (invitation.expires) < now():
+            invitation.state = 'expired'
+            invitation.save()
+            return 0
+        else:
+            return f'{int((invitation.expires - now()).total_seconds() / 60)} min'
+
+    def has_add_permission(self, request, obj=None):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+
 liquid_admin = HooverAdminSite(name='liquidadmin')
 
 for model, model_admin in site._registry.items():
@@ -163,3 +186,6 @@ for model, model_admin in site._registry.items():
         continue
 
     liquid_admin.register(model, model_admin_cls)
+
+if settings.LIQUID_2FA:
+    liquid_admin.register(Invitation, InvitationAdmin)
