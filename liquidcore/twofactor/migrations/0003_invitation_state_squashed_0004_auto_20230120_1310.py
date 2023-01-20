@@ -5,7 +5,8 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    replaces = [('twofactor', '0003_invitation_state'), ('twofactor', '0004_auto_20230120_1310')]
+    replaces = [('twofactor', '0003_invitation_state'),
+                ('twofactor', '0004_auto_20230120_1310')]
 
     dependencies = [
         ('twofactor', '0002_totpdevicetimed'),
@@ -15,6 +16,9 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='invitation',
             name='state',
-            field=models.CharField(choices=[('valid', 'valid'), ('used', 'used'), ('expired', 'expired')], default='valid', max_length=200),
+            field=models.CharField(choices=[('valid', 'valid'),
+                                            ('used', 'used'),
+                                            ('expired', 'expired')],
+                                   default='valid', max_length=200),
         ),
     ]

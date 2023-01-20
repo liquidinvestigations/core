@@ -159,7 +159,8 @@ class InvitationAdmin(ModelAdmin):
             invitation.save()
             return 0
         else:
-            return f'{int((invitation.expires - now()).total_seconds() / 60)} min'
+            minutes_left = int((invitation.expires - now()).total_seconds() / 60)
+            return f'{minutes_left} min'
 
     def has_add_permission(self, request, obj=None):
         return False
