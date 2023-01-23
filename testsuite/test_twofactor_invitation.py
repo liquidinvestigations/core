@@ -57,12 +57,14 @@ def test_flow(
     print(resp.content)
 
     if expired:
-        assert 'totp-invitation-expired.html' in (t.name for t in resp.templates)
+        assert 'totp-invitation-expired.html' in (t.name for
+                                                  t in resp.templates)
         return
 
     if opened:
         resp2 = client.get(url)
-        assert 'totp-invitation-opened.html' in (t.name for t in resp2.templates)
+        assert 'totp-invitation-opened.html' in (t.name for
+                                                 t in resp2.templates)
         return
 
     [device] = TOTPDevice.objects.all()
