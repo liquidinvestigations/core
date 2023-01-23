@@ -17,6 +17,7 @@ def mock_time(monkeypatch):
     t = now()
     patch = monkeypatch.setattr
     patch('liquidcore.twofactor.invitations.now', lambda: t)
+    patch('liquidcore.twofactor.models.now', lambda: t)
     patch('django_otp.plugins.otp_totp.models.time', mock_time)
 
     def set_time(value):
@@ -28,34 +29,44 @@ def mock_time(monkeypatch):
 
 
 @pytest.mark.parametrize(
-    'minutes,username_ok,password_ok,code_ok,invitation,success',
+    'minutes,username_ok,password_ok,code_ok,success,expired,opened,used',
     [
-        (10, True, True, True, True, True),
-        (40, True, True, True, False, False),
-        (10, False, True, True, True, False),
-        (10, True, False, True, True, False),
-        (10, True, True, False, True, False),
+        (10, True, True, True, True, False, False, False),
+        (10, True, True, True, True, False, True, False),
+        (10, True, True, True, True, False, False, True),
+        (40, True, True, True, False, True, False, False),
+        (10, False, True, True, False, False, False, False),
+        (10, True, False, True, False, False, False, False),
+        (10, True, True, False, False, False, False, False),
     ])
 def test_flow(
         client, mock_time, minutes, username_ok, password_ok, code_ok,
-        invitation, success,
-        ):
+        success, expired, opened, used
+):
 
     t0 = datetime(2016, 6, 13, 12, 0, 0, tzinfo=utc)
     t1 = t0 + timedelta(minutes=minutes)
 
     mock_time(t0)
+    print(now())
     url = invitations.invite('john', INVITATION_DURATION, create=True)
     assert not is_logged_in(client)
 
     mock_time(t1)
-    client.get(url)
+    resp = client.get(url)
+    print(resp.content)
 
-    if not invitation:
-        assert TOTPDevice.objects.count() == 0
+    if expired:
+        assert 'totp-invitation-expired.html' in (t.name for t in resp.templates)
+        return
+
+    if opened:
+        resp2 = client.get(url)
+        assert 'totp-invitation-opened.html' in (t.name for t in resp2.templates)
         return
 
     [device] = TOTPDevice.objects.all()
+
     hour = timedelta(hours=1)
     resp = client.post(url, {
         'username': 'john' if username_ok else 'ramirez',
@@ -70,6 +81,10 @@ def test_flow(
 
     else:
         assert not is_logged_in(client)
+
+    if used:
+        resp3 = client.get(url)
+        assert 'totp-invitation-used.html' in (t.name for t in resp3.templates)
 
 
 def _accept(client, invitation, password, mock_now=None):
