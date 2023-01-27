@@ -21,6 +21,7 @@ def get_png(user, device):
 
 @transaction.atomic
 def invitation(request, code):
+    print(request.session.items())
     invitation = invitations.get(code)
 
     if not invitation:

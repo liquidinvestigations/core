@@ -16,6 +16,10 @@ def random_code():
     return ''.join(urandom.choice(VOCABULARY) for _ in range(chars))
 
 
+class TOTPDeviceTimed(TOTPDevice):
+    created = models.DateTimeField(auto_now_add=True)
+
+
 class Invitation(models.Model):
     user = models.OneToOneField(
         settings.AUTH_USER_MODEL,
@@ -25,6 +29,9 @@ class Invitation(models.Model):
     expires = models.DateTimeField()
     opened_at = models.DateTimeField(null=True)
     used = models.BooleanField(default=False)
+    device = models.OneToOneField(TOTPDeviceTimed,
+                                  null=True,
+                                  on_delete=models.SET_NULL)
 
     @property
     def state(self):
@@ -35,7 +42,3 @@ class Invitation(models.Model):
         if now() > self.expires:
             return 'expired'
         return 'valid'
-
-
-class TOTPDeviceTimed(TOTPDevice):
-    created = models.DateTimeField(auto_now_add=True)

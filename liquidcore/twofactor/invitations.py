@@ -40,13 +40,20 @@ def get(code):
 
 
 def device_for_session(request, invitation):
-    user = invitation.user
-    device_id = request.session.get('invitation_device_id')
-    if device_id:
-        return devices.get(user, device_id)
+    '''Creates a fresh device for a user for each invitation.
 
+    Also removes all old devices first so that multiple invitations
+    don't lead to multiple devices for that user.
+    If the invitation is already associated to a device returns that
+    device.
+    '''
+    if invitation.device:
+        return invitation.device
+    user = invitation.user
+    devices.delete_all(user)
     device = devices.create(user)
-    request.session['invitation_device_id'] = device.id
+    invitation.device = device
+    invitation.save()
     return device
 
 

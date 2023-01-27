@@ -1,0 +1,21 @@
+{% extends "admin/change_form.html" %}
+{% load i18n %}
+{% load 2fa_enabled_tag %}
+
+
+{% block form_top %}
+{% liquid_2fa as liquid_2fa %}
+{% if not is_popup %}
+{% if liquid_2fa %}
+<p>{% translate 'First, enter a username. Then, you’ll be able to edit more user options.' %}</p>
+{% else %}
+<p>{% translate 'First, enter a username and password. Then, you’ll be able to edit more user options.' %}</p>
+{% endif %}
+{% else %}
+{% if liquid_2fa %}
+<p>{% translate "Enter a username." %}</p>
+{% else %}
+<p>{% translate "Enter a username and password." %}</p>
+{% endif %}
+{% endif %}
+{% endblock %}
