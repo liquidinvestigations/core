@@ -21,9 +21,9 @@ qrcode = "*"
 Pillow = "*"
 pytest-forked = "*"
 redis = "*"
-uptrace = "*"
+opentelemetry-instrumentation-sqlite3 = "<=0.31b0"  # https://github.com/open-telemetry/opentelemetry-python-contrib/issues/1179
 opentelemetry-instrumentation-django = "*"
-opentelemetry-instrumentation-sqlite3 = "*"
+uptrace = "*"
 
 [requires]
 python_version = "3.9"
