@@ -5,7 +5,7 @@ import sys
 import uptrace
 from opentelemetry.instrumentation.django import DjangoInstrumentor
 from opentelemetry.instrumentation.sqlite3 import SQLite3Instrumentor
-# from opentelemetry.instrumentation.logging import LoggingInstrumentor
+from opentelemetry.instrumentation.logging import LoggingInstrumentor
 
 
 if __name__ == "__main__":
@@ -15,7 +15,7 @@ if __name__ == "__main__":
             service_name="liquidcore",
             service_version="0.0.0",
         )
-        # LoggingInstrumentor().instrument(set_logging_format=True)
+        LoggingInstrumentor().instrument(set_logging_format=True)
         SQLite3Instrumentor().instrument()
         DjangoInstrumentor().instrument()
     try:

@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "35dd04a5286af40efde3a157875721b5afb0de46520cd624be6e660d408e9299"
+            "sha256": "3f61fcd4f30c377b8cce206d865890d00a42d6368a13e468f30c52ee49d35209"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -347,6 +347,14 @@
             "hashes": [
                 "sha256:4d6c75f01e60cae45bf09f3445533b6473b8f8b5b884d5ea4af97f06cf9429e2",
                 "sha256:6e8bcd3985b22979ba27079943dd8ce2ade204fb979585d4445e8af41159e4d8"
+            ],
+            "index": "pypi",
+            "version": "==0.30b1"
+        },
+        "opentelemetry-instrumentation-logging": {
+            "hashes": [
+                "sha256:a737a2b7736126a044352f82d3b3d5d8f401a6d4ed1cef262f1cde11ae57fa53",
+                "sha256:ef3277210ecd5b5c4656b2f838786eca42e3431cf1ef74b376fb28698823dfc2"
             ],
             "index": "pypi",
             "version": "==0.30b1"

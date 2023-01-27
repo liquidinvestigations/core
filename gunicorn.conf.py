@@ -3,7 +3,7 @@ import os
 import uptrace
 from opentelemetry.instrumentation.django import DjangoInstrumentor
 from opentelemetry.instrumentation.sqlite3 import SQLite3Instrumentor
-# from opentelemetry.instrumentation.logging import LoggingInstrumentor
+from opentelemetry.instrumentation.logging import LoggingInstrumentor
 
 
 def post_fork(server, worker):
@@ -17,6 +17,6 @@ def post_fork(server, worker):
                 service_name="liquidcore",
                 service_version="0.0.0",
             )
-            # LoggingInstrumentor().instrument(set_logging_format=True)
+            LoggingInstrumentor().instrument(set_logging_format=True)
             SQLite3Instrumentor().instrument()
             DjangoInstrumentor().instrument()
