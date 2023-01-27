@@ -23,6 +23,7 @@ pytest-forked = "*"
 redis = "*"
 uptrace = "*"
 opentelemetry-instrumentation-django = "*"
+opentelemetry-instrumentation-sqlite3 = "*"
 
 [requires]
 python_version = "3.9"
