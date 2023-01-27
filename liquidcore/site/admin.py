@@ -155,7 +155,7 @@ class InvitationAdmin(ModelAdmin):
 
     def time_left(self, invitation):
         if (invitation.expires) < now():
-            return 0
+            return ''
         else:
             minutes_left = int((invitation.expires - now())
                                .total_seconds() / 60)

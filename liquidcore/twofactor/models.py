@@ -23,7 +23,6 @@ class Invitation(models.Model):
     )
     code = models.CharField(max_length=200, default=random_code)
     expires = models.DateTimeField()
-    opened = models.BooleanField(default=False)
     opened_at = models.DateTimeField(null=True)
     used = models.BooleanField(default=False)
 
@@ -31,7 +30,7 @@ class Invitation(models.Model):
     def state(self):
         if self.used:
             return 'used'
-        if self.opened:
+        if self.opened_at:
             return 'opened'
         if now() > self.expires:
             return 'expired'

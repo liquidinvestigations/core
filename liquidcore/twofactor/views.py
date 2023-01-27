@@ -24,20 +24,23 @@ def invitation(request, code):
     invitation = invitations.get(code)
 
     if not invitation:
-        return render(request, 'totp-invitation-nonexistent.html')
+        return render(request, 'totp-invitation-nonexistent.html', status=404)
 
     if invitation.state == 'expired':
         return render(request, 'totp-invitation-expired.html',
-                      {'timeout': settings.LIQUID_2FA_INVITATION_VALID})
+                      {'timeout': settings.LIQUID_2FA_INVITATION_VALID},
+                      status=403)
     if invitation.state == 'used':
-        return render(request, 'totp-invitation-used.html')
+        return render(request, 'totp-invitation-used.html', status=403)
     if invitation.state == 'valid' and request.user.is_authenticated:
         return render(request, 'totp-invitation-loggedin.html',
-                      {'timeout': settings.LIQUID_2FA_INVITATION_VALID})
+                      {'timeout': settings.LIQUID_2FA_INVITATION_VALID},
+                      status=403)
 
     if invitation.state == 'opened' and request.method == 'GET':
         return render(request, 'totp-invitation-opened.html',
-                      {'timestamp': invitation.opened_at})
+                      {'timestamp': invitation.opened_at},
+                      status=403)
 
     bad_token = None
     bad_username = False
