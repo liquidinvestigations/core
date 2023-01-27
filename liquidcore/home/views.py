@@ -70,7 +70,10 @@ def proxy_dashboards(request):
 
     url = None
     headers = dict(request.headers)
-    for prefix in ['/snoop', '/grafana', '/_search_rabbit', '/_snoop_rabbit', '/uptrace']:
+    for prefix in [
+                    '/snoop', '/grafana', '/_search_rabbit',
+                    '/_snoop_rabbit', '/uptrace',
+                ]:
         if request.path.startswith(prefix):
             url = settings.LIQUID_DASHBOARDS_PROXY_BASE_URL \
                 + request.get_full_path()

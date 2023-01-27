@@ -14,7 +14,8 @@ class HooverAdminSite(AdminSite):
 
 
 class PermissionFilterMixin(object):
-    '''Filter permissions field in the admin panel to show only app permisssions.
+    '''Filter permissions field in the admin panel to show only app
+    permisssions.
 
     Changes the manytomany formfield for the django permissions, by filtering
     all permissions but the ones to allow app usage.
