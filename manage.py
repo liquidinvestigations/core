@@ -4,7 +4,7 @@ import sys
 
 import uptrace
 from opentelemetry.instrumentation.django import DjangoInstrumentor
-from opentelemetry.instrumentation.sqlite3 import SQLite3Instrumentor
+# from opentelemetry.instrumentation.sqlite3 import SQLite3Instrumentor
 # from opentelemetry.instrumentation.logging import LoggingInstrumentor
 
 
@@ -16,7 +16,7 @@ if __name__ == "__main__":
             service_version="0.0.0",
         )
         # LoggingInstrumentor().instrument(set_logging_format=True)
-        SQLite3Instrumentor().instrument()
+        # SQLite3Instrumentor().instrument()
         DjangoInstrumentor().instrument()
     try:
         from django.core.management import execute_from_command_line

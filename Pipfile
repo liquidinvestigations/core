@@ -24,6 +24,7 @@ redis = "*"
 opentelemetry-instrumentation-sqlite3 = "<=0.31b0"  # https://github.com/open-telemetry/opentelemetry-python-contrib/issues/1179
 opentelemetry-instrumentation-django = "*"
 uptrace = "*"
+protobuf = "<=3.20"
 
 [requires]
 python_version = "3.9"
