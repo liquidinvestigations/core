@@ -21,6 +21,8 @@ qrcode = "*"
 Pillow = "*"
 pytest-forked = "*"
 redis = "*"
+uptrace = "*"
+opentelemetry-instrumentation-django = "*"
 
 [requires]
 python_version = "3.9"

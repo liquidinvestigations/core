@@ -60,6 +60,9 @@ if settings.LIQUID_ENABLE_DASHBOARDS:
         re_path(r'^snoop.*$', views.proxy_dashboards,
                 name='proxy-dashboard-snoop'),
 
+        re_path(r'^uptrace.*$', views.proxy_dashboards,
+                name='proxy-dashboard-uptrace'),
+
         re_path(r'^ui/.*$', views.proxy_dashboards,
                 name='proxy-dashboard-nomad-ui'),
         re_path(r'^v1.*$', views.proxy_dashboards,
