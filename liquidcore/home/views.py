@@ -77,6 +77,9 @@ def proxy_dashboards(request):
         if request.path.startswith(prefix):
             url = settings.LIQUID_DASHBOARDS_PROXY_BASE_URL \
                 + request.get_full_path()
+            # tried to add `guest / guest` login for rabbitmq, but queue urls don't work
+            # if '_rabbit' in prefix:
+            #     headers['Authorization'] ='Basic Z3Vlc3Q6Z3Vlc3Q='
             break
     if not url:
         for nomad_prefix in ['/ui', '/v1']:
@@ -100,8 +103,11 @@ def proxy_dashboards(request):
                 timeout=600,
         )
 
+        chunk_size = 1024
+        if response.headers.get('transfer-encoding') == 'chunked':
+            chunk_size = 10
         streaming_resp = StreamingHttpResponse(
-            response.iter_content(chunk_size=1),
+            response.iter_content(chunk_size=chunk_size),
             content_type=response.headers.get('content-type'),
             status=response.status_code,
             reason=response.reason)
