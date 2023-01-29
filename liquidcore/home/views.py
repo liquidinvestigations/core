@@ -77,7 +77,8 @@ def proxy_dashboards(request):
         if request.path.startswith(prefix):
             url = settings.LIQUID_DASHBOARDS_PROXY_BASE_URL \
                 + request.get_full_path()
-            # tried to add `guest / guest` login for rabbitmq, but queue urls don't work
+            # tried to add `guest / guest` login for rabbitmq,
+            # but queue urls don't work with this
             # if '_rabbit' in prefix:
             #     headers['Authorization'] ='Basic Z3Vlc3Q6Z3Vlc3Q='
             break
