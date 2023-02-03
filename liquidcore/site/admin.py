@@ -1,7 +1,9 @@
+from django import forms
 from django.conf import settings
 from django.contrib.auth.admin import User, Group, UserAdmin, GroupAdmin
+from django.contrib.admin.widgets import FilteredSelectMultiple
 from django.contrib.admin import site
-from django.forms import CheckboxSelectMultiple
+from django.forms import CheckboxSelectMultiple, ModelForm
 
 if settings.LIQUID_2FA:
     from django_otp.admin import OTPAdminSite as AdminSite
@@ -71,6 +73,12 @@ class HooverUserAdmin(PermissionFilterMixin, UserAdmin):
         else:
             return '-'
 
+    def user_groups(self, obj):
+        groups = obj.groups.all()
+        if not groups:
+            return ''
+        return [group for group in groups]
+
     fieldsets = (
         (None, {'fields': ('username', 'password')}),
         ('Personal info', {'fields': ('first_name', 'last_name', 'email')}),
@@ -88,7 +96,7 @@ class HooverUserAdmin(PermissionFilterMixin, UserAdmin):
     list_display = ('username', 'email', 'first_name', 'last_name',
                     'is_staff', 'is_superuser',
                     'last_login', 'user_app_permissions',
-                    'app_permissions_from_groups')
+                    'user_groups', 'app_permissions_from_groups')
 
     readonly_fields = ('app_permissions_from_groups',)
 
@@ -97,8 +105,35 @@ class HooverUserAdmin(PermissionFilterMixin, UserAdmin):
         actions.append(create_invitations)
 
 
+class GroupAdminForm(ModelForm):
+    class Meta:
+        model = Group
+        exclude = []
+
+    users = forms.ModelMultipleChoiceField(
+        queryset=User.objects.all(),
+        required=False,
+        widget=FilteredSelectMultiple('users', False)
+    )
+
+    def __init__(self, *args, **kwargs):
+        super(GroupAdminForm, self).__init__(*args, **kwargs)
+        if self.instance.pk:
+            self.fields['users'].initial = self.instance.user_set.all()
+
+    def save_m2m(self):
+        self.instance.user_set.set(self.cleaned_data['users'])
+
+    def save(self, *args, **kwargs):
+        instance = super(GroupAdminForm, self).save()
+        self.save_m2m()
+        return instance
+
+
 class HooverGroupAdmin(PermissionFilterMixin, GroupAdmin):
+
     def get_form(self, request, obj=None, **kwargs):
+        kwargs['form'] = GroupAdminForm
         form = super(HooverGroupAdmin, self).get_form(request, obj, **kwargs)
         form.base_fields['permissions'].widget = CheckboxSelectMultiple()
         return form
@@ -106,6 +141,7 @@ class HooverGroupAdmin(PermissionFilterMixin, GroupAdmin):
     def group_app_permissions(self, obj):
         return [perm.codename for perm in obj.permissions.all()]
 
+    fields = ['name', 'users', 'permissions']
     list_display = ('name', 'group_app_permissions',)
 
 
