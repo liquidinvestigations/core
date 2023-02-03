@@ -4,6 +4,8 @@ from django.shortcuts import render
 from . import devices
 from . import invitations
 import django_otp
+from django.conf import settings
+from django.utils.timezone import now
 from django_otp.plugins.otp_totp.models import TOTPDevice
 from django.contrib.auth import authenticate
 from django.contrib.auth.decorators import login_required
@@ -19,7 +21,28 @@ def get_png(user, device):
 
 @transaction.atomic
 def invitation(request, code):
-    invitation = invitations.get_or_404(code)
+    print(request.session.items())
+    invitation = invitations.get(code)
+
+    if not invitation:
+        return render(request, 'totp-invitation-nonexistent.html', status=404)
+
+    if invitation.state == 'expired':
+        return render(request, 'totp-invitation-expired.html',
+                      {'timeout': settings.LIQUID_2FA_INVITATION_VALID},
+                      status=403)
+    if invitation.state == 'used':
+        return render(request, 'totp-invitation-used.html', status=403)
+    if invitation.state == 'valid' and request.user.is_authenticated:
+        return render(request, 'totp-invitation-loggedin.html',
+                      {'timeout': settings.LIQUID_2FA_INVITATION_VALID},
+                      status=403)
+
+    if invitation.state == 'opened' and request.method == 'GET':
+        return render(request, 'totp-invitation-opened.html',
+                      {'timestamp': invitation.opened_at},
+                      status=403)
+
     bad_token = None
     bad_username = False
     bad_password = False
@@ -45,6 +68,9 @@ def invitation(request, code):
     png_data = b64encode(devices.qr_png(device, username)).decode('utf8')
     otp_png = 'data:image/png;base64,' + png_data
 
+    invitation.opened = True
+    invitation.opened_at = now()
+    invitation.save()
     return render(request, 'totp-invitation-form.html', {
         'username': username,
         'otp_png': otp_png,
@@ -107,7 +133,7 @@ def change_totp(request, add=False):
 
 def get_devices(user):
     qs = TOTPDevice.objects.devices_for_user(user) \
-         .select_related('totpdevicetimed')
+                           .select_related('totpdevicetimed')
     DeviceTimed = namedtuple('DeviceTimed', ['device', 'time'])
     for d in qs:
         try:

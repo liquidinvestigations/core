@@ -2,6 +2,7 @@ import random
 import math
 from django.conf import settings
 from django.db import models
+from django.utils.timezone import now
 from django_otp.plugins.otp_totp.models import TOTPDevice
 
 VOCABULARY = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
@@ -15,6 +16,10 @@ def random_code():
     return ''.join(urandom.choice(VOCABULARY) for _ in range(chars))
 
 
+class TOTPDeviceTimed(TOTPDevice):
+    created = models.DateTimeField(auto_now_add=True)
+
+
 class Invitation(models.Model):
     user = models.OneToOneField(
         settings.AUTH_USER_MODEL,
@@ -22,7 +27,18 @@ class Invitation(models.Model):
     )
     code = models.CharField(max_length=200, default=random_code)
     expires = models.DateTimeField()
+    opened_at = models.DateTimeField(null=True)
+    used = models.BooleanField(default=False)
+    device = models.OneToOneField(TOTPDeviceTimed,
+                                  null=True,
+                                  on_delete=models.SET_NULL)
 
-
-class TOTPDeviceTimed(TOTPDevice):
-    created = models.DateTimeField(auto_now_add=True)
+    @property
+    def state(self):
+        if self.used:
+            return 'used'
+        if self.opened_at:
+            return 'opened'
+        if now() > self.expires:
+            return 'expired'
+        return 'valid'

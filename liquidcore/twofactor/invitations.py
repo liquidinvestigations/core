@@ -1,7 +1,6 @@
 from django.db import transaction
 from datetime import timedelta
 from django.conf import settings
-from django.http import Http404
 from django.contrib.auth import authenticate, login, get_user_model
 from django.utils.timezone import now
 from django.shortcuts import render
@@ -26,30 +25,35 @@ def invite(username, duration, operator=None, create=False):
     return f'{settings.LIQUID_URL}/invitation/{invitation.code}'
 
 
-def get_or_404(code):
-    now_time = now()
-    invitations = (
+def get(code):
+    '''Checks if an invitation is expired and returns the invitation.'''
+    invitation = (
         models.Invitation.objects
         .select_for_update()
         .filter(code=code)
-    )
+    ).first()
 
-    invitation = None
-    for invitation in invitations:
-        if invitation.expires > now_time:
-            return invitation
+    if invitation is None:
+        return None
 
-    raise Http404()
+    return invitation
 
 
 def device_for_session(request, invitation):
-    user = invitation.user
-    device_id = request.session.get('invitation_device_id')
-    if device_id:
-        return devices.get(user, device_id)
+    '''Creates a fresh device for a user for each invitation.
 
+    Also removes all old devices first so that multiple invitations
+    don't lead to multiple devices for that user.
+    If the invitation is already associated to a device returns that
+    device.
+    '''
+    if invitation.device:
+        return invitation.device
+    user = invitation.user
+    devices.delete_all(user)
     device = devices.create(user)
-    request.session['invitation_device_id'] = device.id
+    invitation.device = device
+    invitation.save()
     return device
 
 
@@ -61,7 +65,8 @@ def accept(request, invitation, device, password):
     device.confirmed = True
     device.save()
     devices.delete_all(user, keep=device)
-    invitation.delete()
+    invitation.used = True
+    invitation.save()
     user2 = authenticate(username=user.get_username(), password=password)
     assert user2
     login(request, user2)
