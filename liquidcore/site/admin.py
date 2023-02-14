@@ -219,7 +219,7 @@ class InvitationAdmin(ModelAdmin):
         return False
 
     def has_delete_permission(self, request, obj=None):
-        return False
+        return True
 
 
 liquid_admin = HooverAdminSite(name='liquidadmin')
