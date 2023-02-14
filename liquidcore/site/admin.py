@@ -144,7 +144,6 @@ class HooverUserAdmin(PermissionFilterMixin, UserAdmin):
             'fields': ('last_login', 'date_joined')
         }),
     )
-    add_fieldsets = ((None, {'fields': ('username', )}), )
 
     list_display = ('username', 'email', 'first_name', 'last_name',
                     'is_staff', 'is_superuser',
@@ -154,6 +153,7 @@ class HooverUserAdmin(PermissionFilterMixin, UserAdmin):
     readonly_fields = ('app_permissions_from_groups', )
 
     if settings.LIQUID_2FA:
+        add_fieldsets = ((None, {'fields': ('username', )}), )
         from ..twofactor.invitations import create_invitations
         actions.append(create_invitations)
 
