@@ -7,7 +7,7 @@ class AppPermissions(models.Model):
     class Meta:
         permissions = [
             ('use_nextcloud', 'Can use Nextcloud'),
-            ('use_nextcloud_instance_2', 'Can use Nextcloud Instance 2'),
+            ('use_nextcloud-instance-2', 'Can use Nextcloud Instance 2'),
             ('use_codimd', 'Can use CodiMD'),
             ('use_dokuwiki', 'Can use dokuwiki'),
             ('use_hoover', 'Can use hoover'),
