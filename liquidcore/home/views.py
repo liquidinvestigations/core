@@ -43,11 +43,14 @@ def profile(request):
     user_email = user.get_username() + '@' + settings.LIQUID_DOMAIN
     user_app_perms = app_permissions(user)
 
-    roles = ['user']
+    # Guests needed to map wikijs groups
+    roles = ['user', 'Guests']
     if user.is_staff:
         roles.append('admin')
     if user.is_superuser:
         roles.append('superuser')
+        # needed to map wikijs groups
+        roles.append('Administrators')
 
     return JsonResponse({
         'id': user.get_username(),
