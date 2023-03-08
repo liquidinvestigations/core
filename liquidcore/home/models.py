@@ -13,6 +13,7 @@ class AppPermissions(models.Model):
             ('use_hoover', 'Can use hoover'),
             ('use_rocketchat', 'Can use rocketchat'),
             ('use_hypothesis', 'Can use hypothesis'),
+            ('use_wikijs', 'Can use Wiki.js'),
         ]
 
 
