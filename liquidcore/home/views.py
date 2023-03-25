@@ -44,7 +44,7 @@ def profile(request):
     user_app_perms = app_permissions(user)
 
     # Guests needed to map wikijs groups
-    roles = ['user', 'Guests']
+    roles = ['user']
     if user.is_staff:
         roles.append('admin')
     if user.is_superuser:
