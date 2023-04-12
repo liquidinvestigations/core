@@ -4,7 +4,7 @@ import string
 import requests
 import os
 from django.contrib.auth import get_user_model
-from django.contrib.auth.models import Permission
+from django.contrib.auth.models import Permission, Group
 from django.contrib.auth.signals import user_logged_out
 from django.db.models import signals
 from django.dispatch import receiver
@@ -53,6 +53,31 @@ def create_user_everywhere(sender, instance, created=None, **kwargs):
             log.warning('No nomad address found to create liquid users!')
 
 
+@receiver(signals.post_save, sender=Group)
+def create_group_everywhere(sender, instance, created=None, **kwargs):
+    if created:
+        payload = {
+            "Meta": {
+                "GROUP": instance.name
+            }
+        }
+        nomad_url = os.getenv('NOMAD_URL')
+        if nomad_url:
+            res = requests.post(
+                f'{nomad_url}/v1/job/liquid-creategroup/dispatch',
+                json=payload
+            )
+            if res.status_code != 200:
+                log.warning(f'Error creating group "{instance.name}".')
+                log.warning(
+                    f'Nomad returned: {str(res.status_code)}, {res.text}'
+                )
+            else:
+                log.warning(f'Created liquid group "{instance.name}".')
+        else:
+            log.warning('No nomad address found to create liquid groups!')
+
+
 @receiver(signals.post_delete, sender=User)
 def delete_user_everywhere(sender, instance, **kwargs):
     payload = {
@@ -75,6 +100,30 @@ def delete_user_everywhere(sender, instance, **kwargs):
             log.warning(f'Deleted liquid user "{instance.username}".')
     else:
         log.warning('No nomad address found to delete liquid users!')
+
+
+@receiver(signals.post_delete, sender=Group)
+def delete_group_everywhere(sender, instance, created=None, **kwargs):
+    payload = {
+        "Meta": {
+            "GROUP": instance.name
+        }
+    }
+    nomad_url = os.getenv('NOMAD_URL')
+    if nomad_url:
+        res = requests.post(
+            f'{nomad_url}/v1/job/liquid-deletegroup/dispatch',
+            json=payload
+        )
+        if res.status_code != 200:
+            log.warning(f'Error deleting group "{instance.name}".')
+            log.warning(
+                f'Nomad returned: {str(res.status_code)}, {res.text}'
+            )
+        else:
+            log.warning(f'Deleted liquid group "{instance.name}".')
+    else:
+        log.warning('No nomad address found to create liquid groups!')
 
 
 @receiver(signals.post_save, sender=User)

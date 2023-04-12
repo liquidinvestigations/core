@@ -3,6 +3,7 @@ import logging
 from django.http import JsonResponse, HttpResponse, StreamingHttpResponse
 from django.shortcuts import render
 from django.conf import settings
+from django.contrib.auth.models import Permission
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
 
@@ -34,6 +35,28 @@ def app_permissions(user):
     return app_perms
 
 
+def app_groups(app, user):
+    """Helper function to get groups that have permission to use the app."""
+    permission = Permission.objects.get(codename=f'use_{app}')
+    return [g.name for g in user.groups.all()
+            if permission in list(g.permissions.all())]
+
+
+def get_roles(user, app):
+    # Guests needed to map wikijs groups
+    roles = []
+    if app == 'wikijs':
+        roles.append('Guests')
+    elif app == 'dokuwiki':
+        roles.append('user')
+    if user.is_staff or user.is_superuser:
+        if app == 'wikijs':
+            roles.append('Administrators')
+        elif app == 'dokuwiki':
+            roles.append('admin')
+    return roles
+
+
 def profile(request):
     user = request.user
 
@@ -61,7 +84,12 @@ def profile(request):
         # These roles are used by the ouauth2proxy to restrict app access.
         # The proxy expects the group to
         # match the app id from the configuration.
-        'roles': roles + user_app_perms,
+        'roles': roles,
+        'allowed_apps': user_app_perms,
+        'app_groups': {
+            'wikijs': (app_groups('wikijs', user)
+                       + get_roles(user, app='wikijs'))
+        }
     })
 
 
@@ -74,9 +102,9 @@ def proxy_dashboards(request):
     url = None
     headers = dict(request.headers)
     for prefix in [
-                    '/snoop', '/grafana', '/_search_rabbit',
-                    '/_snoop_rabbit', '/uptrace',
-                ]:
+            '/snoop', '/grafana', '/_search_rabbit',
+            '/_snoop_rabbit', '/uptrace',
+    ]:
         if request.path.startswith(prefix):
             url = settings.LIQUID_DASHBOARDS_PROXY_BASE_URL \
                 + request.get_full_path()
@@ -100,11 +128,11 @@ def proxy_dashboards(request):
 
     try:
         response = requests.Session().send(
-                requests.Request(request.method, url,
-                                 headers=headers,
-                                 data=request.body).prepare(),
-                stream=True,
-                timeout=600,
+            requests.Request(request.method, url,
+                             headers=headers,
+                             data=request.body).prepare(),
+            stream=True,
+            timeout=600,
         )
 
         chunk_size = 1024
