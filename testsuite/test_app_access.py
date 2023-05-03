@@ -26,9 +26,9 @@ def test_profile_roles(client, create_user, use_liquid_apps):
     profile = json.loads(resp.content)
     for app in APPS:
         if app == 'rocketchat':
-            assert 'rocketchat' in profile['roles']
+            assert 'rocketchat' in profile['allowed_apps']
         else:
-            assert app not in profile['roles']
+            assert app not in profile['allowed_apps']
 
     permission = Permission.objects.get(codename='use_hoover')
     user.user_permissions.add(permission)
@@ -38,8 +38,8 @@ def test_profile_roles(client, create_user, use_liquid_apps):
                  password=create_user.password)
     new_resp = client.get(url)
     new_profile = json.loads(new_resp.content)
-    assert 'hoover' in new_profile['roles']
-    assert 'rocketchat' in new_profile['roles']
+    assert 'hoover' in new_profile['allowed_apps']
+    assert 'rocketchat' in new_profile['allowed_apps']
 
 
 def test_html(client, create_user, use_liquid_apps):
