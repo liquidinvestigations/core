@@ -14,6 +14,7 @@ class AppPermissions(models.Model):
             ('use_rocketchat', 'Can use rocketchat'),
             ('use_hypothesis', 'Can use hypothesis'),
             ('use_wikijs', 'Can use Wiki.js'),
+            ('use_nextcloud26', 'Can use Nextcloud v26'),
         ]
 
 
