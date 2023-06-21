@@ -10,6 +10,8 @@ import requests
 
 log = logging.getLogger(__name__)
 
+from .health_checks import get_report as get_health_check_report
+
 
 @login_required
 def homepage(request):
@@ -20,6 +22,15 @@ def homepage(request):
         'liquid_core_version': settings.LIQUID_CORE_VERSION,
         'liquid_enable_dashboards': settings.LIQUID_ENABLE_DASHBOARDS,
         '2fa_enabled': settings.LIQUID_2FA,
+        'health_report': get_health_check_report(),
+    })
+
+@login_required
+def healthchecks_page(request):
+    return render(request, 'healthcheck.html', {
+        'health_report': get_health_check_report(),
+        'liquid_version': settings.LIQUID_VERSION,
+        'liquid_title': settings.LIQUID_TITLE,
     })
 
 

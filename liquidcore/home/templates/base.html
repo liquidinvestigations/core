@@ -7,9 +7,31 @@
 <script src="{% static "core/bootstrap.js"%}"></script>
 <link rel="shortcut icon" type="image/png" href="{% static "icons/favicon.png" %}">
 
+
+<style>
+.shady {
+  transform: rotate(90deg);
+  transform-origin: top left;
+  color: #ddd;
+  padding-left: 211pt;
+  padding-top: 10pt;
+}
+ .inactiveLink {
+     cursor: help;
+     color: #808080;
+ }
+ .inactiveLink:hover {
+     cursor: help;
+     color: #808080;
+ }
+ .inactiveP {
+     color: #808080;
+ }
+</style>
+
 {% block headstyles %}{% endblock %}
 <body class="container container-lg">
-<div style="margin-top: 5rem;">
+<div style="margin-top: 1rem;">
 {% block content %}{% endblock %}
 </div>
 

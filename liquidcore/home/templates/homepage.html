@@ -25,20 +25,6 @@
 
 <p> Welcome to the Liquid Investigations Home Page. <small style="float: right;">{{liquid_core_version}} </small></p>
 
-<style>
- .inactiveLink {
-     cursor: help;
-     color: #808080;
- }
- .inactiveLink:hover {
-     cursor: help;
-     color: #808080;
- }
- .inactiveP {
-     color: #808080;
- }
-</style>
-
 {% for app in liquid_apps%}
 <p>
     {% if app.enabled and 'home.use_'|add:app.id in perms %}
@@ -73,24 +59,13 @@
     superuser / admin dashboards: not enabled.
   </p>
   {% endif %}
-{% endif %}
 
-{% endblock %}
-{% block headstyles %}
-<style>
-.shady {
-  transform: rotate(90deg);
-  transform-origin: top left;
-  color: #ddd;
-  padding-left: 100pt;
-}
-</style>
-{% endblock %}
-
-{% block scripts %}
-
-{% if hypothesis_app_url %}
-  <script src="{{ hypothesis_app_url }}/embed.js" async></script>
+  {% if health_report %}
+  <br>
+  <a href="/system-health"><span style="color:black"> System Health: </span>
+    <span style="color:{{health_report.status_color}}">{{ health_report.status_message }} </span>
+  </a>
+  {% endif %}
 {% endif %}
 
 {% endblock %}
