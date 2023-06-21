@@ -4,8 +4,8 @@
 
 {% block content %}
 <h1 class="shady">Liquid Investigations <br/> {{liquid_version}}</h1>
-<img src="{% static "icons/logo.png" %}" height="125" alt="Liquid Investigations">
-<h1>{{ liquid_title }}</h1>
+<img src="{% static "icons/logo.png" %}" height="100" alt="Liquid Investigations">
+<h1 style="margin: 24px">{{ liquid_title }}</h1>
 
 <p>
   {% if request.user.is_authenticated %}
@@ -24,20 +24,6 @@
 </p>
 
 <p> Welcome to the Liquid Investigations Home Page. <small style="float: right;">{{liquid_core_version}} </small></p>
-
-<style>
- .inactiveLink {
-     cursor: help;
-     color: #808080;
- }
- .inactiveLink:hover {
-     cursor: help;
-     color: #808080;
- }
- .inactiveP {
-     color: #808080;
- }
-</style>
 
 {% for app in liquid_apps%}
 <p>
@@ -73,24 +59,13 @@
     superuser / admin dashboards: not enabled.
   </p>
   {% endif %}
-{% endif %}
 
-{% endblock %}
-{% block headstyles %}
-<style>
-.shady {
-  transform: rotate(90deg);
-  transform-origin: top left;
-  color: #ddd;
-  padding-left: 100pt;
-}
-</style>
-{% endblock %}
-
-{% block scripts %}
-
-{% if hypothesis_app_url %}
-  <script src="{{ hypothesis_app_url }}/embed.js" async></script>
+  {% if health_report %}
+  <br>
+  <a href="/system-health"><span style="color:black"> System Health: </span>
+    <span style="color:{{health_report.status_color}}">{{ health_report.status_message }} </span>
+  </a>
+  {% endif %}
 {% endif %}
 
 {% endblock %}

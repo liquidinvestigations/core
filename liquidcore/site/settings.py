@@ -167,3 +167,10 @@ OAUTH2_PROVIDER = {
 }
 
 AUTHPROXY_REDIS_URL = os.getenv('AUTHPROXY_REDIS_URL')
+
+HEALTH_CHECK_INFO = []
+if os.getenv('LIQUID_HEALTHCHECK_INFO_FILE'):
+    with open(os.getenv('LIQUID_HEALTHCHECK_INFO_FILE'), 'r') as f:
+        HEALTH_CHECK_INFO = json.load(f)
+HEALTH_CHECK_CONSUL_URL = os.getenv('CONSUL_URL')
+HEALTH_CHECK_NOMAD_URL = os.getenv('NOMAD_URL')

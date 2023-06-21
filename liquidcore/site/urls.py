@@ -18,6 +18,7 @@ urlpatterns = [
     path('accounts/logout/', auth_views.LogoutView.as_view(), name='logout'),
     path('accounts/profile', views.profile, name='profile'),
     path('o/', include('oauth2_provider.urls', namespace='oauth2_provider')),
+    path('system-health', views.healthchecks_page, name='healthchecks'),
     path('', views.homepage, name='home'),
 ]
 

@@ -20,3 +20,10 @@ class AppPermissions(models.Model):
 # we need to override the __str__ method to only display the name
 # instead of contenttype | name in the admin panel
 Permission.__str__ = lambda self: f'{self.name}'
+
+
+class HealthCheckPing(models.Model):
+    """Stores all previous health check results."""
+
+    date = models.DateTimeField(auto_now_add=True, db_index=True)
+    result = models.JSONField()

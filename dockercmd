@@ -1,14 +1,24 @@
-#!/bin/bash -ex
+#!/bin/bash
+set -ex
 
 ./manage.py migrate
-# exec ./manage.py runserver 0.0.0.0:8000
 
 # poor man's cron
 (
+  set +e
   while true; do
+    sleep 444
     ./manage.py clearsessions
     ./manage.py cleartokens
-    sleep 444
+  done
+) &
+
+./manage.py resethealthchecks
+(
+  set +e
+  while true; do
+    sleep 120
+    ./manage.py updatehealthchecks
   done
 ) &
 
@@ -17,8 +27,10 @@
 # > AssertionError: X is a "hop-by-hop" header;
 # that comes from all uWSGI implementations (django server and waitress)
 if [[ "$DEBUG" == "true" ]]; then
-	    # --max-requests 1 \  # poor man's autoreload
-	  exec gunicorn --reload \
+  # sometimes auto-reload means crashing containers (because of syntax errors)
+  while true; do
+
+	  gunicorn --reload \
 	    --access-logfile '-' \
 	    --error-logfile '-' \
 	    --log-level 'info' \
@@ -26,7 +38,10 @@ if [[ "$DEBUG" == "true" ]]; then
 	    --timeout 600 \
  	 -b 0.0.0.0:8000 \
  	 liquidcore.site.wsgi:application
+    sleep 5
+  done
 else
+      # in production we want whole container resets on gunicorn failure
 	exec gunicorn \
 	    --error-logfile '-' \
  	 --threads 20 \
