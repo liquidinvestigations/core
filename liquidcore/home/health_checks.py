@@ -102,12 +102,13 @@ def _build_report():
         for bar in color_bars:
             if bar == 'green':
                 count_total += 1
-                count_success +=1
+                count_success += 1
             if bar == 'red':
                 count_total += 1
         if count_total == 0:
             count_total += 1
-        return f'Uptime in last {HISTORY_HOURS}h: ' + str(int(100.0 * count_success / count_total)) + '%'
+        return f'Uptime in last {HISTORY_HOURS}h: ' \
+            + str(int(100.0 * count_success / count_total)) + '%'
 
     app_color_bars = {
         app: {

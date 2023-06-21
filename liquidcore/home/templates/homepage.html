@@ -4,8 +4,8 @@
 
 {% block content %}
 <h1 class="shady">Liquid Investigations <br/> {{liquid_version}}</h1>
-<img src="{% static "icons/logo.png" %}" height="125" alt="Liquid Investigations">
-<h1>{{ liquid_title }}</h1>
+<img src="{% static "icons/logo.png" %}" height="100" alt="Liquid Investigations">
+<h1 style="margin: 24px">{{ liquid_title }}</h1>
 
 <p>
   {% if request.user.is_authenticated %}
