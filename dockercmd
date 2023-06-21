@@ -5,18 +5,20 @@ set -ex
 
 # poor man's cron
 (
+  set +e
   while true; do
+    sleep 444
     ./manage.py clearsessions
     ./manage.py cleartokens
-    sleep 444
   done
 ) &
 
+./manage.py resethealthchecks
 (
-  ./manage.py resethealthchecks
+  set +e
   while true; do
-    ./manage.py updatehealthchecks
     sleep 60
+    ./manage.py updatehealthchecks
   done
 ) &
 
