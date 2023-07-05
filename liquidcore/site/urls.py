@@ -56,6 +56,8 @@ if settings.LIQUID_ENABLE_DASHBOARDS:
                 name='proxy-dashboard-nomad'),
         re_path(r'^_snoop_rabbit.*$', views.proxy_dashboards,
                 name='proxy-dashboard-snoop-rabbitmq'),
+        re_path(r'^_snoop_pgwatch2.*$', views.proxy_dashboards,
+                name='proxy-dashboard-snoop-pgwatch2'),
         re_path(r'^_search_rabbit.*$', views.proxy_dashboards,
                 name='proxy-dashboard-search-rabbitmq'),
         re_path(r'^snoop.*$', views.proxy_dashboards,
