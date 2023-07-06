@@ -174,3 +174,9 @@ if os.getenv('LIQUID_HEALTHCHECK_INFO_FILE'):
         HEALTH_CHECK_INFO = json.load(f)
 HEALTH_CHECK_CONSUL_URL = os.getenv('CONSUL_URL')
 HEALTH_CHECK_NOMAD_URL = os.getenv('NOMAD_URL')
+
+if os.getenv('SENTRY_DSN'):
+    import sentry_sdk
+    SENTRY_DSN = os.getenv('SENTRY_DSN')
+    SENTRY_SAMPLE_RATE = float(os.getenv('SENTRY_SAMPLE_RATE', '1.0'))
+    sentry_sdk.init(dsn=SENTRY_DSN, traces_sample_rate=SENTRY_SAMPLE_RATE)
