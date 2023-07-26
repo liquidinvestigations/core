@@ -22,12 +22,10 @@ qrcode = "*"
 Pillow = "*"
 pytest-forked = "*"
 redis = "*"
-opentelemetry-instrumentation-sqlite3 = "<=0.31b0"  # https://github.com/open-telemetry/opentelemetry-python-contrib/issues/1179
-opentelemetry-instrumentation-django = "*"
-opentelemetry-instrumentation-logging = "*"
-uptrace = "*"
 protobuf = "<=3.20"
 sentry-sdk = {version = "*", extras = ["django"]}
+opentelemetry-distro = "*"
+opentelemetry-exporter-otlp = "*"
 
 [requires]
 python_version = "3.9"
