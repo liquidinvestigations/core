@@ -22,4 +22,3 @@ The app is configured by setting environment variables.
 * `LIQUID_DOMAIN`: the domain name, e.g. `liquid.example.com`.
 * `SERVICE_ADDRESS`: name or address of the internal service, as it's
 * `LIQUID_2FA`: set to `true` to enable TOTP two-factor auth.
-* `UPTRACE_DSN`: set to enable tracing with uptrace

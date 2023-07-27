@@ -14,7 +14,6 @@ gunicorn = '*'
 hupper = '*'
 requests = '*'
 whitenoise = "*"
-Django = "*"
 django-otp = "*"
 pytest = "*"
 pytest-django = "*"
@@ -22,12 +21,13 @@ qrcode = "*"
 Pillow = "*"
 pytest-forked = "*"
 redis = "*"
-opentelemetry-instrumentation-sqlite3 = "<=0.31b0"  # https://github.com/open-telemetry/opentelemetry-python-contrib/issues/1179
-opentelemetry-instrumentation-django = "*"
-opentelemetry-instrumentation-logging = "*"
-uptrace = "*"
-protobuf = "<=3.20"
+# protobuf = "<=3.20"
 sentry-sdk = {version = "*", extras = ["django"]}
+opentelemetry-distro = "*"
+opentelemetry-exporter-otlp = "*"
+opentelemetry-sdk = "*"
+protobuf = "*"
+django = "==3.*"
 
 [requires]
-python_version = "3.9"
+python_version = "3.11"

@@ -3,12 +3,12 @@ name: test
 
 steps:
 - name: flake8
-  image: alpine/flake8:3.7.7
+  image: alpine/flake8:6.0.0
   commands:
   - flake8
 
 - name: test
-  image: python:3.9-buster
+  image: python:3.11-bullseye
   commands:
   - apt-get update -yqq
   - apt-get install -yqq --no-install-recommends qrencode

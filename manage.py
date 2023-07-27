@@ -1,23 +1,12 @@
 #!/usr/bin/env python
 import os
 import sys
-
-import uptrace
-from opentelemetry.instrumentation.django import DjangoInstrumentor
-from opentelemetry.instrumentation.sqlite3 import SQLite3Instrumentor
-from opentelemetry.instrumentation.logging import LoggingInstrumentor
+from liquidcore import tracing
 
 
 if __name__ == "__main__":
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "liquidcore.site.settings")
-    if os.getenv('UPTRACE_DSN'):
-        uptrace.configure_opentelemetry(
-            service_name="liquidcore",
-            service_version="0.0.0",
-        )
-        LoggingInstrumentor().instrument(set_logging_format=True)
-        SQLite3Instrumentor().instrument()
-        DjangoInstrumentor().instrument()
+    tracing.init_tracing('gunicorn')
     try:
         from django.core.management import execute_from_command_line
     except ImportError:
