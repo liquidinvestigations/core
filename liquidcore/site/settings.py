@@ -167,6 +167,8 @@ OAUTH2_PROVIDER = {
     'DEFAULT_SCOPES': ['read', 'write'],
 }
 
+PKCE_REQUIRED = False
+
 AUTHPROXY_REDIS_URL = os.getenv('AUTHPROXY_REDIS_URL')
 
 HEALTH_CHECK_INFO = []
