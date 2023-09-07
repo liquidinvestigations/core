@@ -53,7 +53,8 @@ def invitation(request, code):
         if not device.verify_token(request.POST['code']):
             bad_token = True
 
-        if request.POST['username'] != username:
+        # strip whitespace from POST username because copy in browser adds it
+        if request.POST['username'].strip() != username:
             bad_username = True
 
         password = request.POST['password']
