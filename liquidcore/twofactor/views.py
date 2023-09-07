@@ -4,7 +4,6 @@ from django.shortcuts import render
 from . import devices
 from . import invitations
 import django_otp
-from django.conf import settings
 from django.utils.timezone import now
 from django_otp.plugins.otp_totp.models import TOTPDevice
 from django.contrib.auth import authenticate
@@ -29,13 +28,13 @@ def invitation(request, code):
 
     if invitation.state == 'expired':
         return render(request, 'totp-invitation-expired.html',
-                      {'timeout': settings.LIQUID_2FA_INVITATION_VALID},
+                      {'expires': invitation.expires},
                       status=403)
     if invitation.state == 'used':
         return render(request, 'totp-invitation-used.html', status=403)
     if invitation.state == 'valid' and request.user.is_authenticated:
         return render(request, 'totp-invitation-loggedin.html',
-                      {'timeout': settings.LIQUID_2FA_INVITATION_VALID},
+                      {'expires': invitation.expires},
                       status=403)
 
     if invitation.state == 'opened' and request.method == 'GET':
