@@ -1,3 +1,6 @@
+# #########################################################
+#                       TEST
+# #########################################################
 kind: pipeline
 name: test
 
@@ -17,8 +20,11 @@ steps:
   - pytest --forked
 
 ---
+# #########################################################
+#                       BUILD x86
+# #########################################################
 kind: pipeline
-name: publish
+name: build x86
 
 trigger:
   status:
@@ -26,6 +32,7 @@ trigger:
   event:
   - push
   - tag
+  - cron
 
 depends_on:
 - test
@@ -58,6 +65,58 @@ steps:
       from_secret: docker_password
 
 ---
+# #########################################################
+#                       BUILD arm64
+# #########################################################
+kind: pipeline
+name: build arm64
+
+platform:
+  os: linux
+  arch: arm64
+
+trigger:
+  status:
+  - success
+  event:
+  - push
+  - tag
+  - cron
+
+depends_on:
+- test
+
+steps:
+- name: docker push branch ${DRONE_COMMIT_BRANCH}
+  image: plugins/docker
+  settings:
+    repo: liquidinvestigations/core
+    tags: ${DRONE_COMMIT_BRANCH}
+    username:
+      from_secret: docker_username
+    password:
+      from_secret: docker_password
+  when:
+    event:
+    - push
+    branch:
+      exclude:
+      - dependabot/**
+
+- name: docker push autotag + latest
+  image: plugins/docker
+  settings:
+    repo: liquidinvestigations/core
+    auto_tag: true
+    username:
+      from_secret: docker_username
+    password:
+      from_secret: docker_password
+
+---
+# #########################################################
+#                       SECRETS
+# #########################################################
 kind: secret
 name: docker_username
 get:
