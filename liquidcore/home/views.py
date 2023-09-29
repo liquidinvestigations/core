@@ -52,7 +52,7 @@ def profile(request):
     if not user.is_authenticated:
         return HttpResponse('Unauthorized', status=401)
 
-    user_email = user.get_username() + '@' + settings.LIQUID_DOMAIN
+    fake_user_email = user.get_username() + '@' + settings.LIQUID_DOMAIN
     user_app_perms = app_permissions(user)
 
     # Guests needed to map wikijs groups
@@ -67,7 +67,10 @@ def profile(request):
     return JsonResponse({
         'id': user.get_username(),
         'login': user.get_username(),
-        'email': user.email or user_email,
+        # WARNING: DO NOT USE user.email as that is overridden by the admin.
+        # This causes problems in apps, e.g. the email is duplicated by the
+        # admin, or some apps have bugs (.e.g Wiki.js)
+        'email': fake_user_email,
         'is_admin': user.is_staff,
         'name': user.get_full_name() or user.get_username(),
         # These roles are used by the ouauth2proxy to restrict app access.
