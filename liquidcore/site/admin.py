@@ -46,7 +46,7 @@ class Hoover2FAUserCreationForm(forms.ModelForm):
 
 
 class HooverAdminSite(AdminSite):
-    site_header = "Liquid Core administration"
+    site_header = "Liquid Investigations Administration"
 
 
 class PermissionFilterMixin(object):
@@ -150,12 +150,20 @@ class HooverUserAdmin(PermissionFilterMixin, UserAdmin):
                     'last_login', 'user_app_permissions',
                     'user_groups', 'app_permissions_from_groups')
 
-    readonly_fields = ('app_permissions_from_groups', )
+    def get_readonly_fields(self, request, obj=None):
+        if obj:
+            # obj is not None, so this is an edit
+            return ('username', 'app_permissions_from_groups', 'last_login', 'date_joined')
+        else:
+            # This is an addition - allow setting all fields
+            return ('app_permissions_from_groups', 'last_login', 'date_joined')
 
     if settings.LIQUID_2FA:
         add_fieldsets = ((None, {'fields': ('username', )}), )
         from ..twofactor.invitations import create_invitations
         actions.append(create_invitations)
+    else:
+        add_fieldsets = ((None, {'fields': ('username', 'password1', 'password2')}), )
 
 
 class GroupAdminForm(ModelForm):
@@ -199,6 +207,13 @@ class HooverGroupAdmin(PermissionFilterMixin, GroupAdmin):
         'name',
         'group_app_permissions',
     )
+    def get_readonly_fields(self, request, obj=None):
+        if obj:
+            # obj is not None, so this is an edit
+            return ['name']
+        else:
+            # This is an addition - allow setting all fields
+            return []
 
 
 class InvitationAdmin(ModelAdmin):
