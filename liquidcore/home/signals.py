@@ -14,6 +14,7 @@ from . import sessions
 
 log = logging.getLogger(__name__)
 USERNAME_CHARS = string.ascii_letters + string.digits + '.'
+# USERNAME_REGEX = r'[' + USERNAME_CHARS + r']{1,150}'
 User = get_user_model()
 
 

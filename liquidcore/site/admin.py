@@ -3,7 +3,7 @@ from django.conf import settings
 from django.contrib.auth.admin import User, Group, UserAdmin, GroupAdmin
 from django.contrib.admin.widgets import FilteredSelectMultiple
 from django.forms import CheckboxSelectMultiple, ModelForm
-from django.contrib.auth.forms import UsernameField
+from django.contrib.auth.forms import UsernameField, UserCreationForm
 from django.contrib.admin import site, ModelAdmin
 from django.utils.timezone import now
 
@@ -12,6 +12,25 @@ if settings.LIQUID_2FA:
     from ..twofactor.models import Invitation
 else:
     from django.contrib.admin import AdminSite
+
+
+USER_RESTRICTION_HELP_TEXT = (
+    'Required. 150 characters or fewer. ASCII Letters, digits and dots (.) only. '
+)
+
+
+class HooverUserCreationForm(UserCreationForm):
+    """
+    A form that creates a user, with no privileges, from the given username.
+    Does not need a password to be set.
+    """
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if self._meta.model.USERNAME_FIELD in self.fields:
+            self.fields[self._meta.model.
+                        USERNAME_FIELD].widget.attrs['autofocus'] = True
+            self.fields[self._meta.model. USERNAME_FIELD].help_text = \
+                USER_RESTRICTION_HELP_TEXT
 
 
 class Hoover2FAUserCreationForm(forms.ModelForm):
@@ -30,6 +49,8 @@ class Hoover2FAUserCreationForm(forms.ModelForm):
         if self._meta.model.USERNAME_FIELD in self.fields:
             self.fields[self._meta.model.
                         USERNAME_FIELD].widget.attrs['autofocus'] = True
+            self.fields[self._meta.model.
+                        USERNAME_FIELD].help_text = USER_RESTRICTION_HELP_TEXT
 
     def clean_password2(self):
         pass
@@ -94,8 +115,11 @@ class HooverUserAdmin(PermissionFilterMixin, UserAdmin):
     actions = []
 
     def get_form(self, request, obj=None, **kwargs):
-        if settings.LIQUID_2FA and not obj:
-            kwargs['form'] = Hoover2FAUserCreationForm
+        if not obj:
+            if settings.LIQUID_2FA:
+                kwargs['form'] = Hoover2FAUserCreationForm
+            else:
+                kwargs['form'] = HooverUserCreationForm
         form = super(HooverUserAdmin, self).get_form(request, obj, **kwargs)
         if 'user_permissions' in form.base_fields:
             form.base_fields['user_permissions'].widget = (
@@ -207,6 +231,7 @@ class HooverGroupAdmin(PermissionFilterMixin, GroupAdmin):
         'name',
         'group_app_permissions',
     )
+
     def get_readonly_fields(self, request, obj=None):
         if obj:
             # obj is not None, so this is an edit
