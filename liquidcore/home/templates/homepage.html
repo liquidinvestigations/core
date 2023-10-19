@@ -29,10 +29,10 @@
 <p>
     {% if app.enabled and 'home.use_'|add:app.id in perms %}
       {% if app.adminOnly and user.is_superuser or not app.adminOnly  %}
-      <a href="{{app.url}}">{{app.title}}</a>
-        {{app.description}}
-        <small style="float: right;">{{app.version}}</small>
+        <a href="{{app.url}}">{{app.title}}</a> {{app.description}} <small style="float: right;">{{app.version}}</small>
       {% endif %}
+    {% elif app.enabled and app.allow_all_users %}
+        <a href="{{app.url}}">{{app.title}}</a> {{app.description}} <small style="float: right;">{{app.version}}</small>
     {% elif not app.adminOnly %}
         <a href="{{app.url}}" class="inactiveLink" onClick="return false" title={% if not app.enabled %}"Not enabled"{% else %}"No permission"{% endif %}>{{app.title}}</a>
         {{app.description}}
