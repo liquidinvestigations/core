@@ -1,6 +1,15 @@
 #!/bin/bash
 set -ex
 
+# fix bug added 0.16.2 -- removed 0.17.1
+# we upgraded django-oauth2-toolkit to v2 in 0.16.2
+# and then downgraded it back to v1 after discovering some breaking changes.
+MARKER=/app/var/did_reset_oauth_provider_migrations
+if [ ! -f $MARKER ] && [ -f /app/var/db.sqlite3 ]; then
+  ./manage.py migrate oauth2_provider zero || true
+  date > $MARKER
+fi
+
 ./manage.py migrate
 
 # poor man's cron
