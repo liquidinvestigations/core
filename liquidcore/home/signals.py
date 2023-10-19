@@ -20,7 +20,16 @@ User = get_user_model()
 
 @receiver(user_logged_out)
 def kill_user_sessions(user, **kwargs):
-    kill_sessions(user=user)
+    if user:
+        sessions.clear_authproxy_session(user.username)
+        kill_sessions(user=user)
+        log.warning((
+            'Removed app sessions for user: '
+            f"{user.username}"
+            'after logout.'
+        ))
+    else:
+        log.warning('Got user_logged_out signal with user=None!')
 
 
 @receiver(signals.pre_save, sender=User)
@@ -88,13 +97,6 @@ def add_default_permissions(sender, instance, created, **kwargs):
         instance.user_permissions.add(rocketchat_perm)
         instance.user_permissions.add(hypothesis_perm)
         instance.save()
-
-
-@receiver(user_logged_out)
-def delete_authproxy_sessions_logout(user, **kwargs):
-    sessions.clear_authproxy_session(user.username)
-    log.warning((f'Removed app sessions for user: "{user.username}" '
-                 'after logout.'))
 
 
 @receiver(signals.pre_save, sender=User)
