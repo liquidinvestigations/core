@@ -160,7 +160,11 @@ OAUTH2_PROVIDER = {
     'REFRESH_TOKEN_EXPIRE_SECONDS': AUTH_AUTO_LOGOUT_SECONDS,
     'AUTHORIZATION_CODE_EXPIRE_SECONDS': 600,  # recommended from docs
     'REFRESH_TOKEN_GRACE_PERIOD_SECONDS': 120,  # recommended from docs
+    "OIDC_ENABLED": True,
+    "OIDC_ISS_ENDPOINT": LIQUID_URL,
+    "OAUTH2_VALIDATOR_CLASS": "liquidcore.home.oauth2_validator.CustomOAuth2Validator",
     'SCOPES': {
+        "openid": "OpenID Connect scope",
         'read': 'Read scope',
         'write': 'Write scope',
     },

@@ -49,10 +49,17 @@ def update():
     Finally, generate and store report in cache file.
     """
 
+    try:
+        new_checks = fetch_health_checks()
+    except Exception as e:
+        log.warning('error fetching health checks: %s', str(e))
+        log.exception(e)
+        return
+
     cutoff_date = timezone.now() - datetime.timedelta(hours=HISTORY_HOURS)
     HealthCheckPing.objects.filter(date__lt=cutoff_date).delete()
 
-    HealthCheckPing(result=fetch_health_checks()).save()
+    HealthCheckPing(result=new_checks).save()
 
     with open(CACHE_FILE, 'w') as f:
         json.dump(_build_report(), f, indent=2)
@@ -169,6 +176,7 @@ def fetch_health_checks():
             if check['Node'] not in healthy_nodes:
                 continue
 
+            result[key] = result.get(key, {})
             result[key]['status'] = pick_worst(
                 check['Status'],
                 result[key].get('status'),

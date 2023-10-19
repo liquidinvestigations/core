@@ -77,6 +77,10 @@ def profile(request):
         # The proxy expects the group to
         # match the app id from the configuration.
         'roles': roles + user_app_perms,
+        # OpenID (matrix)
+        "sub": fake_user_email,
+        "first_name": request.user.first_name,
+        "last_name": request.user.last_name,
     })
 
 
