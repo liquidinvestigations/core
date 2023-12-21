@@ -162,7 +162,7 @@ OAUTH2_PROVIDER = {
     'REFRESH_TOKEN_GRACE_PERIOD_SECONDS': 120,  # recommended from docs
     "OIDC_ENABLED": True,
     "OIDC_ISS_ENDPOINT": LIQUID_URL,
-    "OIDC_RSA_PRIVATE_KEY" : os.environ.get('OIDC_RSA_PRIVATE_KEY'),
+    "OIDC_RSA_PRIVATE_KEY": os.environ.get('OIDC_RSA_PRIVATE_KEY'),
     "OAUTH2_VALIDATOR_CLASS": "liquidcore.home.oauth2_validator.CustomOAuth2Validator",
     'SCOPES': {
         "openid": "OpenID Connect scope",
