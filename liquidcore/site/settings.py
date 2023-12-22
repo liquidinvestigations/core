@@ -167,6 +167,8 @@ OAUTH2_PROVIDER = {
         "openid": "OpenID Connect scope",
         'read': 'Read scope',
         'write': 'Write scope',
+        'email': 'email',
+        'profile': 'profile',
     },
     'DEFAULT_SCOPES': ['read', 'write'],
 }
