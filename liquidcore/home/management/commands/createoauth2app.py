@@ -20,13 +20,13 @@ class Command(BaseCommand):
         app.authorization_grant_type = 'authorization-code'
         app.user_id = None
 
-        if options['noskip'] :
-          app.skip_authorization = False
+        if options['noskip']:
+            app.skip_authorization = False
         else:
-          app.skip_authorization = True
+            app.skip_authorization = True
 
-        if options['algo'] :
-          app.algorithm = options['algo']
+        if options['algo']:
+            app.algorithm = options['algo']
 
         app.save()
 
