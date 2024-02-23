@@ -11,5 +11,5 @@ class CustomOAuth2Validator(OAuth2Validator):
             "email": fake_user_email,
             "first_name": request.user.first_name,
             "last_name": request.user.last_name,
-            "name": request.user.last_name,
+            "name": request.user.username,
         }

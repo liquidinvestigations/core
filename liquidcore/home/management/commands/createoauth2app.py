@@ -11,7 +11,7 @@ class Command(BaseCommand):
         parser.add_argument('app_name')
         parser.add_argument('redirect_uri')
         parser.add_argument('--algo')
-        parser.add_argument('--noskip')
+        parser.add_argument('--noskip', type=bool)
 
     def handle(self, app_name, redirect_uri, **options):
         app, _ = Application.objects.get_or_create(name=app_name)
