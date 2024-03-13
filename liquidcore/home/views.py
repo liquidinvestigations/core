@@ -42,9 +42,6 @@ def app_permissions(user):
     for liquid_app in settings.LIQUID_APPS:
         id = liquid_app['id']
         if user.has_perm((f'home.use_{id}')):
-            if id == 'nextcloud28':
-                # add only office permission if nextcloud is enabled
-                app_perms.append('onlyoffice')
             app_perms.append(id)
     return app_perms
 
