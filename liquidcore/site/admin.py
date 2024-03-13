@@ -276,8 +276,8 @@ for model, model_admin in site._registry.items():
     if model._meta.app_label == 'otp_totp':
         continue
 
-    if model._meta.app_label == 'oauth2_provider':
-        continue
+#     if model._meta.app_label == 'oauth2_provider':
+#         continue
 
     liquid_admin.register(model, model_admin_cls)
 

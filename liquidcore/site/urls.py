@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.urls import path, include, re_path
+from django.shortcuts import redirect
 from .admin import liquid_admin
 from ..home import views
 from django.contrib.auth import views as auth_views
@@ -19,6 +20,10 @@ urlpatterns = [
     path('accounts/profile', views.profile, name='profile'),
     path('o/', include('oauth2_provider.urls', namespace='oauth2_provider')),
     path('system-health', views.healthchecks_page, name='healthchecks'),
+    # This openid-configuration is needed for greenlight OIDC configuration
+    path('.well-known/openid-configuration/',
+         lambda request: redirect('/o/.well-known/openid-configuration/',
+                                  permanent=True), name='redir_oidc'),
     path('', views.homepage, name='home'),
 ]
 
