@@ -5,7 +5,8 @@ from django.shortcuts import render
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
-
+import oauth2_provider.models
+from django.contrib.auth.admin import User
 import requests
 
 from .health_checks import get_report as get_health_check_report
@@ -50,6 +51,12 @@ def profile(request):
     user = request.user
 
     if not user.is_authenticated:
+        token = request.GET.get('access_token', '')
+        if token:
+            user_id = oauth2_provider.models.AccessToken.objects.get(token=token).user_id
+            user = User.objects.get(id=user_id)
+
+    if not user.is_authenticated:
         return HttpResponse('Unauthorized', status=401)
 
     fake_user_email = user.get_username() + '@' + settings.LIQUID_DOMAIN
@@ -79,8 +86,10 @@ def profile(request):
         'roles': roles + user_app_perms,
         # OpenID (matrix)
         "sub": fake_user_email,
-        "first_name": request.user.first_name,
-        "last_name": request.user.last_name,
+        "first_name": user.first_name,
+        "last_name": user.last_name,
+        "__str__": str(user),
+        "__type__": str(type(user)),
     })
 
 
