@@ -7,6 +7,7 @@ from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
 import oauth2_provider.models
 from django.contrib.auth.admin import User
+from datetime import datetime, timedelta
 import requests
 
 from .health_checks import get_report as get_health_check_report
@@ -16,7 +17,8 @@ log = logging.getLogger(__name__)
 
 @login_required
 def homepage(request):
-    return render(request, 'homepage.html', {
+    demo_mode = True
+    context = {
         'liquid_title': settings.LIQUID_TITLE,
         'liquid_apps': settings.LIQUID_APPS,
         'liquid_version': settings.LIQUID_VERSION,
@@ -24,7 +26,11 @@ def homepage(request):
         'liquid_enable_dashboards': settings.LIQUID_ENABLE_DASHBOARDS,
         '2fa_enabled': settings.LIQUID_2FA,
         'health_report': get_health_check_report(),
-    })
+        'demo_mode': settings.DEMO_MODE_ENABLED,
+    }
+    if demo_mode:
+        context['remaining_seconds'] = demo_seconds()
+    return render(request, 'homepage.html', context)
 
 
 @login_required
@@ -147,3 +153,10 @@ def proxy_dashboards(request):
     except Exception as e:
         log.exception(e)
         raise
+
+
+def demo_seconds():
+    now = datetime.now()
+    delta = timedelta(hours=1)
+    next_hour = (now + delta).replace(microsecond=0, second=0, minute=0)
+    return (next_hour - now).seconds
