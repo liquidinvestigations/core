@@ -11,14 +11,16 @@ class DemoModeAuthenticationMiddleware:
     def __call__(self, request):
         # before view is called
         if settings.DEMO_MODE_ENABLED:
-            print('demo mode request')
             try:
                 demo_user = User.objects.get(username='demo')
             except User.DoesNotExist:
                 demo_user = create_demo_user()
             request.user = demo_user
-            demo_user.last_login = timezone.now()
-            demo_user.save(update_fields=['last_login'])
+            print(demo_user.last_login)
+            if request.path == '/' and request.headers.get('User-Agent',
+                                                           '') != 'Consul Health Check':
+                demo_user.last_login = timezone.now()
+                demo_user.save(update_fields=['last_login'])
 
         response = self.get_response(request)
 
