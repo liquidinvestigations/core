@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.contrib.auth.admin import User
 from django.contrib.auth.models import Permission
+from django.utils import timezone
 
 
 class DemoModeAuthenticationMiddleware:
@@ -16,6 +17,8 @@ class DemoModeAuthenticationMiddleware:
             except User.DoesNotExist:
                 demo_user = create_demo_user()
             request.user = demo_user
+            demo_user.last_login = timezone.now()
+            demo_user.save(update_fields=['last_login'])
 
         response = self.get_response(request)
 

@@ -80,6 +80,7 @@ MIDDLEWARE = [
     'liquidcore.home.demo.DemoModeAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'liquidcore.home.maintenance.MaintenanceModeMiddleware',
 ]
 
 AUTH_STAFF_ONLY = bool_env(os.environ.get('AUTH_STAFF_ONLY'))
@@ -195,3 +196,6 @@ if DEMO_MODE_ENABLED:
     for app in LIQUID_APPS:
         if app.get('allow_all_users'):
             app['allow_all_users'] = False
+
+MAINTENANCE_FILE = '/app/maintenance'
+MAINTENANCE_HTML = '/app/liquidcore/home/templates/maintenance.html'
