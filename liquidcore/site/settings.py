@@ -198,4 +198,3 @@ if DEMO_MODE_ENABLED:
             app['allow_all_users'] = False
 
 MAINTENANCE_FILE = '/app/maintenance'
-MAINTENANCE_HTML = '/app/liquidcore/home/templates/maintenance.html'
