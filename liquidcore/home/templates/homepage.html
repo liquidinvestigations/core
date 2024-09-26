@@ -6,7 +6,32 @@
 <h1 class="shady">Liquid Investigations <br/> {{liquid_version}}</h1>
 <img src="{% static "icons/logo.png" %}" height="100" alt="Liquid Investigations">
 <h1 style="margin: 24px">{{ liquid_title }}</h1>
+<div id="countdown"></div>
+</br>
+{% if demo_mode %}
+<script>
+ // Get server time from Django view
+ var remainingSeconds = parseInt({{ remaining_seconds }});
+ console.log(remainingSeconds)
 
+ function updateCountdown() {
+   const minutes = Math.floor(remainingSeconds / 60);
+   const seconds = remainingSeconds % 60;
+
+   document.getElementById('countdown').innerHTML = 
+     `<b>${minutes} minutes and ${seconds} seconds</b> until the demo server will be reset`;
+
+   remainingSeconds--;
+
+   if (remainingSeconds <= 0) {
+     document.getElementById('countdown').innerHTML = "Time's up!";
+   }
+ }
+
+ updateCountdown();
+ setInterval(updateCountdown, 1000);
+</script>
+{% endif %}
 <p>
   {% if request.user.is_authenticated %}
     <span class="username">{{ request.user }}</span>

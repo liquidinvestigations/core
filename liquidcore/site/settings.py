@@ -77,8 +77,10 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'liquidcore.home.autologout.AutoLogoutMiddleware',
     'oauth2_provider.middleware.OAuth2TokenMiddleware',
+    'liquidcore.home.demo.DemoModeAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'liquidcore.home.maintenance.MaintenanceModeMiddleware',
 ]
 
 AUTH_STAFF_ONLY = bool_env(os.environ.get('AUTH_STAFF_ONLY'))
@@ -187,3 +189,12 @@ if os.getenv('SENTRY_DSN'):
     SENTRY_DSN = os.getenv('SENTRY_DSN')
     SENTRY_SAMPLE_RATE = float(os.getenv('SENTRY_SAMPLE_RATE', '1.0'))
     sentry_sdk.init(dsn=SENTRY_DSN, traces_sample_rate=SENTRY_SAMPLE_RATE)
+
+DEMO_MODE_ENABLED = bool_env(os.getenv('HOOVER_DEMO_MODE'))
+
+if DEMO_MODE_ENABLED:
+    for app in LIQUID_APPS:
+        if app.get('allow_all_users'):
+            app['allow_all_users'] = False
+
+MAINTENANCE_FILE = '/app/maintenance'

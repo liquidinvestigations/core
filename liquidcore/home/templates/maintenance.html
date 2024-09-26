@@ -1,0 +1,20 @@
+<!-- - Taken from here: https://gist.github.com/pitch-gist/2999707#file-gistfile1-html -->
+{% load tz %}
+<!doctype html>
+<title>Resetting Demo Server</title>
+<style>
+ body { text-align: center; padding: 150px; }
+ h1 { font-size: 50px; }
+ body { font: 20px Helvetica, sans-serif; color: #333; }
+ article { display: block; text-align: left; width: 650px; margin: 0 auto; }
+ a { color: #dc8100; text-decoration: none; }
+ a:hover { color: #333; text-decoration: none; }
+</style>
+
+<article>
+  <h1>Demo server is restarting!</h1>
+  <div>
+    <p>The demo server is currently being reset. In a few minutes it will be back online. Please wait a bit and try again.</p>
+    <p>Reset was initiated at: <br><br>{{ last_reset }}.</p>
+  </div>
+</article>
