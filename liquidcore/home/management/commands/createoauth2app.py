@@ -17,6 +17,7 @@ class Command(BaseCommand):
         app, _ = Application.objects.get_or_create(name=app_name)
         app.redirect_uris = redirect_uri
         app.client_type = 'confidential'
+        app.hash_client_secret = 'false'
         app.authorization_grant_type = 'authorization-code'
         app.user_id = None
 
