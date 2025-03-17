@@ -14,6 +14,7 @@ class AppPermissions(models.Model):
             ('use_rocketchat', 'Can use rocketchat'),
             ('use_hypothesis', 'Can use hypothesis'),
             ('use_wikijs', 'Can use Wiki.js'),
+            ('use_xwiki', 'Can use xwiki'),
             ('use_nextcloud28', 'Can use Nextcloud 28'),
             ('use_grist', 'Can use Grist worksheets'),
             ('use_prophecies', 'Can use ICIJ Prophecies'),
