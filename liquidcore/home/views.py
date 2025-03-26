@@ -53,6 +53,17 @@ def app_permissions(user):
     return app_perms
 
 
+def get_xwiki_groups(user):
+    xwiki_groups = ['XWikiAllGroup']
+    if user.is_staff or user.is_superuser:
+        xwiki_groups.append('XWikiAdminGroup')
+    for group in user.groups.all():
+        permissions = [perm.codename for perm in group.permissions.all()]
+        if 'use_xwiki' in permissions:
+            xwiki_groups.append(group.name)
+    return xwiki_groups
+
+
 def profile(request):
     user = request.user
 
@@ -90,6 +101,7 @@ def profile(request):
         # The proxy expects the group to
         # match the app id from the configuration.
         'roles': roles + user_app_perms,
+        'xwiki_groups': get_xwiki_groups(user),
         # OpenID (matrix)
         "sub": fake_user_email,
         "first_name": user.first_name,
